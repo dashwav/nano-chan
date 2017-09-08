@@ -1,3 +1,3 @@
-from bot.spoilerbot import Spoilerbot
+from bot.nanochan import Nanochan
 
-__all__ = ['Spoilerbot']
+__all__ = ['Nanochan']

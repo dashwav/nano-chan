@@ -6,7 +6,7 @@ from discord.ext.commands import Bot
 from time import time
 from logging import Formatter, INFO, StreamHandler, getLogger
 
-class Spoilerbot(Bot):
+class Nanochan(Bot):
     """
     actual bot class
     """
@@ -38,7 +38,7 @@ class Spoilerbot(Bot):
         returns a logger to be used
         :return: logger
         """
-        logger = getLogger('spoilerbot')
+        logger = getLogger('nanochan')
         console_handler = StreamHandler()
         console_handler.setFormatter(Formatter(
             '%(asctime)s %(levelname)s %(name)s: %(message)s')
@@ -47,7 +47,6 @@ class Spoilerbot(Bot):
         logger.setLevel(INFO)
         return logger
 
-    @Bot.event
     async def on_ready(self):
-        self.logger.info(f'Logged in as\n{self.bot.user.name}'
-                         f'\n{self.bot.user.id}\n------')
+        self.logger.info(f'\nLogged in as\n{self.user.name}'
+                         f'\n{self.user.id}\n------')

@@ -1,14 +1,14 @@
 """
 Actually runs the code
 """
-from bot import Spoilerbot
+from bot import Nanochan
 from cogs import Spoils, Filter
 from asyncio import get_event_loop
 
 
 def run():
     loop = get_event_loop()
-    bot = Spoilerbot()
+    bot = Nanochan()
     post_cog = Spoils(bot)
     filter_cog = Filter(bot)
     cogs = [
