@@ -17,13 +17,14 @@ class Spoils():
         self.embed.description = '\_\_\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'\
                                  '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\_\_\_\nSpoilers above'
         # create the background task and run it in the background
-        self.bg_task = self.bot.loop.create_task(self.my_background_task())
-
-    def __unload(self):
-        self.bg_task.cancel()
+        try:
+            self.bg_task = self.bot.loop.create_task(self.my_background_task())
+        except Exception as e:
+            self.log.warning(f"Error starting task {e}")
 
     async def my_background_task(self):
         await self.bot.wait_until_ready()
+        self.bot.logger.info("Starting spoiler task")
         while not self.bot.is_closed():
             for channel_id in self.bot.spoiler_channels:
                 try:
