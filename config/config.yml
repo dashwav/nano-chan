@@ -1,0 +1,21 @@
+bot_credentials:
+    # These are the credentials that are requred to get the bot running
+    client_id: ""
+    username: ""
+    token: ""
+    owner_id: ""
+
+spoiler_channels:
+    # Channel ids to check
+    - 123456789
+
+filter_channels:
+    #channel ids to filter
+    - 123456789
+
+filter_allowed:
+    - ".iam Clover"
+    - ".iam Member"
+
+# Wait time in seconds (default 10 min)
+wait_time: 600
