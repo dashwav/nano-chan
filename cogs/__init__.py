@@ -1,3 +1,5 @@
 from cogs.spoils import Spoils
 from cogs.filter import Filter
-__all__ = ['Filter', 'Spoils']
+from cogs.janitor import Janitor
+
+__all__ = ['Janitor', 'Filter', 'Spoils']

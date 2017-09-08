@@ -2,18 +2,17 @@
 Actually runs the code
 """
 from bot import Nanochan
-from cogs import Spoils, Filter
+from cogs import Spoils, Filter, Janitor
 from asyncio import get_event_loop
 
 
 def run():
     loop = get_event_loop()
     bot = Nanochan()
-    post_cog = Spoils(bot)
-    filter_cog = Filter(bot)
     cogs = [
-      post_cog,
-      filter_cog
+      Spoils(bot),
+      Filter(bot),
+      Janitor(bot)
     ]
     bot.start_bot(cogs)
 
