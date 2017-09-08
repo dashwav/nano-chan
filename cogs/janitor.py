@@ -7,7 +7,7 @@ class Janitor():
     """
     The main class wrapepr
     """
-    __init__(self, bot):
+    def __init__(self, bot):
         super().__init__()
         self.bot = bot
 
@@ -26,7 +26,7 @@ class Janitor():
                 has_member = True
 
         if has_clover and has_member:
-            member_roles.del(clover_index)
+            del member_roles[clover_index]
             try:
                 await message.author.edit(
                     roles=member_roles,
