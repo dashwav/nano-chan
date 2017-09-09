@@ -60,6 +60,11 @@ class Janitor():
     async def prune(self, ctx):
         await self.prune_clovers()
 
+    @prune.error
+    async def prune_error(self, ctx, error):
+        if isinstance(error, commands.errors.CheckFailure):
+            self.bot.logger.warning(f'{ctx.message.author} tried to run prune w/o permissions')
+
     async def daily_prune(self):
         await self.bot.wait_until_ready()
         self.bot.logger.info("Starting prune task, first prune in 24 hours")
