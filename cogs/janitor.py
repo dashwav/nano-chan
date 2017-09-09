@@ -83,7 +83,7 @@ class Janitor():
         audit_logs = a_irl.audit_logs(
             after=dt_24hr,
             action=AuditLogAction.member_role_update)
-        for entry in audit_logs:
+        async for entry in audit_logs:
             for role in entry.after.roles:
                 if role.name.lower() == 'clover':
                     safe_users.append(entry.target.id)
