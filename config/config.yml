@@ -1,9 +1,9 @@
-bot_credentials:
-    # These are the credentials that are requred to get the bot running
-    client_id: ""
-    username: ""
-    token: ""
-    owner_id: ""
+token: ""
+
+guild_id: 123456789
+
+mod_log: 123456798
+
 
 spoiler_channels:
     # Channel ids to check
