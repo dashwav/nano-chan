@@ -15,7 +15,7 @@ class Janitor():
         super().__init__()
         self.bot = bot
         try:
-            self.bg_task = self.bot.loop.create_task(self.prune_clovers())
+            self.bg_task = self.bot.loop.create_task(self.daily_prune())
         except Exception as e:
             self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
     
