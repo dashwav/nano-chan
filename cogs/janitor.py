@@ -66,11 +66,12 @@ class Janitor():
             await self.prune_clovers()
 
     async def prune_clovers(self):
+        self.bot.logger.info('Starting prune task now')
         safe_users = []
         clovers = []
         clover_role = None
         mod_log = self.bot.get_channel(self.bot.mod_log)
-        dt_24hr = datetime.utcnow() - timedelta(minutes=5)
+        dt_24hr = datetime.utcnow() - timedelta(days=1)
         a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
         for role in a_irl.roles:
             if role.name.lower() == 'clover':
@@ -84,9 +85,11 @@ class Janitor():
             after=dt_24hr,
             action=AuditLogAction.member_role_update)
         async for entry in audit_logs:
-            for role in entry.after.roles:
-                if role.name.lower() == 'clover':
-                    safe_users.append(entry.target.id)
+            if entry.created_at > dt_24hr:
+                for role in entry.after.roles:
+                    if role.name.lower() == 'clover':
+                        if entry.target.id not in safe_users:
+                            safe_users.append(entry.target.id)
         prune_info = {'pruned': False, 'amount': 0}
         for member in clovers:
             if member.id not in safe_users:
@@ -102,6 +105,7 @@ class Janitor():
                     self.bot.logger.warning(
                         f'Error pruning clovers: {e}'
                     )
+        self.bot.logger.info(f'Prune info: {prune_info}')
         if prune_info['pruned']:
             try:
                 await mod_log.send(f'Pruned {prune_info["amount"]} clovers')
