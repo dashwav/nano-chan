@@ -30,7 +30,7 @@ class Janitor():
     async def on_message(self, message):
         if message.author.bot:
             return
-        if message.channel.id in self.bot.filter_allowed:
+        if message.channel.id in self.bot.filter_channels:
             return
         has_clover = False
         clover_index = None
@@ -55,7 +55,7 @@ class Janitor():
                 self.bot.logger.warning(f'Error updating users roles: {e}')
 
     @commands.command(hidden=True)
-    async def prune(self):
+    async def prune(self, ctx):
         await self.prune_clovers()
 
     async def daily_prune(self):
@@ -107,4 +107,3 @@ class Janitor():
                 await mod_log.send(f'Pruned {prune_info["amount"]} clovers')
             except Exception as e:
                 self.bot.logger.warning(f'Error posting prune info to mod_log: {e}')
-                
