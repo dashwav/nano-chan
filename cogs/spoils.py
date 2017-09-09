@@ -14,8 +14,10 @@ class Spoils():
         self.bot = bot
         self.wait_time = bot.wait_time
         self.embed = discord.Embed(title='Clear Spoilers', type='rich')
-        self.embed.description = '\_\_\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n'\
-                                 '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\_\_\_\nSpoilers above'
+        self.embed.description = '\_\_\_\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
+                                 '\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
+                                 '\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
+                                 '\n \n \n \n \n \n \n \n \n\_\_\_\nSpoilers above'
         # create the background task and run it in the background
         try:
             self.bg_task = self.bot.loop.create_task(self.my_background_task())

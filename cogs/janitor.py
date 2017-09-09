@@ -32,5 +32,6 @@ class Janitor():
                     roles=member_roles,
                     reason="User upgraded from clover to member")
                 await message.add_reaction('🎊')
+                self.bot.logger.info(f'{message.author.display_name} was just promoted to member!')
             except Exception as e:
                 self.bot.logger.warning(f'Error updating users roles: {e}')

@@ -22,7 +22,7 @@ class Filter():
         else:
             try:
                 await message.delete()
-                self.bot.logger.info(f'Successfully deleted message from: {message.author.nick}')
+                self.bot.logger.info(f'Successfully deleted message from: {message.author.display_name}')
             except Exception as e:
                 self.bot.logger.warning(f'Error deleting message: {e}')
         
