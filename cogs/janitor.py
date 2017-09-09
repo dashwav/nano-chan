@@ -4,6 +4,7 @@ This cog is to be used primarily for small janitorial tasks
 """
 from discord import AuditLogAction
 from discord.ext import commands
+from .utils import checks
 from datetime import datetime, timedelta
 import asyncio
 
@@ -55,6 +56,7 @@ class Janitor():
                 self.bot.logger.warning(f'Error updating users roles: {e}')
 
     @commands.command(hidden=True)
+    @checks.has_permissions(manage_roles=True)
     async def prune(self, ctx):
         await self.prune_clovers()
 
@@ -108,6 +110,6 @@ class Janitor():
         self.bot.logger.info(f'Prune info: {prune_info}')
         if prune_info['pruned']:
             try:
-                await mod_log.send(f'Pruned {prune_info["amount"]} clovers')
+                await mod_log.send(f'Pruned {prune_info["amount"]} clovers ✂️🍀')
             except Exception as e:
                 self.bot.logger.warning(f'Error posting prune info to mod_log: {e}')
