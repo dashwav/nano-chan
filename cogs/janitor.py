@@ -40,8 +40,8 @@ class Janitor():
                 has_clover = True
             elif role.name.lower() == 'member':
                 has_member = True
-        if message.channel in self.bot.filter_channels:
-            if message.content == '.iam Clover':
+        if message.channel.id in self.bot.filter_channels:
+            if message.content.lower() == '.iam clover':
                 await self.add_clover(message, has_member)
             return
         if has_clover and has_member:
@@ -91,8 +91,9 @@ class Janitor():
                 roles=member_roles,
                 reason=f'Self-applied role in #welcome-center'
             )
-            self.bot.logger.warning(
+            self.bot.logger.info(
                 f'Successfully applied clover to {message.author.display_name}')
+            await message.delete()
         except Exception as e:
             self.bot.logger.warning(
                 f'Error applying role to {message.author.display_name}: {e}')
