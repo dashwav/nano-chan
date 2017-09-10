@@ -31,8 +31,6 @@ class Janitor():
     async def on_message(self, message):
         if message.author.bot:
             return
-        if message.channel.id in self.bot.filter_channels:
-            return
         has_clover = False
         clover_index = None
         has_member = False
@@ -42,7 +40,10 @@ class Janitor():
                 has_clover = True
             elif role.name.lower() == 'member':
                 has_member = True
-
+        if message.channel in self.bot.filter_channels:
+            if message.content == '.iam Clover':
+                await self.add_clover(message, has_member)
+            return
         if has_clover and has_member:
             member_roles = self.remove_clover(message.author)
             try:
@@ -66,6 +67,32 @@ class Janitor():
         while not self.bot.is_closed():
             await asyncio.sleep(86400)
             await self.prune_clovers()
+
+    async def add_clover(self, message, has_member):
+        if has_member:
+            return
+        a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
+        for role in a_irl.roles:
+            if role.name.lower() == 'clover':
+                clover_role = role
+        if not clover_role:
+            self.bot.logger.warning(
+                f'Something went really wrong, I couldn\'t find the clover role')
+            return
+        member_roles = message.author.roles
+        member_roles.append(clover_role)
+        try:
+            await message.author.edit(
+                roles=member_roles,
+                reason=f'Self-applied role in #welcome-center'
+            )
+            self.bot.logger.warning(
+                f'Successfully applied clover to {message.author.display_name}')
+        except Exception as e:
+            self.bot.logger.warning(
+                f'Error applying role to {message.author.display_name}: {e}')
+        return
+
 
     async def prune_clovers(self):
         self.bot.logger.info('Starting prune task now')
