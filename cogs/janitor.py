@@ -42,7 +42,9 @@ class Janitor():
                 has_member = True
         if message.channel.id in self.bot.filter_channels:
             if message.content.lower() == '.iam clover':
-                await self.add_clover(message, has_member)
+                await self.add_clover(message, has_member, False)
+            elif message.content.lower() == '.iam member':
+                await self.add_clover(message, has_member, True)
             return
         if has_clover and has_member:
             member_roles = self.remove_clover(message.author)
@@ -73,26 +75,27 @@ class Janitor():
             await asyncio.sleep(86400)
             await self.prune_clovers()
 
-    async def add_clover(self, message, has_member):
+    async def add_clover(self, message, has_member, add_member):
+        role_name = 'member' if add_member else 'clover' 
         if has_member:
             return
         a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
         for role in a_irl.roles:
-            if role.name.lower() == 'clover':
-                clover_role = role
-        if not clover_role:
+            if role.name.lower() == role_name:
+                add_role = role
+        if not add_role:
             self.bot.logger.warning(
-                f'Something went really wrong, I couldn\'t find the clover role')
+                f'Something went really wrong, I couldn\'t find the {role_name} role')
             return
         member_roles = message.author.roles
-        member_roles.append(clover_role)
+        member_roles.append(add_role)
         try:
             await message.author.edit(
                 roles=member_roles,
                 reason=f'Self-applied role in #welcome-center'
             )
             self.bot.logger.info(
-                f'Successfully applied clover to {message.author.display_name}')
+                f'Successfully applied {role_name} to {message.author.display_name}')
             await message.delete()
         except Exception as e:
             self.bot.logger.warning(
