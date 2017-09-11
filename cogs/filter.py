@@ -17,7 +17,7 @@ class Filter():
         if message.author.bot:
             return
         cleaned_message = message.clean_content
-        if cleaned_message in self.filter_allowed:
+        if cleaned_message.lower() in self.filter_allowed:
             return
         else:
             try:
