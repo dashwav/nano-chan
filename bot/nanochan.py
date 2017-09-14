@@ -19,6 +19,7 @@ class Nanochan(Bot):
             config = yaml.load(yml_config)
         self.credentials = config['token']
         self.guild_id = config['guild_id']
+        self.bot_owner_id = config['owner_id']
         self.mod_log = config['mod_log']
         self.filter_channels = config['filter_channels']
         self.filter_allowed = config['filter_allowed']

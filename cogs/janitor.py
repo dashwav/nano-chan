@@ -17,9 +17,28 @@ class Janitor():
         self.bot = bot
         try:
             self.bg_task = self.bot.loop.create_task(self.daily_prune())
+            self.owner_task = self.bot.loop.create_task(self.setup_owner_dm())
         except Exception as e:
             self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
     
+    async def setup_owner_dm(self):
+        await self.bot.wait_until_ready()
+        self.bot.logger.info(f'Setting up owner channel {self.bot.bot_owner_id}')
+        try:
+            self.owner = await self.bot.get_user_info(self.bot.bot_owner_id)
+        except Exception as e:
+            self.bot.logger.warning(f'Error getting owner: {e}')
+        self.bot.logger.info(f'User retrieved: {self.owner.name}')
+        try:
+            try:
+                await self.owner.create_dm()
+            except Exception as e:
+                self.bot.logger.warning(f'Error creating dm channel: {e}')  
+            await self.owner.dm_channel.send('Bot started successfully')
+        except Exception as e:
+            self.bot.logger.warning(f'Error getting dm channel: {e}')
+
+        
     def remove_clover(self, member) -> list:
         member_roles = member.roles
         for index, role in enumerate(member_roles):
@@ -69,7 +88,6 @@ class Janitor():
             self.bot.logger.warning(f'{ctx.message.author} tried to run prune w/o permissions')
 
     async def daily_prune(self):
-        await self.bot.wait_until_ready()
         self.bot.logger.info("Starting prune task, first prune in 24 hours")
         while not self.bot.is_closed():
             await asyncio.sleep(86400)
@@ -97,6 +115,8 @@ class Janitor():
             self.bot.logger.info(
                 f'Successfully applied {role_name} to {message.author.display_name}')
             await message.delete()
+            await self.owner.dm_channel.send(
+                f'Successfully applied {role_name} to {message.author.display_name}')
         except Exception as e:
             self.bot.logger.warning(
                 f'Error applying role to {message.author.display_name}: {e}')
