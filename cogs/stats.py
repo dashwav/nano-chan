@@ -18,16 +18,7 @@ class Stats:
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
     async def stats_reactions(self, ctx):
-        emoji_list = []
-        for emoji in ctx.message.guild.emojis:
-            emoji_list.append(
-                {
-                    'emoji_name': emoji.name,
-                    'emoji_id': emoji.id,
-                    'count': 0
-                }
-            )
-        print(emoji_list)
+        found_emojis = []
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
         for channel in ctx.message.guild.channels:
             try:
@@ -37,6 +28,9 @@ class Stats:
             async for message in message_history:
                 for word in message.content.split():
                     if '<:' in word:
-                        word = re.sub(r'\:(.*?)\:', ' ', word)
-                        word = re.sub(r'[<>]', '', word)
-                        print(word)
+                        found_emojis.append(word)
+        for emoji_id in found_emojis:
+            for emoji in ctx.message.guild.emojis:
+                if emoji_id == emoji:
+                    print(emoji.name)
+                    
