@@ -12,7 +12,7 @@ async def confirm(ctx:commands.Context, member_to_kick, reason):
     message - Optional messsage that the question should ask.
     """
     message = create_confirm_embed(ctx, ctx.guild, member_to_kick, reason)
-    await ctx.send(embed=message, delete_after=10)
+    confirmation_message = await ctx.send(embed=message, delete_after=10)
     try:
         message = await ctx.bot.wait_for("message", timeout=10,
                                          check=lambda message: message.author == ctx.message.author)
@@ -21,9 +21,10 @@ async def confirm(ctx:commands.Context, member_to_kick, reason):
     if message.clean_content.lower() != 'confirm':
         return False
     try:
+        await confirmation_message.delete()
         await message.delete()
     except Exception as e:
-        pass
+        print(f'Error in deleting message: {e}')
     return True
 
 def create_confirm_embed(ctx, server_name, member_to_kick, reason):

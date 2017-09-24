@@ -102,6 +102,7 @@ class Moderation:
                     self.bot.logger.warning(f'Error messaging user!: {e}')
                 await ctx.guild.ban(
                     discord.Object(id=member_id),
+                    delete_message_days=0,
                     reason=f'by: {ctx.author} for: {reason}')
                 await ctx.send('\N{OK HAND SIGN}', delete_after=3)
             except Exception as e:
