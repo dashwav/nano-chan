@@ -1,7 +1,7 @@
 """
 Fun things with stats
 """
-
+import re
 import discord
 import datetime
 from .utils import helpers, checks
@@ -30,7 +30,13 @@ class Stats:
         print(emoji_list)
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
         for channel in ctx.message.guild.channels:
-            message_history = channel.history(after=check_date)
+            try:
+                message_history = channel.history(after=check_date)
+            except Exception as e:
+                self.bot.logger.warning(f'Issue getting channel history: {e}')
             async for message in message_history:
                 for word in message.content.split():
-                    print(word)
+                    if '<:' in word:
+                        word = re.sub(r'\:(.*?)\:', ' ', word)
+                        word = re.sub(r'[<>]', '', word)
+                        print(word)
