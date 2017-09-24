@@ -26,7 +26,7 @@ class Nanochan(Bot):
         self.spoiler_channels = config['spoiler_channels']
         self.wait_time = config['wait_time']
         self.logger = self.__get_logger()
-        super().__init__('?~')
+        super().__init__('-')
     
     def start_bot(self, cogs):
         """
