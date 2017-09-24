@@ -24,7 +24,7 @@ class Stats:
         emoji_count = defaultdict(int)
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
         for channel in ctx.message.guild.channels:
-            if channel.id in [355506341495832577, 1234]:
+            if channel.id in self.bot.emoji_ignore_channels:
                 pass
             else:
                 try:

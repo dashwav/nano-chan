@@ -21,6 +21,7 @@ class Nanochan(Bot):
         self.guild_id = config['guild_id']
         self.bot_owner_id = config['owner_id']
         self.mod_log = config['mod_log']
+        self.emoji_ignore_channels = config['emoji_ignore_channels']
         self.filter_channels = config['filter_channels']
         self.filter_allowed = config['filter_allowed']
         self.spoiler_channels = config['spoiler_channels']
