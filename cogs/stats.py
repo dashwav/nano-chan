@@ -22,15 +22,16 @@ class Stats:
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
         for channel in ctx.message.guild.channels:
             try:
-                message_history = channel.history(after=check_date)
+                message_history = channel.history(limit=None, after=check_date)
             except Exception as e:
                 self.bot.logger.warning(f'Issue getting channel history: {e}')
             async for message in message_history:
                 for word in message.content.split():
                     if '<:' in word:
                         found_emojis.append(word)
+        print(found_emojis)
         for emoji_id in found_emojis:
             for emoji in ctx.message.guild.emojis:
-                if emoji_id == emoji:
+                if emoji_id == str(emoji):
                     print(emoji.name)
                     
