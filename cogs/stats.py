@@ -18,7 +18,7 @@ class Stats:
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
-    async def stats_reactions(self, ctx):
+    async def stats_emoji(self, ctx):
         found_emojis = []
         total_reactions = defaultdict(int)
         emoji_count = defaultdict(int)
