@@ -19,7 +19,7 @@ class Stats:
     @checks.has_permissions(manage_emojis=True)
     async def stats_reactions(self, ctx):
         emoji_list = []
-        for emoji in ctx.Guild.emoji:
+        for emoji in ctx.message.guild.emojis:
             emoji_list.append(
                 {
                     'emoji_name': emoji.name,
@@ -29,8 +29,8 @@ class Stats:
             )
         print(emoji_list)
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
-        for channel in ctx.Guild.channels:
+        for channel in ctx.message.guild.channels:
             message_history = channel.history(after=check_date)
-            for message in message_history:
-                for word in message.split():
+            async for message in message_history:
+                for word in message.content.split():
                     print(word)
