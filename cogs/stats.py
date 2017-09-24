@@ -36,7 +36,7 @@ class Stats:
             for emoji in ctx.message.guild.emojis:
                 if emoji_id == str(emoji):
                     emoji_count[emoji] += 1
-        temp_str = 'Emoji use over last 30 days:'
-        for key, value in emoji_count:
-            temp_str += f'{key}: {value}\n'
-        ctx.send(temp_str)
+        temp_str = 'Emoji use over last 30 days:\n'
+        for key in sorted(emoji_count, key=emoji_count.get, reverse=True):
+            temp_str += f'{key}: {emoji_count[key]}\n'
+        await ctx.send(temp_str)
