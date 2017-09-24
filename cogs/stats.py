@@ -24,17 +24,19 @@ class Stats:
         emoji_count = defaultdict(int)
         check_date = datetime.datetime.now() + datetime.timedelta(-30)
         for channel in ctx.message.guild.channels:
-            try:
-                message_history = channel.history(limit=None, after=check_date)
-            except Exception as e:
-                self.bot.logger.warning(f'Issue getting channel history: {e}')
-            async for message in message_history:
-                for word in message.content.split():
-                    if '<:' in word:
-                        found_emojis.append(word)
-                for reaction in message.reactions:
-                    total_reactions[reaction.emoji] += reaction.count
-        print(found_emojis)
+            if channel.id in [355506341495832577, 1234]:
+                pass
+            else:
+                try:
+                    message_history = channel.history(limit=None, after=check_date)
+                except Exception as e:
+                    self.bot.logger.warning(f'Issue getting channel history: {e}')
+                async for message in message_history:
+                    for word in message.content.split():
+                        if '<:' in word:
+                            found_emojis.append(word)
+                    for reaction in message.reactions:
+                        total_reactions[reaction.emoji] += reaction.count
         for emoji_id in found_emojis:
             for emoji in ctx.message.guild.emojis:
                 if emoji_id == str(emoji):
