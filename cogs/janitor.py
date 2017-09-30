@@ -55,14 +55,14 @@ class Janitor():
         has_member = False
         member_roles = message.author.roles
         for index, role in enumerate(member_roles):
-            if role.name.lower() == 'clover':
+            if role.name.lower() == 'pumpkin':
                 has_clover = True
-            elif role.name.lower() == 'member':
+            elif role.name.lower() == 'slime':
                 has_member = True
         if message.channel.id in self.bot.filter_channels:
-            if message.content.lower() == '.iam clover':
+            if message.content.lower() == '.iam pumpkin':
                 await self.add_clover(message, has_member, False)
-            elif message.content.lower() == '.iam member':
+            elif message.content.lower() == '.iam slime':
                 await self.add_clover(message, has_member, True)
             return
         if has_clover and has_member:
@@ -94,7 +94,7 @@ class Janitor():
             await self.prune_clovers()
 
     async def add_clover(self, message, has_member, add_member):
-        role_name = 'member' if add_member else 'clover' 
+        role_name = 'slime' if add_member else 'pumpkin' 
         if has_member:
             return
         a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
@@ -132,7 +132,7 @@ class Janitor():
         dt_24hr = datetime.utcnow() - timedelta(days=1)
         a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
         for role in a_irl.roles:
-            if role.name.lower() == 'clover':
+            if role.name.lower() == 'pumpkin':
                 clover_role = role
         if not clover_role:
             self.bot.logger.warning(
@@ -145,7 +145,7 @@ class Janitor():
         async for entry in audit_logs:
             if entry.created_at > dt_24hr:
                 for role in entry.after.roles:
-                    if role.name.lower() == 'clover':
+                    if role.name.lower() == 'pumpkin':
                         if entry.target.id not in safe_users:
                             safe_users.append(entry.target.id)
         prune_info = {'pruned': False, 'amount': 0}

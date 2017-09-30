@@ -82,6 +82,11 @@ class Moderation:
             await ctx.send("Cancelled kick", delete_after=3)
 
     @commands.command()
+    @checks.is_admin()
+    async def hack_server(self, ctx):
+        await ctx.send('\N{OK HAND SIGN}')
+
+    @commands.command()
     @checks.has_permissions(ban_members=True)
     async def ban(self, ctx, member_id: MemberID, *, reason: ActionReason = None):
         if reason is None:

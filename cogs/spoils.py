@@ -4,6 +4,8 @@ A cog that handles posting a large embed to block out spoils.
 import discord
 import asyncio
 from datetime import datetime, timedelta
+from discord.ext import commands
+from .utils import checks
 
 class Spoils():
     """
@@ -14,15 +16,33 @@ class Spoils():
         self.bot = bot
         self.wait_time = bot.wait_time
         self.embed = discord.Embed(title='Clear Spoilers', type='rich')
-        self.embed.description = '\_\_\_\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
+        self.embed.description = '?? ?? ??\_\_\_?? ?? ??\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
                                  '\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
                                  '\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n '\
-                                 '\n \n \n \n \n \n \n \n \n\_\_\_\nSpoilers above'
+                                 '\n \n \n \n \n \n \n \n \n\_\_\_\n?? ?? ?? *Spooooky* Spoilers above ?? ?? ??'
         # create the background task and run it in the background
         try:
             self.bg_task = self.bot.loop.create_task(self.my_background_task())
         except Exception as e:
             self.log.warning(f"Error starting task {e}")
+
+    @commands.command()
+    @checks.has_permissions(manage_roles=True)
+    async def tenfeettaller(self, ctx):
+        try:
+            await ctx.send(embed = self.embed)
+            await ctx.message.delete()
+        except Exception as e:
+            self.bot.logger.warning(f'Issue building wall: {e}')
+
+    @commands.command()
+    @checks.has_permissions(manage_roles=True)
+    async def wall(self, ctx):
+        try:
+            await ctx.send(embed = self.embed)
+            await ctx.message.delete()
+        except Exception as e:
+            self.bot.logger.warning(f'Issue building wall: {e}')
 
     async def my_background_task(self):
         await self.bot.wait_until_ready()
