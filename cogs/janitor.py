@@ -71,7 +71,7 @@ class Janitor():
                 await message.author.edit(
                     roles=member_roles,
                     reason="User upgraded from clover to member")
-                await message.add_reaction('🎊')
+                await message.add_reaction('👻')
                 self.bot.logger.info(
                     f'{message.author.display_name} was just promoted to member!')
             except Exception as e:
@@ -166,6 +166,6 @@ class Janitor():
         self.bot.logger.info(f'Prune info: {prune_info}')
         if prune_info['pruned']:
             try:
-                await mod_log.send(f'Pruned {prune_info["amount"]} clovers ✂️🍀')
+                await mod_log.send(f'👻🎃👻 Pruned {prune_info["amount"]} pumpkins 👻🎃👻')
             except Exception as e:
                 self.bot.logger.warning(f'Error posting prune info to mod_log: {e}')
