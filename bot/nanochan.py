@@ -6,6 +6,7 @@ from discord.ext.commands import Bot
 from time import time
 from logging import Formatter, INFO, StreamHandler, getLogger
 
+
 class Nanochan(Bot):
     """
     actual bot class
@@ -28,7 +29,7 @@ class Nanochan(Bot):
         self.wait_time = config['wait_time']
         self.logger = self.__get_logger()
         super().__init__('-')
-    
+
     def start_bot(self, cogs):
         """
         actually start the bot

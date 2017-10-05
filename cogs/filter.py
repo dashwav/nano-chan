@@ -3,6 +3,7 @@ A cog that filters all but a specific few phrases. (ignores bots)
 """
 import discord
 
+
 class Filter():
 
     def __init__(self, bot):
@@ -22,7 +23,8 @@ class Filter():
         else:
             try:
                 await message.delete()
-                self.bot.logger.info(f'Successfully deleted message from: {message.author.display_name}')
+                self.bot.logger.info(
+                    'Successfully deleted message from: '
+                    f'{message.author.display_name}')
             except Exception as e:
                 self.bot.logger.warning(f'Error deleting message: {e}')
-        

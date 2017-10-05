@@ -7,9 +7,11 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from .utils import checks
 
+
 class Spoils():
     """
-    Class that creates a task to run every minute and check for time since last post
+    Class that creates a task to run every minute and check for
+    time since last post
     """
     def __init__(self, bot):
         super().__init__()
@@ -30,7 +32,7 @@ class Spoils():
     @checks.has_permissions(manage_roles=True)
     async def tenfeettaller(self, ctx):
         try:
-            await ctx.send(embed = self.embed)
+            await ctx.send(embed=self.embed)
             await ctx.message.delete()
         except Exception as e:
             self.bot.logger.warning(f'Issue building wall: {e}')
@@ -39,7 +41,7 @@ class Spoils():
     @checks.has_permissions(manage_roles=True)
     async def wall(self, ctx):
         try:
-            await ctx.send(embed = self.embed)
+            await ctx.send(embed=self.embed)
             await ctx.message.delete()
         except Exception as e:
             self.bot.logger.warning(f'Issue building wall: {e}')
@@ -50,11 +52,11 @@ class Spoils():
         while not self.bot.is_closed():
             for channel_id in self.bot.spoiler_channels:
                 try:
-                    channel = self.bot.get_channel(channel_id) # channel ID goes here
+                    channel = self.bot.get_channel(channel_id)
                 except Exception as e:
-                    self.bot.logger.warning(f'Error getting channel {channel_id}: {e}')
+                    self.bot.logger.warning(
+                        f'Error getting channel {channel_id}: {e}')
                 if channel:
-                    iterator = channel.history(limit=1)
                     async for message in channel.history(limit=1):
                         if not message.author.bot:
                             last_post = datetime.utcnow() - message.created_at
@@ -62,7 +64,10 @@ class Spoils():
                                 try:
                                     await channel.send(embed=self.embed)
                                 except Exception as e:
-                                    self.bot.logger.warning(f'Error posting to channel {channel_id}: {e}')
+                                    self.bot.logger.warning(
+                                        f'Error posting to channel'
+                                        f' {channel_id}: {e}')
                 else:
-                    self.bot.logger.warning(f'Couldn\'t find channel: {channel_id}: {e}')
-            await asyncio.sleep(60) # task runs every 60 seconds
+                    self.bot.logger.warning(
+                        f'Couldn\'t find channel: {channel_id}: {e}')
+            await asyncio.sleep(60)

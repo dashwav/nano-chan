@@ -1,12 +1,12 @@
 """
 Fun things with stats
 """
-import re
 import discord
 import datetime
 from collections import defaultdict
 from .utils import helpers, checks
 from discord.ext import commands
+
 
 class Stats:
     """
@@ -30,9 +30,11 @@ class Stats:
                     pass
                 else:
                     try:
-                        message_history = channel.history(limit=None, after=check_date)
+                        message_history = channel.history(
+                            limit=None, after=check_date)
                     except Exception as e:
-                        self.bot.logger.warning(f'Issue getting channel history: {e}')
+                        self.bot.logger.warning(
+                            f'Issue getting channel history: {e}')
                     async for message in message_history:
                         for word in message.content.split():
                             if '<:' in word:

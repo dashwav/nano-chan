@@ -1,5 +1,5 @@
 """
-This cog is to be used primarily for small janitorial tasks 
+This cog is to be used primarily for small janitorial tasks
 (removing clover once member is hit, pruning clovers)
 """
 from discord import AuditLogAction
@@ -7,6 +7,7 @@ from discord.ext import commands
 from .utils import checks
 from datetime import datetime, timedelta
 import asyncio
+
 
 class Janitor():
     """
@@ -20,10 +21,11 @@ class Janitor():
             self.owner_task = self.bot.loop.create_task(self.setup_owner_dm())
         except Exception as e:
             self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
-    
+
     async def setup_owner_dm(self):
         await self.bot.wait_until_ready()
-        self.bot.logger.info(f'Setting up owner channel {self.bot.bot_owner_id}')
+        self.bot.logger.info(
+            f'Setting up owner channel {self.bot.bot_owner_id}')
         try:
             self.owner = await self.bot.get_user_info(self.bot.bot_owner_id)
         except Exception as e:
@@ -33,16 +35,15 @@ class Janitor():
             try:
                 await self.owner.create_dm()
             except Exception as e:
-                self.bot.logger.warning(f'Error creating dm channel: {e}')  
+                self.bot.logger.warning(f'Error creating dm channel: {e}')
             await self.owner.dm_channel.send('Bot started successfully')
         except Exception as e:
             self.bot.logger.warning(f'Error getting dm channel: {e}')
 
-        
     def remove_clover(self, member) -> list:
         member_roles = member.roles
         for index, role in enumerate(member_roles):
-            if role.name.lower() == 'clover':
+            if role.name.lower() == 'pumpkin':
                 clover_index = index
         del member_roles[clover_index]
         return member_roles
@@ -51,7 +52,6 @@ class Janitor():
         if message.author.bot:
             return
         has_clover = False
-        clover_index = None
         has_member = False
         member_roles = message.author.roles
         for index, role in enumerate(member_roles):
@@ -73,9 +73,11 @@ class Janitor():
                     reason="User upgraded from clover to member")
                 await message.add_reaction('👻')
                 self.bot.logger.info(
-                    f'{message.author.display_name} was just promoted to member!')
+                    f'{message.author.display_name}'
+                    ' was just promoted to member!')
             except Exception as e:
-                self.bot.logger.warning(f'Error updating users roles: {e}')
+                self.bot.logger.warning(
+                    f'Error updating users roles: {e}')
 
     @commands.command(hidden=True)
     @checks.has_permissions(manage_roles=True)
@@ -85,7 +87,8 @@ class Janitor():
     @prune.error
     async def prune_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
-            self.bot.logger.warning(f'{ctx.message.author} tried to run prune w/o permissions')
+            self.bot.logger.warning(f'{ctx.message.author} '
+                                    'tried to run prune w/o permissions')
 
     async def daily_prune(self):
         self.bot.logger.info("Starting prune task, first prune in 24 hours")
@@ -94,16 +97,17 @@ class Janitor():
             await self.prune_clovers()
 
     async def add_clover(self, message, has_member, add_member):
-        role_name = 'slime' if add_member else 'pumpkin' 
+        role_name = 'slime' if add_member else 'pumpkin'
         if has_member:
             return
-        a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
+        a_irl = self.bot.get_guild(self.bot.guild_id)
         for role in a_irl.roles:
             if role.name.lower() == role_name:
                 add_role = role
         if not add_role:
             self.bot.logger.warning(
-                f'Something went really wrong, I couldn\'t find the {role_name} role')
+                f'Something went really wrong, I couldn\'t'
+                f' find the {role_name} role')
             return
         member_roles = message.author.roles
         member_roles.append(add_role)
@@ -113,15 +117,16 @@ class Janitor():
                 reason=f'Self-applied role in #welcome-center'
             )
             self.bot.logger.info(
-                f'Successfully applied {role_name} to {message.author.display_name}')
+                f'Successfully applied {role_name} to '
+                f'{message.author.display_name}')
             await message.delete()
             await self.owner.dm_channel.send(
-                f'Successfully applied {role_name} to {message.author.display_name}')
+                f'Successfully applied {role_name} to '
+                f'{message.author.display_name}')
         except Exception as e:
             self.bot.logger.warning(
                 f'Error applying role to {message.author.display_name}: {e}')
         return
-
 
     async def prune_clovers(self):
         self.bot.logger.info('Starting prune task now')
@@ -130,13 +135,14 @@ class Janitor():
         clover_role = None
         mod_log = self.bot.get_channel(self.bot.mod_log)
         dt_24hr = datetime.utcnow() - timedelta(days=1)
-        a_irl = self.bot.get_guild(self.bot.guild_id) # a_irl guild id
+        a_irl = self.bot.get_guild(self.bot.guild_id)
         for role in a_irl.roles:
             if role.name.lower() == 'pumpkin':
                 clover_role = role
         if not clover_role:
             self.bot.logger.warning(
-                f'Something went really wrong, I couldn\'t find the clover role')
+                'Something went really wrong, '
+                'I couldn\'t find the clover role')
             return
         clovers = clover_role.members
         audit_logs = a_irl.audit_logs(
@@ -166,6 +172,8 @@ class Janitor():
         self.bot.logger.info(f'Prune info: {prune_info}')
         if prune_info['pruned']:
             try:
-                await mod_log.send(f'👻🎃👻 Pruned {prune_info["amount"]} pumpkins 👻🎃👻')
+                await mod_log.send(
+                    f'👻🎃👻 Picked {prune_info["amount"]} pumpkins 👻🎃👻')
             except Exception as e:
-                self.bot.logger.warning(f'Error posting prune info to mod_log: {e}')
+                self.bot.logger.warning(
+                    f'Error posting prune info to mod_log: {e}')
