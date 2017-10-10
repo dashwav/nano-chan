@@ -4,7 +4,7 @@ Database utility functions.
 from datetime import datetime
 from json import dumps, loads
 from typing import Optional
-from nanochan.enums import Change, Action
+from .enums import Change, Action
 try:
     from asyncpg import Record, InterfaceError, create_pool
     from asyncpg.pool import Pool
@@ -50,18 +50,18 @@ async def make_tables(pool: Pool, schema: str):
       targetid BIGINT,
       action SMALLINT,
       logtime TIMESTAMP DEFAULT current_timestamp,
-      PRIMARY KEY (serverid, userid, targetid, action)
+      PRIMARY KEY (serverid, modid, targetid, action)
     );
     """.format(schema)
 
     servers = """
     CREATE TABLE IF NOT EXISTS {}.servers (
       serverid BIGINT,
-      assignableroles ANNYARRAY,
-      filterwordswhite ANYARRAY,
-      filterwordsblack ANYARRAY,
-      blacklistchannels ANYARRAY,
-      r9kchannels ANYARRAY,
+      assignableroles varchar ARRAY,
+      filterwordswhite varchar ARRAY,
+      filterwordsblack varchar ARRAY,
+      blacklistchannels integer ARRAY,
+      r9kchannels integer ARRAY,
       addtime TIMESTAMP DEFAULT current_timestamp,
       PRIMARY KEY (serverid)
     );""".format(schema)
@@ -82,6 +82,7 @@ class PostgresController():
         self.schema = schema
         self.logger = logger
 
+    @classmethod
     async def get_instance(cls, logger=None, connect_kwargs: dict = None,
                            pool: Pool = None, schema: str = 'nanochan'):
         """

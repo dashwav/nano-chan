@@ -65,17 +65,17 @@ class Moderation:
         self.bot = bot
 
     @commands.command()
-    @checks.has_permissions(kick_members=True)
-    async def set_playing(self, ctx, *, game=None):
-        if game:
-            await self.bot.change_presence(game=discord.Game(name=game))
-        ctx.delete()
+    @checks.is_admin()
+    async def set_playing(self, ctx, *, playing = None):
+        if playing:
+            
 
     @commands.command()
     @checks.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *,
                    reason: ActionReason = None):
         if reason is None:
+
                 await ctx.send(
                     "You need to supply a reason, try again.",
                     delete_after=5)

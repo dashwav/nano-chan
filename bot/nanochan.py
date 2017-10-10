@@ -5,22 +5,7 @@ import yaml
 from discord.ext.commands import Bot
 from time import time
 from logging import Formatter, INFO, StreamHandler, getLogger
-from utils.db_utils import PostgresController
-
-
-def __get_logger():
-        """
-        returns a logger to be used
-        :return: logger
-        """
-        logger = getLogger('nanochan')
-        console_handler = StreamHandler()
-        console_handler.setFormatter(Formatter(
-            '%(asctime)s %(levelname)s %(name)s: %(message)s')
-        )
-        logger.addHandler(console_handler)
-        logger.setLevel(INFO)
-        return logger
+from cogs.utils.db_utils import PostgresController
 
 
 class Nanochan(Bot):
@@ -39,6 +24,7 @@ class Nanochan(Bot):
         self.bot_owner_id = config['owner_id']
         self.mod_log = config['mod_log']
         self.emoji_ignore_channels = config['emoji_ignore_channels']
+        self.traffic_ignore_channels = config['traffic_ignore_channels']
         self.filter_channels = config['filter_channels']
         self.filter_allowed = config['filter_allowed']
         self.spoiler_channels = config['spoiler_channels']
@@ -46,13 +32,20 @@ class Nanochan(Bot):
         self.logger = logger
         super().__init__('-')
 
+    @classmethod
     async def get_instance(cls):
         """
         async method to initialize the postgres_controller class
         """
         with open("config/config.yml", 'r') as yml_config:
             config = yaml.load(yml_config)
-        logger = __get_logger()
+        logger = getLogger('nanochan')
+        console_handler = StreamHandler()
+        console_handler.setFormatter(Formatter(
+            '%(asctime)s %(levelname)s %(name)s: %(message)s')
+        )
+        logger.addHandler(console_handler)
+        logger.setLevel(INFO)
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)

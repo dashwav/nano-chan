@@ -5,7 +5,7 @@ This cog is to be used primarily for small janitorial tasks
 from discord import AuditLogAction
 from discord.ext import commands
 from .utils import checks
-from nanochan.enums import Change
+from .utils.enums import Change
 from datetime import datetime, timedelta
 import asyncio
 
