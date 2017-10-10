@@ -5,6 +5,7 @@ This cog is to be used primarily for small janitorial tasks
 from discord import AuditLogAction
 from discord.ext import commands
 from .utils import checks
+from nanochan.enums import Change
 from datetime import datetime, timedelta
 import asyncio
 
@@ -75,6 +76,13 @@ class Janitor():
                 self.bot.logger.info(
                     f'{message.author.display_name}'
                     ' was just promoted to member!')
+                try:
+                    await self.postgres_controller.insert_rolechange(
+                        message.guild.id, message.author.id, Change.PROMOTION
+                    )
+                except Exception as e:
+                    self.bot.logger.warning(
+                        f'Issue logging action to db: {e})')
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error updating users roles: {e}')

@@ -5,6 +5,7 @@ kicking/banning users.
 import discord
 from discord.ext import commands
 from .utils import helpers, checks
+from nanochan.enums import Action
 
 
 class MemberID(commands.Converter):
@@ -90,6 +91,12 @@ class Moderation:
             self.bot.logger.info(f'Successfully kicked {member}')
         else:
             await ctx.send("Cancelled kick", delete_after=3)
+        try:
+            await self.postgres_controller.insert_modaction(
+                ctx.guild.id, ctx.author.id, member.id, Action.KICK
+            )
+        except Exception as e:
+            self.bot.logger.warning(f'Issue logging action to db: {e})')
 
     @commands.command()
     @checks.is_admin()
@@ -127,6 +134,12 @@ class Moderation:
             self.bot.logger.info(f'Successfully banning {member}')
         else:
             await ctx.send("Cancelled ban", delete_after=3)
+        try:
+            await self.postgres_controller.insert_modaction(
+                ctx.guild.id, ctx.author.id, member_id, Action.BAN
+            )
+        except Exception as e:
+            self.bot.logger.warning(f'Issue logging mod action to db: {e})')
 
     @commands.command()
     @checks.has_permissions(ban_members=True)

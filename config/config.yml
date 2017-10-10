@@ -10,6 +10,10 @@ emoji_ignore_channels:
     #Channels to ignore when counting emojis
     -123456789
 
+traffic_ignore_channels:
+    # Channels to ignore when counting traffic
+    - 123456789
+
 spoiler_channels:
     # Channel ids to check
     - 123456789
@@ -21,6 +25,13 @@ filter_channels:
 filter_allowed:
     - ".iam Clover"
     - ".iam Member"
+
+postgres_credentials:
+    host: ""
+    port: ""
+    user: ""
+    database: ""
+    password: ""
 
 # Wait time in seconds (default 10 min)
 wait_time: 600
