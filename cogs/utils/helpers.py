@@ -38,7 +38,7 @@ async def custom_confirm(ctx: commands.Context, custom_message):
     ctx - The context in which the question is being asked.
     message - Optional messsage that the question should ask.
     """
-    message = create_confirm_embed(ctx, ctx.guild, message)
+    message = create_custom_embed(ctx, ctx.guild, custom_message)
     confirmation_message = await ctx.send(embed=message, delete_after=10)
     try:
         message = await ctx.bot.wait_for("message",
@@ -58,6 +58,21 @@ async def custom_confirm(ctx: commands.Context, custom_message):
 
 
 def create_confirm_embed(ctx, server_name, member_to_kick, reason):
+        embed = discord.Embed(
+            title=f'❗ Confirmation Request ❗',
+            type='rich')
+        embed.description = f'\nYou are attempting to {ctx.command}'\
+                            f'**{member_to_kick}** from **{server_name}**'\
+                            f'\n```{str(ctx.command).title()} '\
+                            f'reason:\n\n{reason}```'\
+                            f'\n➡️ Type `confirm` to {ctx.command} the user,'\
+                            ' or literally anything else to cancel.'\
+                            '\n\n*You have 10 seconds...*'
+        embed.add_field(name='ID', value=member_to_kick.id)
+        return embed
+
+
+def create_custom_embed(ctx, custom_message):
         embed = discord.Embed(
             title=f'❗ Confirmation Request ❗',
             type='rich')
