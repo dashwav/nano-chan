@@ -64,7 +64,7 @@ async def make_tables(pool: Pool, schema: str):
       pinned BOOLEAN,
       content VARCHAR(2000),
       createdat TIMESTAMP,
-      PRIMARY KEY (serverid, modid, targetid, action)
+      PRIMARY KEY (serverid, messageid, authorid, channelid, botmessage)
     );
     """.format(schema)
 
