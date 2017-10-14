@@ -65,15 +65,15 @@ class Stats:
         """
         confirm = await helpers.custom_confirm(
             ctx,
-            f'Are you sure you want to do this?'
-            ' This will literally take just about forever. Like days.')
+            f'\nAre you sure you want to do this?'
+            ' This will literally take just about forever. Like days maybe.\n')
         if not confirm:
             return
         confirm2 = await helpers.custom_confirm(
             ctx,
-            f'Seriously this is going to take at least 4 hours,'
+            f'\nSeriously this is going to take at least 4 hours,'
             ' and it could even go up to a week. Only respond with'
-            ' confirm if you **really** mean it')
+            ' confirm if you **really** mean it\n')
         if not confirm2:
             return
         self.bot.logger.info(
@@ -82,10 +82,8 @@ class Stats:
         errorcount = 0
         for ch in ctx.message.guild.channels:
             if isinstance(ch, discord.TextChannel): 
-                if ch.id in self.bot.traffic_ignore_channels:
-                        continue
-                elif ch.category_id in self.bot.traffic_ignore_channels:
-                    continue
+                self.bot.logger.info(
+                    f'Downloading messages from: {ch.name}')
                 try:
                     message_history = ch.history(
                         limit=None, reverse=True)
@@ -104,6 +102,6 @@ class Stats:
                         self.bot.logger.warning(
                             f'Issue while putting message in database: {e}')
         await ctx.send(f'<@{ctx.message.author.id}>\n'
-                       f'i did what you wanted...\n'
+                       f'\n L-look, i did what you wanted... (⁄ ⁄•⁄ ⁄•⁄ ⁄)⁄\n'
                        f'Total Messages processed: {totalcount}\n'
                        f'Errors encountered: {errorcount}')
