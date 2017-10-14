@@ -99,7 +99,7 @@ class Moderation:
         else:
             await ctx.send("Cancelled kick", delete_after=3)
         try:
-            await self.postgres_controller.insert_modaction(
+            await self.bot.postgres_controller.insert_modaction(
                 ctx.guild.id, ctx.author.id, member.id, Action.KICK
             )
         except Exception as e:
@@ -142,7 +142,7 @@ class Moderation:
         else:
             await ctx.send("Cancelled ban", delete_after=3)
         try:
-            await self.postgres_controller.insert_modaction(
+            await self.bot.postgres_controller.insert_modaction(
                 ctx.guild.id, ctx.author.id, member_id, Action.BAN
             )
         except Exception as e:

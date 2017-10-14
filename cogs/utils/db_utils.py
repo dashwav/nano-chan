@@ -54,6 +54,20 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    messages = """
+    CREATE TABLE IF NOT EXISTS {}.messages (
+      serverid BIGINT,
+      messageid BIGINT,
+      authorid BIGINT,
+      channelid BIGINT,
+      botmessage BOOLEAN,
+      pinned BOOLEAN,
+      content VARCHAR(2000),
+      createdat TIMESTAMP,
+      PRIMARY KEY (serverid, modid, targetid, action)
+    );
+    """.format(schema)
+
     servers = """
     CREATE TABLE IF NOT EXISTS {}.servers (
       serverid BIGINT,
@@ -68,6 +82,7 @@ async def make_tables(pool: Pool, schema: str):
 
     await pool.execute(roles)
     await pool.execute(moderation)
+    await pool.execute(messages)
     await pool.execute(servers)
 
 
@@ -152,7 +167,7 @@ class PostgresController():
         """
         sql = """
         INSERT INTO {}.servers VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (server_id)
+        ON CONFLICT (serverid)
         DO nothing;
         """.format(self.schema)
 
@@ -165,6 +180,28 @@ class PostgresController():
         :param word: word to add
         """
         return
+
+    async def add_message(self, message):
+        """
+        Adds a message to the database
+        :param message: the discord message object to add
+        """
+        sql = """
+        INSERT INTO {}.servers VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        ON CONFLICT (messageid)
+        DO nothing;
+        """.format(self.schema)
+        await self.pool.execute(
+            sql,
+            message.guild.id,
+            message.id,
+            message.author.id,
+            message.channel.id,
+            message.author.bot,
+            message.pinned,
+            message.clean_content,
+            message.created_at
+        )
 
     async def add_blacklist_word(self, server_id: int, word: str):
         """

@@ -58,44 +58,52 @@ class Stats:
 
     @commands.command()
     @checks.is_admin()
-    async def stats_traffic(self, ctx):
+    async def download_guild_history(self, ctx):
         """
-        This will go through all the channels 
-        and create a graph of channel usage over time
+        This will go through all the channels
+        and download them.
         """
-        channel_traffic_month = {}
-        channel_traffic_total = {}
-        self.bot.logger.info(f'Starting stats.')
-        today = datetime.datetime.today()
-        first_day = today.replace(day=1)
-        for i in range(1, 2):
-            prev_month = first_day - relativedelta(months=i)
-            prev_month_end = prev_month + relativedelta(months=1)
-            self.bot.logger.info(
-                f'Getting stats from {prev_month} to {prev_month_end}')
-            for ch in ctx.message.guild.channels:
-                totalcount = 0
-                if isinstance(ch, discord.TextChannel):
-                    self.bot.logger.info(
-                        f'Getting channel history: {ch.name}')
-                    if ch.id in self.bot.traffic_ignore_channels:
+        confirm = await helpers.custom_confirm(
+            ctx,
+            f'Are you sure you want to do this?'
+            ' This will literally take just about forever. Like days.')
+        if not confirm:
+            return
+        confirm2 = await helpers.custom_confirm(
+            ctx,
+            f'Seriously this is going to take at least 4 hours,'
+            ' and it could even go up to a week. Only respond with'
+            ' confirm if you **really** mean it')
+        if not confirm2:
+            return
+        self.bot.logger.info(
+            f'Starting to pull messages, this will take a while')
+        totalcount = 0
+        errorcount = 0
+        for ch in ctx.message.guild.channels:
+            if isinstance(ch, discord.TextChannel): 
+                if ch.id in self.bot.traffic_ignore_channels:
                         continue
-                    elif ch.category_id in self.bot.traffic_ignore_channels:
-                        continue
+                elif ch.category_id in self.bot.traffic_ignore_channels:
+                    continue
+                try:
+                    message_history = ch.history(
+                        limit=None, reverse=True)
+                except Exception as e:
+                    self.bot.logger.warning(
+                        f'Issue getting channel history: {e}')
+                    continue
+                async for message in message_history:
+                    totalcount += 1
                     try:
-                        message_history = ch.history(
-                            limit=None,
-                            before=prev_month_end,
-                            after=prev_month)
+                        await self.bot.postgres_controller.add_message(
+                            message
+                        )
                     except Exception as e:
+                        errorcount += 0
                         self.bot.logger.warning(
-                            f'Issue getting channel history: {e}')
-                        continue
-                    self.bot.logger.info(
-                        f'Counting messages: {ch.name}')
-                    async for message in message_history:
-                        self.bot.logger.info(f'{message}')
-                        totalcount += 1
-                    channel_traffic_month.update({ch.name:totalcount})
-            channel_traffic_total.update({calendar.month_abbr[i]:channel_traffic_month})
-        self.bot.logger.info(f'Traffic info: {channel_traffic_total}')
+                            f'Issue while putting message in database: {e}')
+        await ctx.send(f'<@{ctx.message.author.id}>\n'
+                       f'l-look i did what you wanted...\n'
+                       f'Total Messages processed: {totalcount}\n'
+                       f'Errors encountered: {errorcount}')

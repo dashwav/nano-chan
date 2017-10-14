@@ -63,6 +63,10 @@ class Janitor():
         if message.channel.id in self.bot.filter_channels:
             if message.content.lower() == '.iam pumpkin':
                 await self.add_clover(message, has_member, False)
+            elif message.content.lower() == '.iam clover':
+                await self.add_clover(message, has_member, False)
+            elif message.content.lower() == '.iam member':
+                await self.add_clover(message, has_member, True)
             elif message.content.lower() == '.iam slime':
                 await self.add_clover(message, has_member, True)
             return
@@ -77,7 +81,7 @@ class Janitor():
                     f'{message.author.display_name}'
                     ' was just promoted to member!')
                 try:
-                    await self.postgres_controller.insert_rolechange(
+                    await self.bot.postgres_controller.insert_rolechange(
                         message.guild.id, message.author.id, Change.PROMOTION
                     )
                 except Exception as e:
