@@ -38,7 +38,7 @@ async def custom_confirm(ctx: commands.Context, custom_message):
     ctx - The context in which the question is being asked.
     message - Optional messsage that the question should ask.
     """
-    message = create_custom_embed(ctx, ctx.guild, custom_message)
+    message = create_custom_embed(ctx, custom_message)
     confirmation_message = await ctx.send(embed=message, delete_after=10)
     try:
         message = await ctx.bot.wait_for("message",

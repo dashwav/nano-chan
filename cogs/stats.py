@@ -104,6 +104,6 @@ class Stats:
                         self.bot.logger.warning(
                             f'Issue while putting message in database: {e}')
         await ctx.send(f'<@{ctx.message.author.id}>\n'
-                       f'l-look i did what you wanted...\n'
+                       f'i did what you wanted...\n'
                        f'Total Messages processed: {totalcount}\n'
                        f'Errors encountered: {errorcount}')

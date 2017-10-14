@@ -57,7 +57,7 @@ async def make_tables(pool: Pool, schema: str):
     messages = """
     CREATE TABLE IF NOT EXISTS {}.messages (
       serverid BIGINT,
-      messageid BIGINT,
+      messageid BIGINT UNIQUE,
       authorid BIGINT,
       channelid BIGINT,
       botmessage BOOLEAN,
@@ -187,7 +187,7 @@ class PostgresController():
         :param message: the discord message object to add
         """
         sql = """
-        INSERT INTO {}.servers VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO {}.messages VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         ON CONFLICT (messageid)
         DO nothing;
         """.format(self.schema)
