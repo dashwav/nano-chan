@@ -58,15 +58,15 @@ class Stats:
         count_dict = defaultdict(int)
         for emoji in ctx.guild.emojis:
             try:
-                count_dict[emoji.name] = await \
-                    self.postgres_controller.get_emoji_count(
+                count_dict[emoji] = await \
+                    self.bot.postgres_controller.get_emoji_count(
                         emoji, days, self.bot.logger
                     )
             except Exception as e:
                 self.bot.logger(f'Error getting emoji info:{e}')
         desc = ''
         for key in sorted(count_dict, key=count_dict.get, reverse=True):
-            desc += f'{key}: {emoji_count[key]}\n'
+            desc += f'{key}: {count_dict[key]}\n'
         local_embed = discord.Embed(
             title=f'Emoji use over the past {days} day/s:',
             description=desc

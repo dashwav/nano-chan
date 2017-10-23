@@ -253,7 +253,7 @@ class PostgresController():
 
         date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
         try:
-            return self.pool.fetchval(sql, emoji.id, date_delta)
+            return await self.pool.fetchval(sql, emoji.id, date_delta)
         except Exception as e:
             logger.warning(f'Error retrieving emoji count: {e}')
             return None
