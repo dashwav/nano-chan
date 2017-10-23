@@ -227,18 +227,20 @@ class PostgresController():
         sql = """
         INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         """.format(self.schema)
-
-        await self.pool.execute(
-            sql,
-            emoji.id,
-            emoji.name,
-            message_id,
-            channel.id,
-            channel.name,
-            user.id,
-            user.name,
-            is_reaction
-        )
+        try:
+            await self.pool.execute(
+                sql,
+                emoji.id,
+                emoji.name,
+                message_id,
+                channel.id,
+                channel.name,
+                user.id,
+                user.name,
+                is_reaction
+            )
+        except UniqueViolationError:
+            pass
 
     async def add_blacklist_word(self, server_id: int, word: str):
         """
