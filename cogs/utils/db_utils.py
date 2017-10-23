@@ -58,11 +58,14 @@ async def make_tables(pool: Pool, schema: str):
     CREATE TABLE IF NOT EXISTS {}.emojis (
         id BIGINT,
         name TEXT,
+        message_id BIGINT,
+        channel_id BIGINT,
+        channel_name TEXT,
         user_id BIGINT,
         user_name TEXT,
         reaction BOOLEAN,
         logtime TIMESTAMP DEFAULT current_timestamp,
-        PRIMARY KEY(id, user_id, reaction)
+        PRIMARY KEY(id, message_id, user_id, reaction)
     );
     """.format(schema)
 
@@ -156,7 +159,7 @@ class PostgresController():
         INSERT INTO {}.roles VALUES ($1, $2, $3);
         """.format(self.schema)
 
-        await self.pool.execute(sql, user_id, changetype.value)
+        await self.pool.execute(sql,server_id, user_id, changetype.value)
 
     async def insert_modaction(self, server_id: int, mod_id: int,
                                target_id: int, action_type: Action):
@@ -216,19 +219,22 @@ class PostgresController():
             message.created_at
         )
 
-    async def add_emoji(self, emoji, user, is_reaction):
+    async def add_emoji(self, emoji, message_id, user, channel, is_reaction):
         """
         Adds emoji to emoji tracking table
         :param emoji: discord emoji to add
         """
         sql = """
-        INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         """.format(self.schema)
 
         await self.pool.execute(
             sql,
             emoji.id,
             emoji.name,
+            message_id,
+            channel.id,
+            channel.name,
             user.id,
             user.name,
             is_reaction

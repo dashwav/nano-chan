@@ -20,8 +20,12 @@ class Stats:
         self.editible_posts = []
 
     async def on_message(self, message):
+        if not isinstance(message.channel, discord.TextChannel):
+            return
         found_emojis = []
         confirmed_emojis = []
+        if message.channel.id == 191102386633179136:
+            return
         for word in message.content.split():
             if '<:' in word:
                 found_emojis.append(word)
@@ -33,7 +37,7 @@ class Stats:
             await self.bot.postgres_controller.add_message(message)
             for emoji in confirmed_emojis:
                 await self.bot.postgres_controller.add_emoji(
-                    emoji, message.author, False)
+                    emoji, message.id, message.author, message.channel, False)
         except Exception as e:
             self.bot.logger.warning(f'Error adding message to db: {e}')
 
@@ -41,12 +45,12 @@ class Stats:
         """
         Called when an emoji is added
         """
-        channel = await self.bot.get_channel(channel_id)
-        user = await self.bot.get_user(user_id)
+        channel = self.bot.get_channel(channel_id)
+        user = self.bot.get_user(user_id)
         for server_emoji in channel.guild.emojis:
-            if emoji == server_emoji:
+            if emoji.id == server_emoji.id:
                 await self.bot.postgres_controller.add_emoji(
-                    emoji, user, True)
+                    emoji, message_id, user, channel, True)
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
