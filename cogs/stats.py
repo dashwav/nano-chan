@@ -54,6 +54,29 @@ class Stats:
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
+    async def emojis(self, ctx, days: int=1):
+        count_dict = defaultdict(int)
+        for emoji in ctx.guild.emojis:
+            try:
+                count_dict[emoji.name] = await \
+                    self.postgres_controller.get_emoji_count(
+                        emoji, days, self.bot.logger
+                    )
+            except Exception as e:
+                self.bot.logger(f'Error getting emoji info:{e}')
+        desc = ''
+        for key in sorted(count_dict, key=count_dict.get, reverse=True):
+            desc += f'{key}: {emoji_count[key]}\n'
+        local_embed = discord.Embed(
+            title=f'Emoji use over the past {days} day/s:',
+            description=desc
+        )
+        await ctx.send(embed=local_embed)
+            
+
+
+    @commands.command()
+    @checks.has_permissions(manage_emojis=True)
     async def stats_emoji(self, ctx):
         found_emojis = []
         total_reactions = defaultdict(int)

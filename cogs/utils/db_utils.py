@@ -1,12 +1,12 @@
 """
 Database utility functions.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from json import dumps, loads
 from typing import Optional
 from .enums import Change, Action
 try:
-    from asyncpg import Record, InterfaceError, create_pool
+    from asyncpg import Record, InterfaceError, UniqueViolationError, create_pool
     from asyncpg.pool import Pool
 except ImportError:
     Record = None
@@ -241,6 +241,22 @@ class PostgresController():
             )
         except UniqueViolationError:
             pass
+    
+    async def get_emoji_count(self, emoji, days_to_subtract, logger):
+        """
+        Returns the amount of the single emoji that were found in the last days
+        """
+        sql = """
+        SELECT count(id) FROM {}.emojis
+        WHERE id = $1 AND logtime > $2;
+        """.format(self.schema)
+
+        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        try:
+            return self.pool.fetchval(sql, emoji.id, date_delta)
+        except Exception as e:
+            logger.warning(f'Error retrieving emoji count: {e}')
+            return None
 
     async def add_blacklist_word(self, server_id: int, word: str):
         """
