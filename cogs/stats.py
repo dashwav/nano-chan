@@ -17,6 +17,36 @@ class Stats:
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+        self.editible_posts = []
+
+    async def on_message(self, message):
+        found_emojis = []
+        confirmed_emojis = []
+        for word in message.content.split():
+            if '<:' in word:
+                found_emojis.append(word)
+        for emoji_id in found_emojis:
+            for emoji in message.guild.emojis:
+                if emoji_id == str(emoji):
+                    confirmed_emojis.append(emoji)
+        try:
+            await self.bot.postgres_controller.add_message(message)
+            for emoji in confirmed_emojis:
+                await self.bot.postgres_controller.add_emoji(
+                    emoji, message.author, False)
+        except Exception as e:
+            self.bot.logger.warning(f'Error adding message to db: {e}')
+
+    async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
+        """
+        Called when an emoji is added
+        """
+        channel = await self.bot.get_channel(channel_id)
+        user = await self.bot.get_user(user_id)
+        for server_emoji in channel.guild.emojis:
+            if emoji == server_emoji:
+                await self.bot.postgres_controller.add_emoji(
+                    emoji, user, True)
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)

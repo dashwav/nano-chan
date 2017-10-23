@@ -54,6 +54,18 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    emojis = """
+    CREATE TABLE IF NOT EXISTS {}.emojis (
+        id BIGINT,
+        name TEXT,
+        user_id BIGINT,
+        user_name TEXT,
+        reaction BOOLEAN,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY(id, user_id, reaction)
+    );
+    """.format(schema)
+
     messages = """
     CREATE TABLE IF NOT EXISTS {}.messages (
       serverid BIGINT,
@@ -82,6 +94,7 @@ async def make_tables(pool: Pool, schema: str):
 
     await pool.execute(roles)
     await pool.execute(moderation)
+    await pool.execute(emojis)
     await pool.execute(messages)
     await pool.execute(servers)
 
@@ -143,7 +156,7 @@ class PostgresController():
         INSERT INTO {}.roles VALUES ($1, $2, $3);
         """.format(self.schema)
 
-        await self.pool.execute(sql, user_id, changetype.Value)
+        await self.pool.execute(sql, user_id, changetype.value)
 
     async def insert_modaction(self, server_id: int, mod_id: int,
                                target_id: int, action_type: Action):
@@ -158,7 +171,7 @@ class PostgresController():
         """.format(self.schema)
 
         await self.pool.execute(
-            sql, server_id, mod_id, target_id, action_type.Value)
+            sql, server_id, mod_id, target_id, action_type.value)
 
     async def add_server(self, server_id: int):
         """
@@ -201,6 +214,24 @@ class PostgresController():
             message.pinned,
             message.clean_content,
             message.created_at
+        )
+
+    async def add_emoji(self, emoji, user, is_reaction):
+        """
+        Adds emoji to emoji tracking table
+        :param emoji: discord emoji to add
+        """
+        sql = """
+        INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5)
+        """.format(self.schema)
+
+        await self.pool.execute(
+            sql,
+            emoji.id,
+            emoji.name,
+            user.id,
+            user.name,
+            is_reaction
         )
 
     async def add_blacklist_word(self, server_id: int, word: str):
