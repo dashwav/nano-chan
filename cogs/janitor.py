@@ -72,7 +72,7 @@ class Janitor():
                 await message.author.edit(
                     roles=member_roles,
                     reason="User upgraded from clover to member")
-                await message.add_reaction('👻')
+                await message.add_reaction('🎊')
                 self.bot.logger.info(
                     f'{message.author.display_name}'
                     ' was just promoted to member!')
