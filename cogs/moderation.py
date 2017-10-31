@@ -72,6 +72,38 @@ class Moderation:
         ctx.delete()
 
     @commands.command()
+    @checks.has_permissions(manage_messages=True)
+    async def purge(self, ctx, *args,  mentions=None):
+        deleted = []
+        try:
+            count = int(next(iter(args or []), 'fugg'))
+        except ValueError:
+            count = 100
+        mentions = ctx.message.mentions
+        await ctx.message.delete()
+        if mentions:
+            for user in mentions:
+                try:
+                    deleted += await ctx.channel.purge(
+                        limit=count,
+                        check=lambda x: x.author == user
+                    )
+                except discord.Forbidden as e:
+                    return await ctx.send(
+                        'I do not have sufficient permissions to purge.')
+                except Exception as e:
+                    self.bot.logger.warning(f'Error purging messages: {e}')
+        else:
+            try:
+                deleted += await ctx.channel.purge(limit=count)
+            except discord.Forbidden as e:
+                return await ctx.send(
+                    'I do not have sufficient permissions to purge.')
+            except Exception as e:
+                    self.bot.logger.warning(f'Error purging messages: {e}')
+
+
+    @commands.command()
     @checks.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *,
                    reason: ActionReason = None):

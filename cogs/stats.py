@@ -138,7 +138,9 @@ class Stats:
         totalcount = 0
         errorcount = 0
         for ch in ctx.message.guild.channels:
-            if isinstance(ch, discord.TextChannel): 
+            if isinstance(ch, discord.TextChannel):
+                if ch.id in {148609211977302017, 149945199873884160, 266805623579082758, 266805579115134976}:
+                    continue 
                 self.bot.logger.info(
                     f'Downloading messages from: {ch.name}')
                 try:
@@ -150,6 +152,8 @@ class Stats:
                     continue
                 async for message in message_history:
                     totalcount += 1
+                    if message.author.bot:
+                        continue
                     try:
                         await self.bot.postgres_controller.add_message(
                             message

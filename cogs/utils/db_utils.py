@@ -74,12 +74,13 @@ async def make_tables(pool: Pool, schema: str):
       serverid BIGINT,
       messageid BIGINT UNIQUE,
       authorid BIGINT,
+      authorname TEXT,
       channelid BIGINT,
-      botmessage BOOLEAN,
+      channelname TEXT,
       pinned BOOLEAN,
       content VARCHAR(2000),
       createdat TIMESTAMP,
-      PRIMARY KEY (serverid, messageid, authorid, channelid, botmessage)
+      PRIMARY KEY (serverid, messageid, authorid, channelid)
     );
     """.format(schema)
 
@@ -203,7 +204,7 @@ class PostgresController():
         :param message: the discord message object to add
         """
         sql = """
-        INSERT INTO {}.messages VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO {}.messages VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         ON CONFLICT (messageid)
         DO nothing;
         """.format(self.schema)
@@ -212,8 +213,9 @@ class PostgresController():
             message.guild.id,
             message.id,
             message.author.id,
+            message.author.name,
             message.channel.id,
-            message.author.bot,
+            message.channel.name,
             message.pinned,
             message.clean_content,
             message.created_at

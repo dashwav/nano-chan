@@ -44,7 +44,7 @@ class Janitor():
     def remove_clover(self, member) -> list:
         member_roles = member.roles
         for index, role in enumerate(member_roles):
-            if role.name.lower() == 'pumpkin':
+            if role.name.lower() == 'clover':
                 clover_index = index
         del member_roles[clover_index]
         return member_roles
@@ -56,18 +56,14 @@ class Janitor():
         has_member = False
         member_roles = message.author.roles
         for index, role in enumerate(member_roles):
-            if role.name.lower() == 'pumpkin':
+            if role.name.lower() == 'clover':
                 has_clover = True
-            elif role.name.lower() == 'slime':
+            elif role.name.lower() == 'member':
                 has_member = True
         if message.channel.id in self.bot.filter_channels:
-            if message.content.lower() == '.iam pumpkin':
-                await self.add_clover(message, has_member, False)
-            elif message.content.lower() == '.iam clover':
+            if message.content.lower() == '.iam clover':
                 await self.add_clover(message, has_member, False)
             elif message.content.lower() == '.iam member':
-                await self.add_clover(message, has_member, True)
-            elif message.content.lower() == '.iam slime':
                 await self.add_clover(message, has_member, True)
             return
         if has_clover and has_member:
@@ -109,7 +105,7 @@ class Janitor():
             await self.prune_clovers()
 
     async def add_clover(self, message, has_member, add_member):
-        role_name = 'slime' if add_member else 'pumpkin'
+        role_name = 'member' if add_member else 'clover'
         if has_member:
             return
         a_irl = self.bot.get_guild(self.bot.guild_id)
@@ -149,7 +145,7 @@ class Janitor():
         dt_24hr = datetime.utcnow() - timedelta(days=1)
         a_irl = self.bot.get_guild(self.bot.guild_id)
         for role in a_irl.roles:
-            if role.name.lower() == 'pumpkin':
+            if role.name.lower() == 'clover':
                 clover_role = role
         if not clover_role:
             self.bot.logger.warning(
@@ -163,7 +159,7 @@ class Janitor():
         async for entry in audit_logs:
             if entry.created_at > dt_24hr:
                 for role in entry.after.roles:
-                    if role.name.lower() == 'pumpkin':
+                    if role.name.lower() == 'clover':
                         if entry.target.id not in safe_users:
                             safe_users.append(entry.target.id)
         prune_info = {'pruned': False, 'amount': 0}
@@ -185,7 +181,7 @@ class Janitor():
         if prune_info['pruned']:
             try:
                 await mod_log.send(
-                    f'👻🎃👻 Picked {prune_info["amount"]} pumpkins 👻🎃👻')
+                    f'Pruned  {prune_info["amount"]} clovers')
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error posting prune info to mod_log: {e}')
