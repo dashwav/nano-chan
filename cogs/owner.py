@@ -16,6 +16,15 @@ class Owner():
         """
         super().__init__()
         self.bot = bot
+
+    @commands.command()
+    @commands.is_owner()
+    async def set_playing(self, ctx, *, game=None):
+        if game:
+            await self.bot.change_presence(game=discord.Game(name=game))
+        ctx.delete()
+
+
     @commands.command(hidden=True)
     async def echo(self, ctx, channel, *, message):
         """

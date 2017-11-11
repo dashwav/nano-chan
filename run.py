@@ -14,7 +14,6 @@ def run():
       Spoils(bot),
       Filter(bot),
       Janitor(bot),
-      Moderation(bot),
       Stats(bot)
     ]
     bot.start_bot(cogs)

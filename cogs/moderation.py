@@ -65,13 +65,6 @@ class Moderation:
         self.bot = bot
 
     @commands.command()
-    @checks.has_permissions(kick_members=True)
-    async def set_playing(self, ctx, *, game=None):
-        if game:
-            await self.bot.change_presence(game=discord.Game(name=game))
-        ctx.delete()
-
-    @commands.command()
     @checks.has_permissions(manage_messages=True)
     async def purge(self, ctx, *args,  mentions=None):
         deleted = []

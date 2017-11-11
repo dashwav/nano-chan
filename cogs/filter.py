@@ -20,11 +20,23 @@ class Filter():
         cleaned_message = message.clean_content
         if cleaned_message.lower() in self.filter_allowed:
             return
-        else:
-            try:
-                await message.delete()
-                self.bot.logger.info(
-                    'Successfully deleted message from: '
-                    f'{message.author.display_name}')
-            except Exception as e:
-                self.bot.logger.warning(f'Error deleting message: {e}')
+        try:
+            await message.delete()
+            await self.bot.postgres_controller.add_message_delete(
+                message.author.id
+            )
+            user_deleted = await self.bot.postgres_controller.get_message_deleted(
+                message.author.id
+            )
+            if user_deleted in [5,10,20,100]:
+                time = self.bot.timestamp()
+                mod_info = self.bot.get_channel(self.bot.mod_info)
+                mod_info.send(
+                    f'**{time} | SPAM:** {message.author} has had {user_deleted} '\
+                    f'messages deleted in #welcome-center'
+                )
+            self.bot.logger.info(
+                'Successfully deleted message from: '
+                f'{message.author.display_name}')
+        except Exception as e:
+            self.bot.logger.warning(f'Error deleting message: {e}')

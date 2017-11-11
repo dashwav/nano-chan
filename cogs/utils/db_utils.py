@@ -34,6 +34,12 @@ async def make_tables(pool: Pool, schema: str):
     """
     await pool.execute('CREATE SCHEMA IF NOT EXISTS {};'.format(schema))
 
+    spam = """
+    CREATE TABLE IF NOT EXISTS {}.spam (
+        userid BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+    );""".format(schema)
+
     roles = """
     CREATE TABLE IF NOT EXISTS {}.roles (
       serverid BIGINT,
@@ -267,6 +273,26 @@ class PostgresController():
         :param word: word to add
         """
         return
+
+    async def add_message_delete(self, user_id: int):
+        """
+        Logs a message deletion into the db
+        """
+        sql = """
+        INSERT INTO {}.spam VALUES ($1);
+        """.format(self.schema)
+        await self.pool.execute(sql, user_id)
+
+    async def get_message_delete(self, user_id: int):
+        """
+        Returns count of message deletions
+        """
+        sql = """
+        SELECT COUNT(*) FROM {}.spam
+        WHERE userid = $1;
+        """.format(self.schema)
+        return await self.pool.fetchrow(sql, user_id)
+
 
     async def add_whitelist_channel(self, server_id: int, channel_id: int):
         """

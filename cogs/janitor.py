@@ -62,12 +62,6 @@ class Janitor():
                 has_clover = True
             elif role.name.lower() == 'member':
                 has_member = True
-        if message.channel.id in self.bot.filter_channels:
-            if message.content.lower() == '.iam clover':
-                await self.add_clover(message, has_member, False)
-            elif message.content.lower() == '.iam member':
-                await self.add_clover(message, has_member, True)
-            return
         if has_clover and has_member:
             member_roles = self.remove_clover(message.author)
             try:
@@ -92,6 +86,7 @@ class Janitor():
     @commands.command(hidden=True)
     @checks.has_permissions(manage_roles=True)
     async def prune(self, ctx):
+        await self.bot.logger.info(f'Prune requested by: {ctx.message.author}')
         await self.prune_clovers()
 
     @prune.error
@@ -105,41 +100,6 @@ class Janitor():
         while not self.bot.is_closed():
             await asyncio.sleep(86400)
             await self.prune_clovers()
-
-    async def add_clover(self, message, has_member, add_member):
-        role_name = 'member' if add_member else 'clover'
-        if has_member:
-            return
-        a_irl = self.bot.get_guild(self.bot.guild_id)
-        for role in a_irl.roles:
-            if role.name.lower() == role_name:
-                add_role = role
-        if not add_role:
-            self.bot.logger.warning(
-                f'Something went really wrong, I couldn\'t'
-                f' find the {role_name} role')
-            return
-        member_roles = message.author.roles
-        member_roles.append(add_role)
-        try:
-            await message.author.edit(
-                roles=member_roles,
-                reason=f'Self-applied role in #welcome-center'
-            )
-            self.bot.logger.info(
-                f'Successfully applied {role_name} to '
-                f'{message.author.display_name}')
-            await self.server_logs.send(
-                f'Successfully applied {role_name} to '
-                f'{message.author.display_name}')
-            await self.owner.dm_channel.send(
-                f'Successfully applied {role_name} to '
-                f'{message.author.display_name}')
-            await message.delete()
-        except Exception as e:
-            self.bot.logger.warning(
-                f'Error applying role to {message.author.display_name}: {e}')
-        return
 
     async def prune_clovers(self):
         self.bot.logger.info('Starting prune task now')

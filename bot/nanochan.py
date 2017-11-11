@@ -4,6 +4,7 @@ Discord bot that spaces out spoiler comments
 import yaml
 from discord.ext.commands import Bot
 from time import time
+import datetime
 from logging import Formatter, INFO, StreamHandler, getLogger
 from cogs.utils.db_utils import PostgresController
 
@@ -23,6 +24,7 @@ class Nanochan(Bot):
         self.guild_id = config['guild_id']
         self.bot_owner_id = config['owner_id']
         self.mod_log = config['mod_log']
+        self.mod_info = config['mod_info']
         self.emoji_ignore_channels = config['emoji_ignore_channels']
         self.traffic_ignore_channels = config['traffic_ignore_channels']
         self.filter_channels = config['filter_channels']
@@ -58,6 +60,13 @@ class Nanochan(Bot):
         for cog in cogs:
             self.add_cog(cog)
         self.run(self.credentials)
+
+    def timestamp(self):
+        """
+        returns a timestamp formatted string
+        """
+        current = datetime.datetime.utcnow()
+        return time.strftime('%H:%M:%S')
 
     async def on_ready(self):
         self.logger.info(f'\nLogged in as\n{self.user.name}'
