@@ -28,6 +28,7 @@ class Janitor():
         self.bot.logger.info(
             f'Setting up owner channel {self.bot.bot_owner_id}')
         try:
+            self.server_logs = self.bot.get_channel(378684962934751239)
             self.owner = await self.bot.get_user_info(self.bot.bot_owner_id)
         except Exception as e:
             self.bot.logger.warning(f'Error getting owner: {e}')
@@ -38,6 +39,7 @@ class Janitor():
             except Exception as e:
                 self.bot.logger.warning(f'Error creating dm channel: {e}')
             await self.owner.dm_channel.send('Bot started successfully')
+            await self.server_logs.send('Bot started successfully')
         except Exception as e:
             self.bot.logger.warning(f'Error getting dm channel: {e}')
 
@@ -127,10 +129,13 @@ class Janitor():
             self.bot.logger.info(
                 f'Successfully applied {role_name} to '
                 f'{message.author.display_name}')
-            await message.delete()
+            await self.server_logs.send(
+                f'Successfully applied {role_name} to '
+                f'{message.author.display_name}')
             await self.owner.dm_channel.send(
                 f'Successfully applied {role_name} to '
                 f'{message.author.display_name}')
+            await message.delete()
         except Exception as e:
             self.bot.logger.warning(
                 f'Error applying role to {message.author.display_name}: {e}')
@@ -181,7 +186,7 @@ class Janitor():
         if prune_info['pruned']:
             try:
                 await mod_log.send(
-                    f'Pruned  {prune_info["amount"]} clovers')
+                    f'Pruned {prune_info["amount"]} clovers 🍀🔫')
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error posting prune info to mod_log: {e}')
