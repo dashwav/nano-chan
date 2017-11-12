@@ -12,15 +12,14 @@ class Reactions():
 
     def __init__(self, bot):
         self.bot = bot
-        self.triggers = await self.bot.postgres_controller.get_all_triggers()
         super().__init__()
 
     @commands.group(aliases=['reacts'])
     @checks.is_admin()
     async def reactions(self, ctx):
+        self.triggers = await self.bot.postgres_controller.get_all_triggers()
         if ctx.invoked_subcommand is None:
             desc = ''
-            self.triggers = await self.bot.postgres_controller.get_all_triggers()
             for trigger in self.triggers:
                 desc += f'{trigger}\n'
             local_embed = discord.Embed(
