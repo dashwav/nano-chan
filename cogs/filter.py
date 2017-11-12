@@ -28,10 +28,12 @@ class Filter():
             user_deleted = await self.bot.postgres_controller.get_message_deleted(
                 message.author.id
             )
-            if user_deleted in [5,10,20,100]:
+            self.bot.logger.info(user_deleted)
+            if int(user_deleted) in [5,10,20,100]:
+                self.bot.logger.info('koko wa deska')
                 time = self.bot.timestamp()
                 mod_info = self.bot.get_channel(self.bot.mod_info)
-                mod_info.send(
+                await mod_info.send(
                     f'**{time} | SPAM:** {message.author} has had {user_deleted} '\
                     f'messages deleted in #welcome-center'
                 )

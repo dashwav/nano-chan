@@ -66,7 +66,7 @@ class Nanochan(Bot):
         returns a timestamp formatted string
         """
         current = datetime.datetime.utcnow()
-        return time.strftime('%H:%M:%S')
+        return current.strftime('%H:%M:%S')
 
     async def on_ready(self):
         self.logger.info(f'\nLogged in as\n{self.user.name}'

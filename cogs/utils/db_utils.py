@@ -38,6 +38,7 @@ async def make_tables(pool: Pool, schema: str):
     CREATE TABLE IF NOT EXISTS {}.spam (
         userid BIGINT,
         logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (logtime)
     );""".format(schema)
 
     roles = """
@@ -102,6 +103,7 @@ async def make_tables(pool: Pool, schema: str):
       PRIMARY KEY (serverid)
     );""".format(schema)
 
+    await pool.execute(spam)
     await pool.execute(roles)
     await pool.execute(moderation)
     await pool.execute(emojis)
@@ -283,7 +285,7 @@ class PostgresController():
         """.format(self.schema)
         await self.pool.execute(sql, user_id)
 
-    async def get_message_delete(self, user_id: int):
+    async def get_message_deleted(self, user_id: int):
         """
         Returns count of message deletions
         """
@@ -291,7 +293,7 @@ class PostgresController():
         SELECT COUNT(*) FROM {}.spam
         WHERE userid = $1;
         """.format(self.schema)
-        return await self.pool.fetchrow(sql, user_id)
+        return await self.pool.fetchval(sql, user_id)
 
 
     async def add_whitelist_channel(self, server_id: int, channel_id: int):
