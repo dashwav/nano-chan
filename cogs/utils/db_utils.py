@@ -34,6 +34,16 @@ async def make_tables(pool: Pool, schema: str):
     """
     await pool.execute('CREATE SCHEMA IF NOT EXISTS {};'.format(schema))
 
+    reacts = """
+    CREATE TABLE IF NOT EXISTS {}.reacts (
+        id SERIAL,
+        trigger TEXT UNIQUE,
+        reaction TEXT,
+        created_at TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (id, trigger)
+    );
+    """.format(schema)
+
     spam = """
     CREATE TABLE IF NOT EXISTS {}.spam (
         userid BIGINT,
@@ -310,3 +320,49 @@ class PostgresController():
         this would be a cool thing to have
         """
         return
+
+    async def get_all_triggers(self):
+        """
+        Returns list of triggers
+        """
+        sql = """
+        SELECT trigger FROM {}.reacts;
+        """
+        trigger_list = []
+        records = await self.pool.fetch(sql)
+        for rec in records:
+            trigger_list.append(rec['trigger'])
+        return trigger_list
+
+    async def rem_reaction(self, trigger):
+        """
+        REmoves a value from the reacts DB
+        """
+        sql = """
+        DELETE FROM {}.reacts WHERE trigger = $1;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, trigger)
+
+    async def add_reaction(self, trigger, reaction):
+        """
+        sets or updates a reaction
+        """
+        sql = """
+        INSERT INTO {}.reacts VALUES ($1, $2)
+        ON CONFLICT (trigger)
+        DO UPDATE SET
+        reaction = $3 WHERE trigger = $4;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, trigger, reaction, reaction, trigger)
+
+    async def get_reaction(self, trigger):
+        """
+        returns a reaction TEXT
+        """
+        sql = """
+        SELECT reaction FROM {}.reacts
+        WHERE trigger = $1;
+        """.format(self.schema)
+        return await self.pool.fetchval(sql, trigger)
