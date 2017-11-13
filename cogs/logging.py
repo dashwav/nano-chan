@@ -25,7 +25,7 @@ class Logging():
             try:
                 mod_info = self.bot.get_channel(self.bot.mod_info)
                 local_embed = discord.Embed(
-                    title=f'DM report:',
+                    title=f'DM report from {a_irl_member.name}#{a_irl_member.discriminator}:',
                     description=message.clean_content
                 )
                 await mod_info.send(embed=local_embed)
