@@ -10,6 +10,25 @@ class Logging():
         self.bot = bot
         super().__init__()
 
+    async def on_message(self, message):
+        if not message.channel isinstance(discord.DMChannel):
+            return
+        if message.author.bot:
+            return
+        guild = self.get_guild(self.bot.guild_id)
+        a_irl_member = guild.get_member(message.author.id)
+        found_role = False
+        for role in member.roles:
+            if role.name.lower() = 'member':
+                found_role = True
+        if found_role:
+            mod_info = self.get_channel(self.mod_info)
+            local_embed = discord.Embed(
+                title=f'DM report:',
+                description=message.clean_content
+            )
+            await mod_info.send(embed=local_embed)
+
     async def on_member_update(self, before, after):
         if before.roles != after.roles:
             mod_info = self.bot.get_channel(self.bot.mod_info)
