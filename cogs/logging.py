@@ -19,9 +19,15 @@ class Logging():
             for role in role_diff:
                 if role.name.lower() == 'clover':
                     await mod_info.send(
-                        f'**{time} | CLOVER:**Successfully applied clover to '
-                        f'{after.name}#{after.discriminator}. [Joined: {join}]')
+                        f'**{time} | CLOVER: **Successfully applied clover to '
+                        f'{after.mention}. [Joined: {join}]')
                 elif role.name.lower() == 'member':
+                    for role in before.roles:
+                        if role.name.lower() == 'clover':
+                            return
                     await mod_info.send(
-                        f'**{time} | MEMBER:**Successfully applied member to '
-                        f'{after.name}#{after.discriminator}. [Joined: {join}]')
+                        f'**{time} | MEMBER: **Successfully applied member to '
+                        f'{after.mention}. [Joined: {join}]')
+
+def setup(bot):
+    bot.add_cog(Logging(bot))

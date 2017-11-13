@@ -12,6 +12,7 @@ class Reactions():
 
     def __init__(self, bot):
         self.bot = bot
+        self.triggers = []
         super().__init__()
 
     @commands.group(aliases=['reacts'])
@@ -26,6 +27,7 @@ class Reactions():
                 title=f'Current Reaction Triggers:',
                 description = desc,
             )
+            await ctx.send(embed=local_embed)
 
     @reactions.command()
     @checks.is_admin()
@@ -67,9 +69,9 @@ class Reactions():
         """
         if self.triggers is None:
             return
-        if message.clean_content is in self.triggers:
-            await ctx.send(
-                self.bot.postgres_controller.get_reaction(self, message.clean_content)
+        if message.clean_content in self.triggers:
+            await message.channel.send(
+                await self.bot.postgres_controller.get_reaction(message.clean_content)
             )
 
 

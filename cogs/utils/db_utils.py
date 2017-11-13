@@ -112,7 +112,7 @@ async def make_tables(pool: Pool, schema: str):
       addtime TIMESTAMP DEFAULT current_timestamp,
       PRIMARY KEY (serverid)
     );""".format(schema)
-
+    await pool.execute(reacts)
     await pool.execute(spam)
     await pool.execute(roles)
     await pool.execute(moderation)
@@ -327,7 +327,7 @@ class PostgresController():
         """
         sql = """
         SELECT trigger FROM {}.reacts;
-        """
+        """.format(self.schema)
         trigger_list = []
         records = await self.pool.fetch(sql)
         for rec in records:
@@ -349,11 +349,11 @@ class PostgresController():
         sets or updates a reaction
         """
         sql = """
-        INSERT INTO {}.reacts VALUES ($1, $2)
+        INSERT INTO {}.reacts (trigger, reaction) VALUES ($1, $2)
         ON CONFLICT (trigger)
         DO UPDATE SET
-        reaction = $3 WHERE trigger = $4;
-        """.format(self.schema)
+        reaction = $3 WHERE {}.reacts.trigger = $4;
+        """.format(self.schema, self.schema)
 
         await self.pool.execute(sql, trigger, reaction, reaction, trigger)
 

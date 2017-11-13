@@ -39,7 +39,7 @@ class Janitor():
             except Exception as e:
                 self.bot.logger.warning(f'Error creating dm channel: {e}')
             await self.owner.dm_channel.send('Bot started successfully')
-            await self.server_logs.send('Bot started successfully')
+            #await self.server_logs.send('Bot started successfully')
         except Exception as e:
             self.bot.logger.warning(f'Error getting dm channel: {e}')
 
