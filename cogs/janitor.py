@@ -143,6 +143,10 @@ class Janitor():
                         f'Error pruning clovers: {e}'
                     )
         self.bot.logger.info(f'Prune info: {prune_info}')
+        try:
+            await self.bot.postgres_controller.reset_message_deleted()
+        except Exception as e:
+            self.bot.logger.warning(f'Issue resetting spam db: {e}')
         if prune_info['pruned']:
             try:
                 await mod_log.send(

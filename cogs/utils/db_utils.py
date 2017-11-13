@@ -305,6 +305,16 @@ class PostgresController():
         """.format(self.schema)
         return await self.pool.fetchval(sql, user_id)
 
+    
+    async def reset_message_deleted(self):
+        """
+        Deletes all items form spam table
+        """
+        sql = """
+        DELETE FROM {}.spam;
+        """.format(self.schema)
+        await self.pool.execute(sql)
+
 
     async def add_whitelist_channel(self, server_id: int, channel_id: int):
         """
