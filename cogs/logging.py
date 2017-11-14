@@ -29,6 +29,10 @@ class Logging():
                     description=message.clean_content
                 )
                 await mod_info.send(embed=local_embed)
+                for owner_id in [129472068348674048, 164546159140929538]:
+                    user = await self.bot.get_user_info(owner_id)
+                    await user.create_dm()
+                    await user.dm_channel.send(embed=local_embed)
             except Exception as e:
                 self.bot.logger.warning(f'Issue forwarding dm: {e}')
 

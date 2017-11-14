@@ -86,7 +86,7 @@ class Janitor():
     @commands.command(hidden=True)
     @checks.has_permissions(manage_roles=True)
     async def prune(self, ctx):
-        await self.bot.logger.info(f'Prune requested by: {ctx.message.author}')
+        self.bot.logger.info(f'Prune requested by: {ctx.message.author}')
         await self.prune_clovers()
 
     @prune.error
@@ -102,7 +102,10 @@ class Janitor():
             await self.prune_clovers()
 
     async def prune_clovers(self):
-        self.bot.logger.info('Starting prune task now')
+        try:
+            self.bot.logger.info('Starting prune task now')
+        except Exception as e:
+            self.bot.logger.info('tf')
         safe_users = []
         clovers = []
         clover_role = None
