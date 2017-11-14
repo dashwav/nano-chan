@@ -42,6 +42,7 @@ class Logging():
                     user = await self.bot.get_user_info(owner_id)
                     await user.create_dm()
                     await user.dm_channel.send(embed=local_embed)
+                await message.channel.send(':white_check_mark: Message sent. Thanks.')
             except Exception as e:
                 self.bot.logger.warning(f'Issue forwarding dm: {e}')
 
