@@ -28,6 +28,15 @@ class Logging():
                     title=f'DM report from {a_irl_member.name}#{a_irl_member.discriminator}:',
                     description=message.clean_content
                 )
+                if message.attachments:
+                    desc = ''
+                    for file in message.attachments:
+                        desc += f'{file.url}\n'
+                    local_embed.add_field(
+                        name='Attachments',
+                        value=f'{desc}',
+                        inline=True
+                    )
                 await mod_info.send(embed=local_embed)
                 for owner_id in [129472068348674048, 164546159140929538]:
                     user = await self.bot.get_user_info(owner_id)
