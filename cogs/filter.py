@@ -13,6 +13,8 @@ class Filter():
         self.filter_allowed = bot.filter_allowed
 
     async def on_message(self, message):
+        if isinstance(message.channel, discord.DMChannel):
+            return
         if message.channel.id not in self.channels:
             return
         if message.author.bot:
