@@ -13,8 +13,6 @@ class Filter():
         self.filter_allowed = bot.filter_allowed
 
     async def on_message(self, message):
-        if isinstance(message.channel, discord.DMChannel):
-            return
         if message.channel.id not in self.channels:
             return
         if message.author.bot:
@@ -30,9 +28,7 @@ class Filter():
             user_deleted = await self.bot.postgres_controller.get_message_deleted(
                 message.author.id
             )
-            self.bot.logger.info(user_deleted)
             if int(user_deleted) in [5,10,20,100]:
-                self.bot.logger.info('koko wa deska')
                 time = self.bot.timestamp()
                 mod_info = self.bot.get_channel(self.bot.mod_info)
                 await mod_info.send(
