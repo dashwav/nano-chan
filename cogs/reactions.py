@@ -2,6 +2,7 @@
 Class for adding custom reactions
 """
 import discord
+from asyncio import get_event_loop
 from discord.ext import commands
 from .utils import checks
 
@@ -13,6 +14,9 @@ class Reactions():
     def __init__(self, bot):
         self.bot = bot
         self.triggers = []
+        loop = get_event_loop()
+        self.triggers = loop.run_until_complete(
+            self.bot.postgres_controller.get_all_triggers())
         super().__init__()
 
     @commands.group(aliases=['reacts'])
