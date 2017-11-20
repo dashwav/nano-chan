@@ -6,6 +6,13 @@ from asyncio import get_event_loop
 from discord.ext import commands
 from .utils import checks
 
+ALLOWED_CHANNELS = [
+    378684962934751239,
+    282640120388255744,
+    220762067739738113,
+    176429411443146752
+]
+
 
 class Reactions():
     """
@@ -71,6 +78,8 @@ class Reactions():
         """
         Actually responds with the reaction
         """
+        if not message.channel in ALLOWED_CHANNELS:
+            return
         if self.triggers is None:
             return
         if message.clean_content in self.triggers:
