@@ -98,7 +98,7 @@ class Janitor():
     async def daily_prune(self):
         self.bot.logger.info("Starting prune task, first prune in 24 hours")
         while not self.bot.is_closed():
-            await asyncio.sleep(86400)
+            await asyncio.sleep(259200)
             await self.prune_clovers()
 
     async def prune_clovers(self):

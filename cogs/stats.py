@@ -34,12 +34,11 @@ class Stats:
                 if emoji_id == str(emoji):
                     confirmed_emojis.append(emoji)
         try:
-            await self.bot.postgres_controller.add_message(message)
             for emoji in confirmed_emojis:
                 await self.bot.postgres_controller.add_emoji(
                     emoji, message.id, message.author, message.channel, False)
         except Exception as e:
-            self.bot.logger.warning(f'Error adding message to db: {e}')
+            self.bot.logger.warning(f'Error adding emoji to db: {e}')
 
     async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
         """

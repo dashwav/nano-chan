@@ -39,6 +39,7 @@ class Spoils():
         self.bot.logger.info("Starting spoiler task")
         while not self.bot.is_closed():
             for channel_id in self.bot.spoiler_channels:
+                self.bot.logger.info(f'Checking for spoilers')
                 try:
                     channel = self.bot.get_channel(channel_id)
                 except Exception as e:
