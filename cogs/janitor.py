@@ -98,7 +98,7 @@ class Janitor():
     async def daily_prune(self):
         self.bot.logger.info("Starting prune task, first prune in 24 hours")
         while not self.bot.is_closed():
-            await asyncio.sleep(259200)
+            await asyncio.sleep(86400)
             await self.prune_clovers()
 
     async def prune_clovers(self):
@@ -110,7 +110,7 @@ class Janitor():
         clovers = []
         clover_role = None
         mod_log = self.bot.get_channel(self.bot.mod_log)
-        dt_24hr = datetime.utcnow() - timedelta(days=1)
+        dt_24hr = datetime.utcnow() - timedelta(days=3)
         a_irl = self.bot.get_guild(self.bot.guild_id)
         for role in a_irl.roles:
             if role.name.lower() == 'clover':
