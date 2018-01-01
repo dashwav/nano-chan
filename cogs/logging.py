@@ -59,7 +59,7 @@ class Logging():
                         f'{after.mention}. [Joined: {join}]')
                 elif role.name.lower() == 'member':
                     for role in before.roles:
-                        if '??' in role.name.lower():
+                        if '🔑' in role.name.lower():
                             return
                         elif role.name.lower() == 'clover':
                             return
