@@ -17,10 +17,13 @@ class Fightclub():
         self.bot = bot
 
     @commands.command()
+    @commands.cooldown(rate=1, per=2.0, type=commands.BucketType.user)
     async def fight(self, ctx, target: discord.Member):
         """
         """
         if ctx.channel.id not in [367217621701099520, 403805028697243648]:
+            return
+        if ctx.message.author == target:
             return
 
         try:
@@ -54,9 +57,9 @@ class Fightclub():
                 False, loser, self.elo(def_elo, 0))
             await ctx.send(embed=discord.Embed(
                 title='Results',
-                description=f'{winner.mention} '
+                description=f'{aggressor["username"]} '
                             f'({aggressor["elo"]} + {round(self.elo(aggro_elo, 1), 1)})'
-                            f' took down {loser.mention} '
+                            f' took down {defender["username"]} '
                             f'({defender["elo"]} {round(self.elo(def_elo, 0), 1)})'
                             f' with {roll} damage.'
             ))
@@ -65,14 +68,14 @@ class Fightclub():
             loser = ctx.message.author
             roll = 1000 - roll
             await self.bot.postgres_controller.add_fightclub_win(
-                False, winner, self.elo(def_elo, 1))
+                False, winner, self.elo(def_elo, 1.05))
             await self.bot.postgres_controller.add_fightclub_loss(
                 True, loser, self.elo(aggro_elo, 0))
             await ctx.send(embed=discord.Embed(
                 title='Results',
-                description=f'{winner.mention} '
-                            f'({defender["elo"]} + {round(self.elo(def_elo, 1), 1)})'
-                            f' took down {loser.mention} '
+                description=f'{defender["username"]} '
+                            f'({defender["elo"]} + {round(self.elo(def_elo, 1.05), 1)})'
+                            f' took down {aggressor["username"]} '
                             f'({aggressor["elo"]} {round(self.elo(aggro_elo, 0), 1)})'
                             f' with {roll} damage.'
             ))
@@ -119,6 +122,12 @@ class Fightclub():
 
     @commands.command()
     @commands.is_owner()
+    async def dock(self, ctx, member: discord.Member, amt=50):
+        await self.bot.postgres_controller.add_fightclub_loss(True, member, -amt)
+        await ctx.send(':okhand:')
+
+    @commands.command()
+    @commands.is_owner()
     async def full_leaderboard(self, ctx, *, amt: int=80):
         if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
@@ -133,11 +142,11 @@ class Fightclub():
         local_embed = discord.Embed(
             title=f'Top {amt} by elo:',description='')
         count = 1
-        while amt/40 > 0:
-            local_embed.add_field(name='--', value=(await self.get_member_string(
-                ctx.guild, 'elo', full_elo[((count * 40) - 40):((count * 40) - 1)])))
+        while amt/20 > 0:
+            local_embed.add_field(name=f'{((count * 20) - 20)} - {((count * 20) - 1)}', value=(await self.get_member_string(
+                ctx.guild, 'elo', full_elo[((count * 20) - 20):((count * 20) - 1)])))
             count += 1
-            amt -= 40
+            amt -= 20
         await ctx.send(embed=local_embed)
 
     def ratio(self, a ,b):
@@ -151,11 +160,9 @@ class Fightclub():
 
     async def get_member_string(self, server, attribute, usr_list):
         string = ''
-        count = 0
         for member in usr_list:
-            count += 1
             user = server.get_member(member['userid'])
-            string += (f'**{count}.**  {user.mention}  ({member[attribute]})\n')
+            string += (f'{member["username"]}  ({member[attribute]})\n')
         return string
 
     def expected(self, A, B):
@@ -166,7 +173,7 @@ class Fightclub():
         """      
         return 1 / (1 + 10 ** ((B - A) / 400))
 
-    def elo(self, exp, score, k=32):
+    def elo(self, exp, score, k=64):
         """
         Calculate the new Elo rating for a player
         :param old: The previous Elo rating
