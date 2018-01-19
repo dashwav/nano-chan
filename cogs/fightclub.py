@@ -198,15 +198,31 @@ class Fightclub():
                 full_list,
                 key=lambda user: user['elo'],
                 reverse=True))
-        full_leaderboard_embed = discord.Embed(
-            title='Full Leaderboard', description=f'')
+        full_leaderboard_embed1 = discord.Embed(
+            title='Full Leaderboard Page 1', description=f'')
+        full_leaderboard_embed2 = discord.Embed(
+            title='Full Leaderboard Page 2', description=f'')
+        full_leaderboard_embed3 = discord.Embed(
+            title='Full Leaderboard Page 3', description=f'')
         leaderboard_list = all_member_elo.split('\n')
         leaderboard_s = ''
+        count = 0
+        board = 1
         for user in leaderboard_list:
             if len(leaderboard_s) > 980:
-                full_leaderboard_embed.add_field(
+                count += 1
+                if count > 11:
+                    full_leaderboard_embed3.add_field(
                     name='----', value=leaderboard_s)
-                leaderboard_s = ''
+                    leaderboard_s = ''
+                elif count > 5:
+                    full_leaderboard_embed2.add_field(
+                    name='----', value=leaderboard_s)
+                    leaderboard_s = ''
+                else:
+                    full_leaderboard_embed1.add_field(
+                        name='----', value=leaderboard_s)
+                    leaderboard_s = ''
             leaderboard_s += user
         final_stats_embed = discord.Embed(
             title='Top 10\'s', description='--------')
@@ -225,7 +241,9 @@ class Fightclub():
                         f'Total Aggressive winrate: {total_aggro_r}\n'
                         f'Total Defensive winrate: {total_def_r}\n'
             )
-        await ctx.send(embed=full_leaderboard_embed)
+        await ctx.send(embed=full_leaderboard_embed1)
+        await ctx.send(embed=full_leaderboard_embed2)
+        await ctx.send(embed=full_leaderboard_embed3)
         await ctx.send(embed=final_stats_embed)
         await ctx.send(embed=overall_stats_embed)
 
