@@ -172,7 +172,7 @@ class Fightclub():
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
             ctx.guild,
-            'aggrowins'
+            'aggrowins',
             sorted(
                 full_list,
                 key=lambda user: user['aggrowins'],
@@ -186,14 +186,14 @@ class Fightclub():
                 reverse=True)[:10])
         top_10_wr = await self.get_member_string(
             ctx.guild,
-            'winrate',
+            'winratio',
             sorted(
                 full_list,
-                key=lambda user: user['winrate'],
+                key=lambda user: user['winratio'],
                 reverse=True)[:10])
         all_member_elo = await self.get_member_string(
             ctx.guild,
-            'elo_final'
+            'elo_final',
             sorted(
                 full_list,
                 key=lambda user: user['elo'],
@@ -245,7 +245,8 @@ class Fightclub():
             if attribute == 'elo_final':
                 string += (
                     f'**{count}.**  {member["username"]}  '
-                    f'({member["elo"]}) W/L: {member["winrate"]}\n')
+                    f'({member["elo"]}) W/L: {member["winratio"]}\n')
+                continue
             string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
         return string
 
