@@ -174,30 +174,30 @@ class Fightclub():
             ctx.guild,
             sorted(
                 full_list,
+                'aggrowins'
                 key=lambda user: user['aggrowins'],
-                reverse=True)[:10],
-            'aggrowins')
+                reverse=True)[:10])
         top_10_def = await self.get_member_string(
             ctx.guild,
             sorted(
                 full_list,
+                'defwins',
                 key=lambda user: user['defwins'],
-                reverse=True)[:10],
-            'defwins')
+                reverse=True)[:10])
         top_10_wr = await self.get_member_string(
             ctx.guild,
             sorted(
                 full_list,
+                'winrate',
                 key=lambda user: user['winrate'],
-                reverse=True)[:10],
-            'winrate')
+                reverse=True)[:10])
         all_member_elo = await self.get_member_string(
             ctx.guild,
+            'elo_final'
             sorted(
                 full_list,
                 key=lambda user: user['elo'],
-                reverse=True),
-            'elo')
+                reverse=True))
         full_leaderboard_embed = discord.Embed(
             title='Full Leaderboard', description=f'')
         leaderboard_list = all_member_elo.split('\n')
