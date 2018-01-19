@@ -3,8 +3,6 @@ Fun things with stats
 """
 import discord
 import datetime
-import calendar
-from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from .utils import helpers, checks
 from discord.ext import commands

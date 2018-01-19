@@ -23,7 +23,7 @@ class Spoils():
         except Exception as e:
             self.bot.logger.warning(f"Error starting task {e}")
 
-    @commands.command(aliases = ['tenfeettaller'])
+    @commands.command(aliases=['tenfeettaller'])
     @checks.has_permissions(manage_roles=True)
     async def wall(self, ctx, *, reason=None):
         local_embed = self.create_wall_embed(reason)
@@ -58,7 +58,7 @@ class Spoils():
                                         f' {channel_id}: {e}')
                 else:
                     self.bot.logger.warning(
-                        f'Couldn\'t find channel: {channel_id}: {e}')
+                        f'Couldn\'t find channel: {channel_id}:')
             await asyncio.sleep(60)
 
     def create_wall_embed(self, reason=None):

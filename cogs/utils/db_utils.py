@@ -112,7 +112,21 @@ async def make_tables(pool: Pool, schema: str):
       addtime TIMESTAMP DEFAULT current_timestamp,
       PRIMARY KEY (serverid)
     );""".format(schema)
+
+    fightclub = """
+    CREATE TABLE IF NOT EXISTS {}.fightclub (
+        userid BIGINT,
+        username varchar,
+        elo INT,
+        aggrowins INT,
+        aggroloss INT,
+        defwins INT,
+        defloss INT,
+        PRIMARY KEY (userid)
+    );""".format(schema)
+
     await pool.execute(reacts)
+    await pool.execute(fightclub)
     await pool.execute(spam)
     await pool.execute(roles)
     await pool.execute(moderation)
@@ -376,3 +390,85 @@ class PostgresController():
         WHERE trigger = $1;
         """.format(self.schema)
         return await self.pool.fetchval(sql, trigger)
+
+    async def add_fightclub_member(self, member):
+        """
+        Adds a user to the fight club db
+        """
+        sql = """
+        INSERT INTO {}.fightclub VALUES ($1, $2, 1200, 0, 0, 0, 0)
+        ON CONFLICT (userid)
+        DO NOTHING;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, member.id, member.name)
+        return await self.get_fightclub_member(member)
+
+    async def update_fightclub_member(self, member, data):
+        """
+        Updates a row with new data
+        """
+        sql = """
+        UPDATE {}.fightclub
+        SET elo = $1, aggrowins = $2, aggroloss = $3, defwins = $4, defloss = $5
+        WHERE userid = $6;
+        """.format(self.schema)
+
+        await self.pool.execute(
+            sql,
+            data['elo'],
+            data['aggrowins'],
+            data['aggroloss'],
+            data['defwins'],
+            data['defloss'],
+            member.id)
+
+    async def add_fightclub_win(self, aggro, member, score):
+        """
+        Adds a win to a user in fight club
+        """
+        stats = dict(await self.get_fightclub_member(member))
+        stats['elo'] = stats['elo'] + score
+        if aggro:
+            stats['aggrowins'] += 1
+        else:
+            stats['defwins'] += 1
+
+        await self.update_fightclub_member(member, stats)
+
+    async def add_fightclub_loss(self, aggro, member, score):
+        """
+        Adds a win to a user in fight club
+        """
+        stats = dict(await self.get_fightclub_member(member))
+        stats['elo'] += score
+        if aggro:
+            stats['aggroloss'] += 1
+        else:
+            stats['defloss'] += 1
+
+        await self.update_fightclub_member(member, stats)
+
+    async def get_fightclub_member(self, member):
+        """
+        Returns a users info in dict format
+        """
+        sql = """
+        SELECT * FROM {}.fightclub 
+        WHERE userid = $1;
+        """.format(self.schema)
+
+        return await self.pool.fetchrow(sql, member.id)
+
+    async def get_fightclub_stats(self):
+        """
+        Returns a dict of every fightclub member
+        """
+        sql = """
+        SELECT * FROM {}.fightclub;
+        """.format(self.schema)
+        records = await self.pool.fetch(sql)
+        ret_list = []
+        for record in records:
+            ret_list.append(dict(record))
+        return ret_list
