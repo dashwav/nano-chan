@@ -84,9 +84,20 @@ class Fightclub():
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
         if member is None:
+            total_aggro_w = 0
+            total_aggro_l = 0
+            total_def_w = 0
+            total_def_l = 0
+            for entry in full_list:
+                total_aggro_w += entry['aggrowins']
+                total_aggro_l += entry['aggroloss']
+                total_def_w += entry['defwins']
+                total_def_l += entry['defloss']
+            total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
+            total_def_r = self.ratio(total_def_w, total_def_l)
             top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
             top_5_def = sorted(full_list, key=lambda user: user['defwins'], reverse=True)[:5]
-            local_embed = discord.Embed(title='Overall Stats', description='-----------------')
+            local_embed = discord.Embed(title='Overall Stats', description=f'Offensive Ratio: {total_aggro_r}\nDefensive Ratio: {total_def_r}')
             local_embed.add_field(name='Top 10 (by score)', value=(
                 await self.get_member_string(ctx.guild, 'elo', full_elo[:10])))
             await ctx.send(embed=local_embed)
@@ -108,7 +119,7 @@ class Fightclub():
 
     @commands.command()
     @commands.is_owner()
-    async def full_leaderboard(self, ctx, *, amt: int=100):
+    async def full_leaderboard(self, ctx, *, amt: int=80):
         if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
@@ -119,12 +130,17 @@ class Fightclub():
                 description=(await self.get_member_string(
                     ctx.guild, 'elo', full_elo))))
             return
-        await ctx.send(embed=discord.Embed(
-            title=f'Top {amt} by elo:',
-            description=(await self.get_member_string(
-                ctx.guild, 'elo', full_elo[:amt]))))
+        local_embed = discord.Embed(
+            title=f'Top {amt} by elo:',description='')
+        count = 1
+        while amt/40 > 0:
+            local_embed.add_field(name='--', value=(await self.get_member_string(
+                ctx.guild, 'elo', full_elo[((count * 40) - 40):((count * 40) - 1)])))
+            count += 1
+            amt -= 40
+        await ctx.send(embed=local_embed)
 
-    def ratio(self, a,b):
+    def ratio(self, a ,b):
         a = float(a)
         b = float(b)
         if b == 0:
