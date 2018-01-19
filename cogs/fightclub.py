@@ -172,23 +172,23 @@ class Fightclub():
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
             ctx.guild,
+            'aggrowins'
             sorted(
                 full_list,
-                'aggrowins'
                 key=lambda user: user['aggrowins'],
                 reverse=True)[:10])
         top_10_def = await self.get_member_string(
             ctx.guild,
+            'defwins',
             sorted(
                 full_list,
-                'defwins',
                 key=lambda user: user['defwins'],
                 reverse=True)[:10])
         top_10_wr = await self.get_member_string(
             ctx.guild,
+            'winrate',
             sorted(
                 full_list,
-                'winrate',
                 key=lambda user: user['winrate'],
                 reverse=True)[:10])
         all_member_elo = await self.get_member_string(
