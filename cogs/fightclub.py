@@ -149,20 +149,96 @@ class Fightclub():
             amt -= 20
         await ctx.send(embed=local_embed)
 
-    def ratio(self, a ,b):
+    @commands.command()
+    @commands.is_owner()
+    async def final_stats(self, ctx):
+        full_list = await self.bot.postgres_controller.get_fightclub_stats()
+        total_aggro_w = 0
+        total_aggro_l = 0
+        total_def_w = 0
+        total_def_l = 0
+        for entry in full_list:
+            total_aggro_w += entry['aggrowins']
+            total_aggro_l += entry['aggroloss']
+            entry['aggroratio'] = self.ratio(
+                entry['aggrowins'], entry['aggroloss'])
+            total_def_w += entry['defwins']
+            total_def_l += entry['defloss']
+            entry['defratio'] = self.ratio(entry['defwins'], entry['defloss'])
+            entry['winratio'] = self.ratio(
+                (entry['aggrowins']+entry['defwins']),
+                (entry['aggroloss']+entry['defloss']))
+        total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
+        total_def_r = self.ratio(total_def_w, total_def_l)
+        top_10_aggro = await self.get_member_string(
+            sorted(
+                full_list,
+                key=lambda user: user['aggrowins'],
+                reverse=True)[:10])
+        top_10_def = await self.get_member_string(
+            sorted(
+                full_list,
+                key=lambda user: user['defwins'],
+                reverse=True)[:10])
+        top_10_wr = await self.get_member_string(
+            sorted(
+                full_list,
+                key=lambda user: user['winrate'],
+                reverse=True)[:10])
+        all_member_elo = await self.get_member_string(
+            sorted(
+                full_list,
+                key=lambda user: user['elo'],
+                reverse=True))
+        full_leaderboard_embed = discord.Embed(
+            title='Full Leaderboard', description=f'')
+        leaderboard_list = all_member_elo.split('\n')
+        leaderboard_s = ''
+        for user in leaderboard_list:
+            if len(leaderboard_s) > 980:
+                full_leaderboard_embed.add_field(
+                    name='----', value=leaderboard_s)
+                leaderboard_s = ''
+            leaderboard_s += user
+        final_stats_embed = discord.Embed(
+            title='Top 10\'s',description='--------')
+        final_stats_embed.add_field(
+            name='Top 10 by Aggressive Wins: ', value=top_10_aggro)
+        final_stats_embed.add_field(
+            name='Top 10 by Defensive Wins: ', value=top_10_def)
+        final_stats_embed.add_field(
+            name='Top 10 by Winrate: ', value=top_10_wr)
+        overall_stats_embed = discord.Embed(
+            title='Overall Stats',
+            description=f'-------------'
+                        f'Total fights: {total_aggro_w + total_aggro_l}\n'
+                        f'Total Aggressive wins: {total_aggro_w}'
+                        f'Total Defensive wins: {total_def_w}\n'
+                        f'Total Aggressive winrate: {total_aggro_r}\n'
+                        f'Total Defensive winrate: {total_def_r}\n'
+            )
+        await ctx.send(embed=full_leaderboard_embed)
+        await ctx.send(embed=final_stats_embed)
+        await ctx.send(embed=overall_stats_embed)
+
+    def ratio(self, a, b):
         a = float(a)
         b = float(b)
         if b == 0:
             return a
         ratio_u = a/b
         return round(ratio_u, 2)
- 
 
     async def get_member_string(self, server, attribute, usr_list):
         string = ''
+        count = 0
         for member in usr_list:
-            user = server.get_member(member['userid'])
-            string += (f'{member["username"]}  ({member[attribute]})\n')
+            count += 1
+            if attribute == 'elo':
+                string += (
+                    f'**{count}.**  {member["username"]}  '
+                    f'({member[attribute]}) W/L: {member["winrate"]}\n')
+            string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
         return string
 
     def expected(self, A, B):
