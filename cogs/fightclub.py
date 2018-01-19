@@ -171,25 +171,33 @@ class Fightclub():
         total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
+            ctx.guild,
             sorted(
                 full_list,
                 key=lambda user: user['aggrowins'],
-                reverse=True)[:10])
+                reverse=True)[:10],
+            'aggrowins')
         top_10_def = await self.get_member_string(
+            ctx.guild,
             sorted(
                 full_list,
                 key=lambda user: user['defwins'],
-                reverse=True)[:10])
+                reverse=True)[:10],
+            'defwins')
         top_10_wr = await self.get_member_string(
+            ctx.guild,
             sorted(
                 full_list,
                 key=lambda user: user['winrate'],
-                reverse=True)[:10])
+                reverse=True)[:10],
+            'winrate')
         all_member_elo = await self.get_member_string(
+            ctx.guild,
             sorted(
                 full_list,
                 key=lambda user: user['elo'],
-                reverse=True))
+                reverse=True),
+            'elo')
         full_leaderboard_embed = discord.Embed(
             title='Full Leaderboard', description=f'')
         leaderboard_list = all_member_elo.split('\n')
@@ -201,7 +209,7 @@ class Fightclub():
                 leaderboard_s = ''
             leaderboard_s += user
         final_stats_embed = discord.Embed(
-            title='Top 10\'s',description='--------')
+            title='Top 10\'s', description='--------')
         final_stats_embed.add_field(
             name='Top 10 by Aggressive Wins: ', value=top_10_aggro)
         final_stats_embed.add_field(
@@ -234,10 +242,10 @@ class Fightclub():
         count = 0
         for member in usr_list:
             count += 1
-            if attribute == 'elo':
+            if attribute == 'elo_final':
                 string += (
                     f'**{count}.**  {member["username"]}  '
-                    f'({member[attribute]}) W/L: {member["winrate"]}\n')
+                    f'({member["elo"]}) W/L: {member["winrate"]}\n')
             string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
         return string
 
