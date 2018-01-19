@@ -20,7 +20,7 @@ class Fightclub():
     async def fight(self, ctx, target: discord.Member):
         """
         """
-        if ctx.channel.id not in [367217621701099520]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
 
         try:
@@ -79,7 +79,7 @@ class Fightclub():
 
     @commands.command()
     async def stats(self, ctx, *, member: discord.Member = None):
-        if ctx.channel.id not in [367217621701099520]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
@@ -87,29 +87,35 @@ class Fightclub():
             top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
             top_5_def = sorted(full_list, key=lambda user: user['defwins'], reverse=True)[:5]
             local_embed = discord.Embed(title='Overall Stats', description='-----------------')
-            local_embed.add_field(name='Top 10 (by ELO)', value=(
+            local_embed.add_field(name='Top 10 (by score)', value=(
                 await self.get_member_string(ctx.guild, 'elo', full_elo[:10])))
             await ctx.send(embed=local_embed)
             return
         else:
             user_stats = await self.bot.postgres_controller.get_fightclub_member(member)
+            aggrowr = self.ratio(user_stats['aggrowins'], user_stats['aggroloss'])
+            defwr = self.ratio(user_stats['defwins'], user_stats['defloss'])
             await ctx.send(embed=discord.Embed(
                 title=f'Stats for {user_stats["username"]}',
-                description=f'Rank = {full_elo.index(dict(user_stats)) + 1}'
+                description=f'Rank: {full_elo.index(dict(user_stats)) + 1}'
                             f'/{len(full_elo)}\n'
-                            f'Elo = {user_stats["elo"]}\n'
+                            f'Score: {user_stats["elo"]}\n'
+                            f'Aggressive Wins: {user_stats["aggrowins"]}\n'
+                            f'Aggressive W/L: {aggrowr}\n'
+                            f'Defensive Wins: {user_stats["defwins"]}\n'
+                            f'Defensive W/L: {defwr}\n'
             ))
 
     @commands.command()
     @commands.is_owner()
     async def full_leaderboard(self, ctx, *, amt: int=100):
-        if ctx.channel.id not in [367217621701099520]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
         if amt == -1:
             await ctx.send(embed=discord.Embed(
-                title=f'Users sorted by elo:',
+                title=f'Users sorted by score:',
                 description=(await self.get_member_string(
                     ctx.guild, 'elo', full_elo))))
             return
@@ -117,6 +123,15 @@ class Fightclub():
             title=f'Top {amt} by elo:',
             description=(await self.get_member_string(
                 ctx.guild, 'elo', full_elo[:amt]))))
+
+    def ratio(self, a,b):
+        a = float(a)
+        b = float(b)
+        if b == 0:
+            return a
+        ratio_u = a/b
+        return round(ratio_u, 2)
+ 
 
     async def get_member_string(self, server, attribute, usr_list):
         string = ''
