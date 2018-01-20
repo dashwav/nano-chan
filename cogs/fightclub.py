@@ -223,7 +223,7 @@ class Fightclub():
                     full_leaderboard_embed1.add_field(
                         name='----', value=leaderboard_s)
                     leaderboard_s = ''
-            leaderboard_s += user
+            leaderboard_s += f'{user}\n'
         final_stats_embed = discord.Embed(
             title='Top 10\'s', description='--------')
         final_stats_embed.add_field(
@@ -234,16 +234,15 @@ class Fightclub():
             name='Top 10 by Winrate: ', value=top_10_wr)
         overall_stats_embed = discord.Embed(
             title='Overall Stats',
-            description=f'-------------'
+            description=f'-------------\n'
                         f'Total fights: {total_aggro_w + total_aggro_l}\n'
-                        f'Total Aggressive wins: {total_aggro_w}'
+                        f'Total Aggressive wins: {total_aggro_w}\n'
                         f'Total Defensive wins: {total_def_w}\n'
                         f'Total Aggressive winrate: {total_aggro_r}\n'
                         f'Total Defensive winrate: {total_def_r}\n'
             )
         await ctx.send(embed=full_leaderboard_embed1)
         await ctx.send(embed=full_leaderboard_embed2)
-        await ctx.send(embed=full_leaderboard_embed3)
         await ctx.send(embed=final_stats_embed)
         await ctx.send(embed=overall_stats_embed)
 
