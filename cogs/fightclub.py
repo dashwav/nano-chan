@@ -17,11 +17,11 @@ class Fightclub():
         self.bot = bot
 
     @commands.command()
-    @commands.cooldown(rate=1, per=2.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=30.0, type=commands.BucketType.user)
     async def fight(self, ctx, target: discord.Member):
         """
         """
-        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
         if ctx.message.author == target:
             return
@@ -46,8 +46,10 @@ class Fightclub():
                 target)
         aggro_elo = self.expected(aggressor['elo'], defender['elo'])
         def_elo = self.expected(defender['elo'], aggressor['elo'])
-
-        roll = rng.randint(0, 1000)
+        if target.bot:
+            roll = rng.randint(-1000, 1000)
+        else:
+            roll = rng.randint(0, 1000)
         if roll > 499:
             winner = ctx.message.author
             loser = target
@@ -58,10 +60,8 @@ class Fightclub():
             await ctx.send(embed=discord.Embed(
                 title='Results',
                 description=f'{aggressor["username"]} '
-                            f'({aggressor["elo"]} + {round(self.elo(aggro_elo, 1), 1)})'
-                            f' took down {defender["username"]} '
-                            f'({defender["elo"]} {round(self.elo(def_elo, 0), 1)})'
-                            f' with {roll} damage.'
+                            f'took down {defender["username"]} '
+                            f'with {roll} damage.'
             ))
         else:
             winner = target
@@ -74,13 +74,12 @@ class Fightclub():
             await ctx.send(embed=discord.Embed(
                 title='Results',
                 description=f'{defender["username"]} '
-                            f'({defender["elo"]} + {round(self.elo(def_elo, 1.05), 1)})'
-                            f' took down {aggressor["username"]} '
-                            f'({aggressor["elo"]} {round(self.elo(aggro_elo, 0), 1)})'
-                            f' with {roll} damage.'
+                            f'took down {aggressor["username"]} '
+                            f'with {roll} damage.'
             ))
 
     @commands.command()
+    @commands.is_owner()
     async def stats(self, ctx, *, member: discord.Member = None):
         if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
@@ -213,15 +212,15 @@ class Fightclub():
                 count += 1
                 if count > 11:
                     full_leaderboard_embed3.add_field(
-                    name='----', value=leaderboard_s)
+                    name='----', value=leaderboard_s, inline=True)
                     leaderboard_s = ''
                 elif count > 5:
                     full_leaderboard_embed2.add_field(
-                    name='----', value=leaderboard_s)
+                    name='----', value=leaderboard_s, inline=True)
                     leaderboard_s = ''
                 else:
                     full_leaderboard_embed1.add_field(
-                        name='----', value=leaderboard_s)
+                        name='----', value=leaderboard_s, inline=True)
                     leaderboard_s = ''
             leaderboard_s += f'{user}\n'
         final_stats_embed = discord.Embed(
