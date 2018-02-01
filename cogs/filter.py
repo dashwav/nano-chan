@@ -32,7 +32,7 @@ class Filter():
             )
             if int(user_deleted) in [5,10,20,100]:
                 time = self.bot.timestamp()
-                mod_info = self.bot.get_channel(self.bot.mod_info)
+                mod_info = self.bot.get_channel(259728514914189312)
                 await mod_info.send(
                     f'**{time} | SPAM:** {message.author} has had {user_deleted} '\
                     f'messages deleted in #welcome-center'

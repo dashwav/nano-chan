@@ -23,7 +23,7 @@ class Logging():
                 found_role = True
         if found_role:
             try:
-                mod_info = self.bot.get_channel(self.bot.mod_info)
+                mod_info = self.bot.get_channel(259728514914189312)
                 local_embed = discord.Embed(
                     title=f'DM report from {a_irl_member.name}#{a_irl_member.discriminator}:',
                     description=message.clean_content
@@ -38,8 +38,8 @@ class Logging():
                         inline=True
                     )
                 await mod_info.send(embed=local_embed)
-                for owner_id in [129472068348674048, 164546159140929538]:
-                    user = await self.bot.get_user_info(owner_id)
+                for user_id in self.dm_forward:
+                    user = await self.bot.get_user_info(user_id)
                     await user.create_dm()
                     await user.dm_channel.send(embed=local_embed)
                 await message.channel.send(':white_check_mark: Message sent. Thanks.')

@@ -2,9 +2,8 @@
 Database utility functions.
 """
 from datetime import datetime, timedelta
-from json import dumps, loads
 from typing import Optional
-from .enums import Change, Action
+from .enums import Change
 try:
     from asyncpg import Record, InterfaceError, UniqueViolationError, create_pool
     from asyncpg.pool import Pool
@@ -44,6 +43,14 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    clovers = """
+    CREATE TABLE IF NOT EXISTS {}.clovers (
+        userid BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (logtime)
+    )
+    """
+
     spam = """
     CREATE TABLE IF NOT EXISTS {}.spam (
         userid BIGINT,
@@ -60,44 +67,21 @@ async def make_tables(pool: Pool, schema: str):
       PRIMARY KEY (serverid, userid, change)
     );""".format(schema)
 
-    moderation = """
-    CREATE TABLE IF NOT EXISTS {}.moderation (
-      serverid BIGINT,
-      modid BIGINT,
-      targetid BIGINT,
-      action SMALLINT,
-      logtime TIMESTAMP DEFAULT current_timestamp,
-      PRIMARY KEY (serverid, modid, targetid, action)
-    );
-    """.format(schema)
-
     emojis = """
     CREATE TABLE IF NOT EXISTS {}.emojis (
-        id BIGINT,
-        name TEXT,
+        emoji_id BIGINT,
+        emoji_name TEXT,
         message_id BIGINT,
         channel_id BIGINT,
         channel_name TEXT,
         user_id BIGINT,
         user_name TEXT,
+        target_id BIGINT,
+        target_name TEXT,
         reaction BOOLEAN,
+        animated BOOLEAN,
         logtime TIMESTAMP DEFAULT current_timestamp,
-        PRIMARY KEY(id, message_id, user_id, reaction)
-    );
-    """.format(schema)
-
-    messages = """
-    CREATE TABLE IF NOT EXISTS {}.messages (
-      serverid BIGINT,
-      messageid BIGINT UNIQUE,
-      authorid BIGINT,
-      authorname TEXT,
-      channelid BIGINT,
-      channelname TEXT,
-      pinned BOOLEAN,
-      content VARCHAR(2000),
-      createdat TIMESTAMP,
-      PRIMARY KEY (serverid, messageid, authorid, channelid)
+        PRIMARY KEY(id, message_id, user_id, reaction, animated)
     );
     """.format(schema)
 
@@ -129,9 +113,8 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(fightclub)
     await pool.execute(spam)
     await pool.execute(roles)
-    await pool.execute(moderation)
+    await pool.execute(clovers)
     await pool.execute(emojis)
-    await pool.execute(messages)
     await pool.execute(servers)
 
 
@@ -192,22 +175,7 @@ class PostgresController():
         INSERT INTO {}.roles VALUES ($1, $2, $3);
         """.format(self.schema)
 
-        await self.pool.execute(sql,server_id, user_id, changetype.value)
-
-    async def insert_modaction(self, server_id: int, mod_id: int,
-                               target_id: int, action_type: Action):
-        """
-        Inserts into the roles table a new rolechange
-        :param mod_id: the id of the mod that triggered the action
-        :param target_id: the id of user that action was performed on
-        :param action_type: The type of change that occured
-        """
-        sql = """
-        INSERT INTO {}.moderation VALUES ($1, $2, $3);
-        """.format(self.schema)
-
-        await self.pool.execute(
-            sql, server_id, mod_id, target_id, action_type.value)
+        await self.pool.execute(sql, server_id, user_id, changetype.value)
 
     async def add_server(self, server_id: int):
         """
@@ -253,7 +221,7 @@ class PostgresController():
             message.created_at
         )
 
-    async def add_emoji(self, emoji, message_id, user, channel, is_reaction):
+    async def add_emoji(self, emoji, message_id, user, target, channel, is_reaction, is_animated):
         """
         Adds emoji to emoji tracking table
         :param emoji: discord emoji to add
@@ -271,7 +239,10 @@ class PostgresController():
                 channel.name,
                 user.id,
                 user.name,
-                is_reaction
+                target.id,
+                target.name,
+                is_reaction,
+                is_animated
             )
         except UniqueViolationError:
             pass
@@ -300,6 +271,10 @@ class PostgresController():
         """
         return
 
+    """
+    Spam stuff
+    """
+
     async def add_message_delete(self, user_id: int):
         """
         Logs a message deletion into the db
@@ -319,7 +294,6 @@ class PostgresController():
         """.format(self.schema)
         return await self.pool.fetchval(sql, user_id)
 
-    
     async def reset_message_deleted(self):
         """
         Deletes all items form spam table
@@ -329,21 +303,41 @@ class PostgresController():
         """.format(self.schema)
         await self.pool.execute(sql)
 
+    """
+    Clover DB stuff
+    """
 
-    async def add_whitelist_channel(self, server_id: int, channel_id: int):
+    async def add_new_clover(self, member):
         """
-        Adds a channel that will delete all but the messages containing a
-        string in the 'whitelist' column of the server row
-        :param server_id: the id of the server to add the word to
-        :param word: word to add
+        Adds a user to the clover db
         """
-        return
+        sql = """
+        INSERT INTO {}.clovers VALUES ($1);
+        """.format(self.schema)
+        await self.pool.execute(sql, member.id)
 
-    async def add_r9k_channel(self, server_id: int, channel_id: int):
+    async def get_all_prunable(self, days: int):
         """
-        this would be a cool thing to have
+        Gets all clovers who applied clover days before
         """
-        return
+        sql = """
+        SELECT * from {}.clovers 
+        WHERE logtime <= '$1 days'::interval;
+        """.format(self.schema)
+        delete_sql = """
+        DELETE from {}.clovers 
+        WHERE logtime <= '$1 days'::interval;
+        """.format(self.schema)
+        records = await self.pool.fetch(sql, days)
+        await self.pool.execute(delete_sql, days)
+        prune_list = []
+        for record in records:
+            prune_list.append(record['userid'])
+        return prune_list
+
+    """
+    Custom Reactions below
+    """
 
     async def get_all_triggers(self):
         """
@@ -390,6 +384,10 @@ class PostgresController():
         WHERE trigger = $1;
         """.format(self.schema)
         return await self.pool.fetchval(sql, trigger)
+
+    """
+    Fightclub DB stuff
+    """
 
     async def add_fightclub_member(self, member):
         """

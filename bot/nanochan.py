@@ -22,7 +22,6 @@ class Nanochan(Bot):
         self.start_time = int(time())
         self.credentials = config['token']
         self.guild_id = config['guild_id']
-        self.bot_owner_id = config['owner_id']
         self.mod_log = config['mod_log']
         self.mod_info = config['mod_info']
         self.emoji_ignore_channels = config['emoji_ignore_channels']
@@ -31,6 +30,8 @@ class Nanochan(Bot):
         self.filter_allowed = config['filter_allowed']
         self.spoiler_channels = config['spoiler_channels']
         self.wait_time = config['wait_time']
+        self.clover_days = config['clover_days']
+        self.dm_forward = config['dm_forward']
         self.logger = logger
         super().__init__('-')
 

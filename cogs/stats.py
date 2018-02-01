@@ -34,7 +34,7 @@ class Stats:
         try:
             for emoji in confirmed_emojis:
                 await self.bot.postgres_controller.add_emoji(
-                    emoji, message.id, message.author, message.channel, False)
+                    emoji, message.id, message.author, message.author, message.channel, False, emoji.animated)
         except Exception as e:
             self.bot.logger.warning(f'Error adding emoji to db: {e}')
 
@@ -44,10 +44,11 @@ class Stats:
         """
         channel = self.bot.get_channel(channel_id)
         user = self.bot.get_user(user_id)
+        message = self.bot.get_message(message_id)
         for server_emoji in channel.guild.emojis:
             if emoji.id == server_emoji.id:
                 await self.bot.postgres_controller.add_emoji(
-                    emoji, message_id, user, channel, True)
+                    emoji, message_id, user, message.author, channel, True, emoji.animated)
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
@@ -70,7 +71,6 @@ class Stats:
         )
         await ctx.send(embed=local_embed)
             
-
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
