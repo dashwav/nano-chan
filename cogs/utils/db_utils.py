@@ -49,7 +49,7 @@ async def make_tables(pool: Pool, schema: str):
         logtime TIMESTAMP DEFAULT current_timestamp,
         PRIMARY KEY (logtime)
     )
-    """
+    """.format(schema)
 
     spam = """
     CREATE TABLE IF NOT EXISTS {}.spam (
@@ -81,7 +81,7 @@ async def make_tables(pool: Pool, schema: str):
         reaction BOOLEAN,
         animated BOOLEAN,
         logtime TIMESTAMP DEFAULT current_timestamp,
-        PRIMARY KEY(id, message_id, user_id, reaction, animated)
+        PRIMARY KEY(emoji_id, message_id, user_id, reaction, animated)
     );
     """.format(schema)
 
@@ -227,7 +227,7 @@ class PostgresController():
         :param emoji: discord emoji to add
         """
         sql = """
-        INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO {}.emojis VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         """.format(self.schema)
         try:
             await self.pool.execute(

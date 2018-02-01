@@ -25,7 +25,7 @@ class Stats:
         if message.channel.id == 191102386633179136:
             return
         for word in message.content.split():
-            if '<:' in word:
+            if '<:' or '<a:' in word:
                 found_emojis.append(word)
         for emoji_id in found_emojis:
             for emoji in message.guild.emojis:
@@ -44,7 +44,7 @@ class Stats:
         """
         channel = self.bot.get_channel(channel_id)
         user = self.bot.get_user(user_id)
-        message = self.bot.get_message(message_id)
+        message = await channel.get_message(message_id)
         for server_emoji in channel.guild.emojis:
             if emoji.id == server_emoji.id:
                 await self.bot.postgres_controller.add_emoji(

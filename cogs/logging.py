@@ -38,7 +38,7 @@ class Logging():
                         inline=True
                     )
                 await mod_info.send(embed=local_embed)
-                for user_id in self.dm_forward:
+                for user_id in self.bot.dm_forward:
                     user = await self.bot.get_user_info(user_id)
                     await user.create_dm()
                     await user.dm_channel.send(embed=local_embed)
