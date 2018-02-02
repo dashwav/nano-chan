@@ -54,6 +54,7 @@ class Logging():
             role_diff = set(after.roles) - (set(before.roles))
             for role in role_diff:
                 if role.name.lower() == 'clover':
+                    await self.bot.postgres_controller.add_new_clover(after)
                     await mod_info.send(
                         f'**{time} | CLOVER: **Successfully applied clover to '
                         f'{after.mention}. [Joined: {join}]')
