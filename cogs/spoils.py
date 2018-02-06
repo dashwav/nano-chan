@@ -37,28 +37,28 @@ class Spoils():
         local_embed = self.create_wall_embed()
         await self.bot.wait_until_ready()
         self.bot.logger.info("Starting spoiler task")
-        while not self.bot.is_closed():
-            for channel_id in self.bot.spoiler_channels:
-                self.bot.logger.info(f'Checking for spoilers')
-                try:
-                    channel = self.bot.get_channel(channel_id)
-                except Exception as e:
-                    self.bot.logger.warning(
-                        f'Error getting channel {channel_id}: {e}')
-                if channel:
-                    async for message in channel.history(limit=1):
-                        if not message.author.bot:
-                            last_post = datetime.utcnow() - message.created_at
-                            if last_post > timedelta(seconds=self.wait_time):
-                                try:
-                                    await channel.send(embed=local_embed)
-                                except Exception as e:
-                                    self.bot.logger.warning(
-                                        f'Error posting to channel'
-                                        f' {channel_id}: {e}')
-                else:
-                    self.bot.logger.warning(
-                        f'Couldn\'t find channel: {channel_id}:')
+        while True:
+            if self.bot.is_closed():
+                await asyncio.sleep(60)
+            else:
+                for channel_id in self.bot.spoiler_channels:
+                    self.bot.logger.info(f'Checking for spoilers')
+                    try:
+                        channel = self.bot.get_channel(channel_id)
+                        if channel:
+                            async for message in channel.history(limit=1):
+                                if not message.author.bot:
+                                    last_post = datetime.utcnow() - message.created_at
+                                    if last_post > timedelta(seconds=self.wait_time):
+                                        try:
+                                            await channel.send(embed=local_embed)
+                                        except Exception as e:
+                                            self.bot.logger.warning(
+                                                f'Error posting to channel'
+                                                f' {channel_id}: {e}')
+                    except Exception as e:
+                        self.bot.logger.warning(
+                            f'Error getting channel {channel_id}: {e}')
             await asyncio.sleep(60)
 
     def create_wall_embed(self, reason=None):
