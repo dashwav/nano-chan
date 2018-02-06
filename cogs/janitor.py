@@ -82,6 +82,11 @@ class Janitor():
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error updating users roles: {e}')
+    @commands.command(hidden=True)
+    @checks.has_permissions(manage_roles=True)
+    async def aggroprune(self,ctx):
+        self.bot.logger.info(f'Prune requested by: {ctx.message.author}')
+        await self.prune_nonclovers()
 
     @commands.command(hidden=True)
     @checks.has_permissions(manage_roles=True)
@@ -91,6 +96,12 @@ class Janitor():
 
     @prune.error
     async def prune_error(self, ctx, error):
+        if isinstance(error, commands.errors.CheckFailure):
+            self.bot.logger.warning(f'{ctx.message.author} '
+                                    'tried to run prune w/o permissions')
+
+    @aggroprune.error
+    async def aggroprune_error(self, ctx, error):
         if isinstance(error, commands.errors.CheckFailure):
             self.bot.logger.warning(f'{ctx.message.author} '
                                     'tried to run prune w/o permissions')
@@ -147,3 +158,56 @@ class Janitor():
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error posting prune info to mod_log: {e}')
+
+    async def prune_nonclovers(self):
+        try:
+            self.bot.logger.info('Starting aggroprune task now')
+        except Exception as e:
+            self.bot.logger.info('tf')
+        clovers = []
+        clover_role = None
+        mod_log = self.bot.get_channel(self.bot.mod_log)
+        a_irl = self.bot.get_guild(self.bot.guild_id)
+        for role in a_irl.roles:
+            if role.name.lower() == 'clover':
+                clover_role = role
+        if not clover_role:
+            self.bot.logger.warning(
+                'Something went really wrong, '
+                'I couldn\'t find the clover role')
+            return
+        clovers = clover_role.members
+        self.bot.logger.info(f'Can i get uhhh')
+        try:
+            members_safe = await self.bot.postgres_controller.get_all_clovers()
+        except Exception as e:
+            self.bot.logger.warning(f'shiiiiittt:{e}')
+        self.bot.logger.info(f'uhhh {members_safe}')
+        prune_info = {'pruned': False, 'amount': 0}
+        for member in clovers:
+            if member.id not in members_safe:
+                try:
+                    new_roles = self.remove_clover(member)
+                    await member.edit(
+                        roles=new_roles,
+                        reason="Pruned due to inactivity"
+                    )
+                    prune_info['pruned'] = True
+                    prune_info['amount'] += 1
+                except Exception as e:
+                    self.bot.logger.warning(
+                        f'Error pruning clovers: {e}'
+                    )
+        self.bot.logger.info(f'Prune info: {prune_info}')
+        try:
+            await self.bot.postgres_controller.reset_message_deleted()
+        except Exception as e:
+            self.bot.logger.warning(f'Issue resetting spam db: {e}')
+        if prune_info['pruned']:
+            try:
+                await mod_log.send(
+                    f'Pruned {prune_info["amount"]} clovers 🍀🔫')
+            except Exception as e:
+                self.bot.logger.warning(
+                    f'Error posting prune info to mod_log: {e}')
+
