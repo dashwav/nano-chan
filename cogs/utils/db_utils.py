@@ -328,20 +328,20 @@ class PostgresController():
             clover_list.append(record['userid'])
         return clover_list
 
-    async def get_all_prunable(self, days: int):
+    async def get_all_prunable(self):
         """
         Gets all clovers who applied clover days before
         """
         sql = """
         SELECT * from {}.clovers 
-        WHERE logtime::date <= (now() - '2 days'::interval);
+        WHERE logtime::date <= (now() - '3 days'::interval);
         """.format(self.schema)
         delete_sql = """
         DELETE from {}.clovers 
-        WHERE logtime::date <= (now() - '2 days'::interval);
+        WHERE logtime::date <= (now() - '3 days'::interval);
         """.format(self.schema)
-        records = await self.pool.fetch(sql, days)
-        await self.pool.execute(delete_sql, days)
+        records = await self.pool.fetch(sql)
+        await self.pool.execute(delete_sql)
         prune_list = []
         for record in records:
             prune_list.append(record['userid'])

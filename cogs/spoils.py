@@ -40,9 +40,9 @@ class Spoils():
         while True:
             if self.bot.is_closed():
                 await asyncio.sleep(60)
+                self.bot.logger.warning("Socket is closed")
             else:
                 for channel_id in self.bot.spoiler_channels:
-                    self.bot.logger.info(f'Checking for spoilers')
                     try:
                         channel = self.bot.get_channel(channel_id)
                         if channel:

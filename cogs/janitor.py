@@ -130,8 +130,12 @@ class Janitor():
                 'I couldn\'t find the clover role')
             return
         clovers = clover_role.members
-        members_prunable = self.postgres_controller.get_all_prunable(self.clover_days)
+        try:
+            members_prunable = await self.bot.postgres_controller.get_all_prunable()
+        except Exception as e:
+            self.bot.logger.warning(f'{e}')
         prune_info = {'pruned': False, 'amount': 0}
+        self.bot.logger.info(f'{members_prunable}')
         for member in clovers:
             if member.id in members_prunable:
                 try:
