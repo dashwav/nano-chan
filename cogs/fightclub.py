@@ -80,7 +80,7 @@ class Fightclub():
 
     @commands.command()
     @commands.is_owner()
-    async def stats(self, ctx, *, member: discord.Member = None):
+    async def fight_stats(self, ctx, *, member: discord.Member = None):
         if ctx.channel.id not in [367217621701099520, 403805028697243648]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
