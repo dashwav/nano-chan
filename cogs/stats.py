@@ -50,6 +50,40 @@ class Stats:
                 await self.bot.postgres_controller.add_emoji(
                     emoji, message_id, user, message.author, channel, True, emoji.animated)
 
+    @commands.group(aliases=['s'])
+    @commands.guild_only()
+    @checks.is_admin()
+    async def stats(self, ctx):
+        """
+        This is the base command for the fun shit
+        """
+        if ctx.invoked_subcommand is None:
+            await ctx.send('bruh thats not even a command')
+
+    @stats.command()
+    async def user(self, ctx, user: discord.Member):
+        """
+        Returns stats on a user
+        """
+        user_count = defaultdict(int)
+        target_count = defaultdict(int)
+        stats = await self.bot.postgres_controller.get_user_emojis(user)
+        for record in stats['user']:
+            user_count[record['emoji_name']] += 1
+        for record in stats['target']:
+            target_count[record['emoji_name']] += 1
+        temp_str = 'Most used emoji:\n'
+        for key in sorted(user_count, key=user_count.get, reverse=True):
+            temp_str += f'{key}: {user_count[key]}\n'
+        temp_str = f'\n\n Most whatever thing'
+        for key in sorted(target_count, key=target_count.get, reverse=True):
+            temp_str += f'{key}: {target_count[key]}\n'
+        local_embed = discord.Embed(
+            title=f'Stats for {user.mention}',
+            description= temp_str
+        )
+
+
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
     async def emojis(self, ctx, days: int=1):

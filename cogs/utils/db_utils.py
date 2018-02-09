@@ -263,13 +263,23 @@ class PostgresController():
             logger.warning(f'Error retrieving emoji count: {e}')
             return None
 
-    async def add_blacklist_word(self, server_id: int, word: str):
+    async def get_user_emojis(self, user):
         """
-        Adds a word that is not allowed on the server
-        :param server_id: the id of the server to add the word to
-        :param word: word to add
+        Returns a dict with stats about the user (probably)
         """
-        return
+        user_sql = """
+        SELECT * FROM {}.emojis
+        WHERE user_id = $1;
+        """.format(self.schema)
+        target_sql = """
+        SELECT * FROM {}.emojis
+        WHERE target_id = $1 AND reaction = True;
+        """.format(self.schema)
+
+        user_stats = await self.pool.fetch(user_sql, user.id)
+        target_stats = await self.pool.fetch(target_sql, user.id)
+        ret_dict = {'user': user_stats, 'target': target_stats}
+        return ret_dict
 
     """
     Spam stuff
