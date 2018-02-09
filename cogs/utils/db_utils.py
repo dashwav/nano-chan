@@ -252,8 +252,8 @@ class PostgresController():
         Returns the amount of the single emoji that were found in the last days
         """
         sql = """
-        SELECT count(id) FROM {}.emojis
-        WHERE id = $1 AND logtime > $2;
+        SELECT count(emoji_id) FROM {}.emojis
+        WHERE emoji_id = $1 AND logtime > $2;
         """.format(self.schema)
 
         date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
@@ -280,6 +280,16 @@ class PostgresController():
         target_stats = await self.pool.fetch(target_sql, user.id)
         ret_dict = {'user': user_stats, 'target': target_stats}
         return ret_dict
+
+    async def get_emoji_stats(self, emoji):
+        """
+        Returns a dict with stats about the emoji
+        """
+        sql = """
+        SELECT * FROM {}.emojis
+        WHERE emoji_id = $1;
+        """.format(self.schema)
+        return await self.pool.fetch(sql, emoji.id)
 
     """
     Spam stuff

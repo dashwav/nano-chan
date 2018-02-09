@@ -52,7 +52,6 @@ class Stats:
 
     @commands.group(aliases=['s'])
     @commands.guild_only()
-    @checks.is_admin()
     async def stats(self, ctx):
         """
         This is the base command for the fun shit
@@ -61,6 +60,44 @@ class Stats:
             await ctx.send('bruh thats not even a command')
 
     @stats.command()
+    async def me(self, ctx):
+        """
+        Returns stats on a user
+        """
+        if ctx.message.channel.id not in [220762067739738113,176429411443146752]:
+            return
+        user = ctx.message.author
+        user_count = defaultdict(int)
+        target_count = defaultdict(int)
+        stats = await self.bot.postgres_controller.get_user_emojis(user)
+        for record in stats['user']:
+            user_count[record['emoji_id']] += 1
+        for record in stats['target']:
+            target_count[record['emoji_id']] += 1
+        temp_str = 'Most used emoji:\n'
+        for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
+            emoji_t = self.bot.get_emoji(key)
+            if emoji_t:
+                temp_str += f'{emoji_t} - {user_count[key]}\n'
+            else:
+                temp_str += f'{key} - {user_count[key]}\n'
+        temp_str += f'\n\n Most reacted on you:\n'
+        for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
+            emoji_t = self.bot.get_emoji(key)
+            if emoji_t:
+                temp_str += f'{emoji_t} - {target_count[key]}\n'
+            else:
+                temp_str += f'{key} - {target_count[key]}\n'
+        nick = user.nick if user.nick else user.name
+        local_embed = discord.Embed(
+            title=f'Stats for {nick}',
+            description= temp_str
+        )
+        await ctx.send(embed=local_embed)
+
+
+    @stats.command()
+    @checks.has_permissions(manage_roles=True)
     async def user(self, ctx, user: discord.Member):
         """
         Returns stats on a user
@@ -69,18 +106,60 @@ class Stats:
         target_count = defaultdict(int)
         stats = await self.bot.postgres_controller.get_user_emojis(user)
         for record in stats['user']:
-            user_count[record['emoji_name']] += 1
+            user_count[record['emoji_id']] += 1
         for record in stats['target']:
-            target_count[record['emoji_name']] += 1
+            target_count[record['emoji_id']] += 1
         temp_str = 'Most used emoji:\n'
-        for key in sorted(user_count, key=user_count.get, reverse=True):
-            temp_str += f'{key}: {user_count[key]}\n'
-        temp_str = f'\n\n Most whatever thing'
-        for key in sorted(target_count, key=target_count.get, reverse=True):
-            temp_str += f'{key}: {target_count[key]}\n'
+        for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
+            emoji_t = self.bot.get_emoji(key)
+            if emoji_t:
+                temp_str += f'{emoji_t} - {user_count[key]}\n'
+            else:
+                temp_str += f'{key} - {user_count[key]}\n'
+        temp_str += f'\n\n Most reacted on them:\n'
+        for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
+            emoji_t = self.bot.get_emoji(key)
+            if emoji_t:
+                temp_str += f'{emoji_t} - {target_count[key]}\n'
+            else:
+                temp_str += f'{key} - {target_count[key]}\n'
+        nick = user.nick if user.nick else user.name
         local_embed = discord.Embed(
-            title=f'Stats for {user.mention}',
+            title=f'Stats for {nick}',
             description= temp_str
+        )
+        await ctx.send(embed=local_embed)
+
+    @stats.command()
+    @checks.has_permissions(manage_roles=True)
+    async def emoji(self, ctx, emoji: discord.Emoji):
+        """
+        Returns stats on an Emoji
+        """
+        emoji_stats = await self.bot.postgres_controller.get_emoji_stats(emoji)
+        user_count = defaultdict(int)
+        target_count = defaultdict(int)
+        for row in emoji_stats:
+            user_count[row['user_id']] += 1
+            if row['reaction']:
+                target_count[row['target_id']] += 1
+        temp_str = f'Top 5 users:\n--------\n'
+        for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
+            user_t = self.bot.get_user(key)
+            if user_t:
+                temp_str += f'**{user_t.name}**#{user_t.discriminator}: {user_count[key]}\n'
+            else:
+                temp_str += f'**{key}**: {user_count[key]}\n'
+        temp_str += f'\n\nTop 5 targets:\n--------\n'
+        for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
+            user_t = self.bot.get_user(key)
+            if user_t:
+                temp_str += f'**{user_t.name}**#{user_t.discriminator}: {target_count[key]}\n'
+            else:
+                temp_str += f'**{key}**: {target_count[key]}\n'
+        local_embed = discord.Embed(
+            title=f'Emoji usage for {emoji}',
+            description=temp_str
         )
         await ctx.send(embed=local_embed)
 
