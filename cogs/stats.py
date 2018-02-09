@@ -82,6 +82,7 @@ class Stats:
             title=f'Stats for {user.mention}',
             description= temp_str
         )
+        await ctx.send(embed=local_embed)
 
 
     @commands.command()
