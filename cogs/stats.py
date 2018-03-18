@@ -131,7 +131,6 @@ class Stats:
         await ctx.send(embed=local_embed)
 
     @stats.command()
-    @checks.has_permissions(manage_roles=True)
     async def emoji(self, ctx, emoji: discord.Emoji):
         """
         Returns stats on an Emoji

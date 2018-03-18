@@ -51,15 +51,44 @@ class Janitor():
         del member_roles[clover_index]
         return member_roles
 
+    def remove_key(self, member) -> list:
+        member_roles = member.roles
+        for index, role in enumerate(member_roles):
+            if role.name.lower() == '🔑':
+                key_index = index
+        del member_roles[key_index]
+        return member_roles
+
+    def remove_access(self, member) -> list:
+        member_roles = member.roles.copy()
+        role_list = []
+        for index, role in enumerate(member_roles):
+            if role.name.lower() in ['muse', 'dev','lewd', 'swole', 'artsy', 'shokugeki', 'degenerate', 'simulcast', 'legacy', 'meta', 'stylish']:
+                role_list.append(role)
+        for role in role_list:
+            member_roles.remove(role)
+        return member_roles
+
     async def on_message(self, message):
         if message.author.bot:
             return
+        if message.content.startswith('.iam'):
+            return
         has_clover = False
+        has_key = False
         has_member = False
+        has_dedicated = False
+        has_permrole = False
         member_roles = message.author.roles
         for index, role in enumerate(member_roles):
             if role.name.lower() == 'clover':
                 has_clover = True
+            elif role.name.lower() == '🔑':
+                has_key = True
+            elif role.name.lower() == 'dedicated':
+                has_dedicated = True
+            elif role.name.lower() in ['muse', 'dev','lewd', 'swole', 'artsy', 'shokugeki', 'degenerate', 'simulcast', 'legacy', 'meta', 'stylish']:
+                has_permrole = True
             elif role.name.lower() == 'member':
                 has_member = True
         if has_clover and has_member:
@@ -82,6 +111,38 @@ class Janitor():
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error updating users roles: {e}')
+        if has_key and has_member:
+            member_roles = self.remove_key(message.author)
+            try:
+                await message.author.edit(
+                    roles=member_roles,
+                    reason="User upgraded from Key to member")
+                self.bot.logger.info(
+                    f'{message.author.display_name}'
+                    ' was just promoted to member!')
+                try:
+                    await self.bot.postgres_controller.insert_rolechange(
+                        message.guild.id, message.author.id, Change.PROMOTION
+                    )
+                except Exception as e:
+                    self.bot.logger.warning(
+                        f'Issue logging action to db: {e})')
+            except Exception as e:
+                self.bot.logger.warning(
+                    f'Error updating users roles: {e}')
+        if has_dedicated and has_permrole:
+            member_roles = self.remove_access(message.author)
+            try:
+                await message.author.edit(
+                    roles=member_roles,
+                    reason="User had perm roles")
+                self.bot.logger.info(
+                    f'{message.author.display_name}'
+                    ' had access roles removed')
+            except Exception as e:
+                self.bot.logger.warning(
+                    f'Error updating users access roles: {e}')
+
     @commands.command(hidden=True)
     @checks.has_permissions(manage_roles=True)
     async def aggroprune(self,ctx):
