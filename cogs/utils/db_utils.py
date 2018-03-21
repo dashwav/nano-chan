@@ -109,6 +109,15 @@ async def make_tables(pool: Pool, schema: str):
         PRIMARY KEY (userid)
     );""".format(schema)
 
+    channels = """
+    CREATE TABLE IF NOT EXISTS {}.channels (
+        message_id BIGINT,
+        channel_id BIGINT,
+        channels ANYARRAY,
+        updated INT,
+        PRIMARY KEY (message_id)
+    );""".format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -116,6 +125,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(clovers)
     await pool.execute(emojis)
     await pool.execute(servers)
+    await pool.execute(channels)
 
 
 class PostgresController():
@@ -502,3 +512,52 @@ class PostgresController():
         for record in records:
             ret_list.append(dict(record))
         return ret_list
+
+
+    async def add_channel_message(self, message_id, channels):
+        """
+        Adds a message and its related channels to the DB
+        """
+        sql = """
+        INSERT INTO {}.channels VALUES ($1, $2, 0);
+        """.format(self.schema)
+
+        await self.pool.execute(sql, message_id, channels)
+
+    async def add_and_get_message(self, channel_id, channel):
+        """
+        Adds a channel and returns the message id
+        """
+        sql = """
+        SELECT message_id FROM {}.channels
+        WHERE channel_id = $2;
+        """.format(self.schema)
+        try:
+            await self.add_perm_channel(channel_id, channel)
+        except Exception:
+            return None
+        return await self.pool.fetchval(sql, channel_id)
+
+    async def add_perm_channel(self, channel_id, channel):
+        """
+        Adds a channel to a preexisting message
+        """
+        sql = """
+        UPDATE {}.channels
+        SET channels = array_append(channels, $1)
+        WHERE channel_id = $2;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, channel, channel_id)
+
+    async def rem_perm_channel(self, channel_id, channel):
+        """
+        Removes a channel from a preexisting message
+        """
+        sql = """
+        UPDATE {}.channels
+        SET channels = array_remove(channels, $1)
+        WHERE channel_id = $2
+        """.format(self.schema)
+
+        await self.pool.execute(sql, channel, channel_id)
