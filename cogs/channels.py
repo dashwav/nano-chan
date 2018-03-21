@@ -48,6 +48,8 @@ class Channels():
             title=f'{message}',
             description=''
         )
+        message = await ctx.send(embed=local_embed)
+        await self.bot.postgres_controller.add_channel_message(message.id, [])
     
     @channel_message.command()
     async def add(self, ctx, channel: discord.TextChannel, *, description):
