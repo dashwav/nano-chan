@@ -113,7 +113,7 @@ async def make_tables(pool: Pool, schema: str):
     CREATE TABLE IF NOT EXISTS {}.channels (
         message_id BIGINT,
         channel_id BIGINT,
-        channels ANYARRAY,
+        channels BIGINT ARRAY,
         reactions INT,
         PRIMARY KEY (message_id)
     );""".format(schema)
