@@ -524,7 +524,7 @@ class PostgresController():
 
         await self.pool.execute(sql, message_id, channels)
 
-    async def add_and_get_message(self, channel_id, channel):
+    async def add_and_get_message(self, logger, channel_id, channel):
         """
         Adds a channel and returns the message id
         """
@@ -540,7 +540,8 @@ class PostgresController():
 
         try:
             await self.add_perm_channel(channel_id, channel)
-        except Exception:
+        except Exception as e:
+            logger.warning(f'{e}')
             return None
         message_id = await self.pool.fetchval(sql, channel_id)
         reactions = await self.pool.fetchval(react_sql, channel_id)

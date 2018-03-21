@@ -55,7 +55,9 @@ class Channels():
     async def add(self, ctx, channel: discord.TextChannel, *, description):
         if not isinstance(channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam")
-        message_info = await self.bot.postgres_controller.add_and_get_message(ctx.channel.id, channel)
+        message_info = await self.bot.postgres_controller.add_and_get_message(
+            self.bot.logger,
+            ctx.channel.id, channel)
         if not message_info:
             await ctx.send("oops something went wrong")
             return
