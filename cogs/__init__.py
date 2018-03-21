@@ -7,4 +7,5 @@ from cogs.filter import Filter
 from cogs.janitor import Janitor
 from cogs.moderation import Moderation
 from cogs.stats import Stats
-__all__ = ['Janitor', 'Fightclub', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats']
+from cogs.channels import Channels
+__all__ = ['Janitor', 'Fightclub', 'Channels', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats']

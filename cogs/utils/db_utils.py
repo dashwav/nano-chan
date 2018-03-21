@@ -114,7 +114,7 @@ async def make_tables(pool: Pool, schema: str):
         message_id BIGINT,
         channel_id BIGINT,
         channels ANYARRAY,
-        updated INT,
+        reactions INT,
         PRIMARY KEY (message_id)
     );""".format(schema)
 
@@ -532,11 +532,20 @@ class PostgresController():
         SELECT message_id FROM {}.channels
         WHERE channel_id = $2;
         """.format(self.schema)
+
+        react_sql = """
+        SELECT reactions FROM {}.channels
+        WHERE channel_id = $2;
+        """.format(self.schema)
+
         try:
             await self.add_perm_channel(channel_id, channel)
         except Exception:
             return None
-        return await self.pool.fetchval(sql, channel_id)
+        message_id = await self.pool.fetchval(sql, channel_id)
+        reactions = await self.pool.fetchval(react_sql, channel_id)
+        ret_dict = {'message_id': message_id, 'reacts': reactions}
+        return ret_dict
 
     async def add_perm_channel(self, channel_id, channel):
         """
@@ -545,6 +554,12 @@ class PostgresController():
         sql = """
         UPDATE {}.channels
         SET channels = array_append(channels, $1)
+        WHERE channel_id = $2;
+        """.format(self.schema)
+
+        sql = """
+        UPDATE {}.channels
+        SET reactions = reactions + 1
         WHERE channel_id = $2;
         """.format(self.schema)
 
