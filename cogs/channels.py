@@ -46,27 +46,31 @@ class Channels():
     async def create(self, ctx, *, message: str):
         local_embed = discord.Embed(
             title=f'{message}',
-            description=''
+            description='',
+            type="rich"
         )
         message = await ctx.send(embed=local_embed)
-        await self.bot.postgres_controller.add_channel_message(message.id, [])
+        await self.bot.postgres_controller.add_channel_message(message.id, ctx.channel.id, [])
     
     @channel_message.command()
     async def add(self, ctx, channel: discord.TextChannel, *, description):
         if not isinstance(channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam")
+        self.bot.logger.info(f'{channel.id}')
         message_info = await self.bot.postgres_controller.add_and_get_message(
             self.bot.logger,
-            ctx.channel.id, channel)
+            ctx.channel.id, channel.id)
         if not message_info:
             await ctx.send("oops something went wrong")
             return
+        self.bot.logger.info(f'test1 id:{message_info["message_id"]}')
         og_message = await ctx.channel.get_message(message_info['message_id'])
         og_embed = og_message.embeds[0]
         og_embed.add_field(
             name=f"{self.reaction_emojis[message_info['reacts'] + 1]}{description}",
-            value='  ')
+            value=f'{self.reaction_emojis[message_info["reacts"] +1]}')
+        self.bot.logger.info('test2')
         await og_message.edit(embed=og_embed)
-        await og_message.add_reactions(self.reaction_emojis[message_info['reacts'] + 1])
+        await og_message.add_reaction(self.reaction_emojis[message_info['reacts'] + 1])
 
 

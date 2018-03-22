@@ -514,15 +514,15 @@ class PostgresController():
         return ret_list
 
 
-    async def add_channel_message(self, message_id, channels):
+    async def add_channel_message(self, message_id, channel_id, channels):
         """
         Adds a message and its related channels to the DB
         """
         sql = """
-        INSERT INTO {}.channels VALUES ($1, $2, 0);
+        INSERT INTO {}.channels VALUES ($1, $2, $3, 0);
         """.format(self.schema)
 
-        await self.pool.execute(sql, message_id, channels)
+        await self.pool.execute(sql, message_id, channel_id, channels)
 
     async def add_and_get_message(self, logger, channel_id, channel):
         """
@@ -530,12 +530,12 @@ class PostgresController():
         """
         sql = """
         SELECT message_id FROM {}.channels
-        WHERE channel_id = $2;
+        WHERE channel_id = $1;
         """.format(self.schema)
 
         react_sql = """
         SELECT reactions FROM {}.channels
-        WHERE channel_id = $2;
+        WHERE channel_id = $1;
         """.format(self.schema)
 
         try:
@@ -554,17 +554,18 @@ class PostgresController():
         """
         sql = """
         UPDATE {}.channels
-        SET channels = array_append(channels, $1)
+        SET channels = array_append(channels,$1::bigint)
         WHERE channel_id = $2;
         """.format(self.schema)
 
-        sql = """
+        sql2 = """
         UPDATE {}.channels
         SET reactions = reactions + 1
-        WHERE channel_id = $2;
+        WHERE channel_id = $1;
         """.format(self.schema)
 
         await self.pool.execute(sql, channel, channel_id)
+        await self.pool.execute(sql2, channel_id)
 
     async def rem_perm_channel(self, channel_id, channel):
         """
