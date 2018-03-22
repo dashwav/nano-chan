@@ -15,24 +15,15 @@ class Channels():
     def __init__(self, bot):
         super().__init__()
         self.reaction_emojis = [
-            '\N{DIGIT ONE}',
-            '\N{DIGIT TWO}',
-            '\N{DIGIT THREE}',
-            '\N{DIGIT FOUR}',
-            '\N{DIGIT FIVE}',
-            '\N{DIGIT SIX}',
-            '\N{DIGIT SEVEN}',
-            '\N{DIGIT EIGHT}',
-            '\N{DIGIT NINE}',
-            '\N{LATIN CAPITAL LETTER A}',
-            '\N{LATIN CAPITAL LETTER B}',
-            '\N{LATIN CAPITAL LETTER C}',
-            '\N{LATIN CAPITAL LETTER D}',
-            '\N{LATIN CAPITAL LETTER E}',
-            '\N{LATIN CAPITAL LETTER F}',
-            '\N{LATIN CAPITAL LETTER G}',
-            '\N{LATIN CAPITAL LETTER H}',
-            '\N{LATIN CAPITAL LETTER I}',]
+            '1\u20e3',
+            '2\u20e3',
+            '3\u20e3',
+            '4\u20e3',
+            '5\u20e3',
+            '6\u20e3',
+            '7\u20e3',
+            '8\u20e3',
+            '9\u20e3',]
         self.bot = bot
 
     @commands.group()
@@ -67,8 +58,8 @@ class Channels():
         og_message = await ctx.channel.get_message(message_info['message_id'])
         og_embed = og_message.embeds[0]
         og_embed.add_field(
-            name=f"{self.reaction_emojis[message_info['reacts'] + 1]}{description}",
-            value=f'{self.reaction_emojis[message_info["reacts"] +1]}')
+            name=f"{self.reaction_emojis[message_info['reacts'] + 1]}  {description}",
+            value=f'{channel.name}')
         self.bot.logger.info('test2')
         await og_message.edit(embed=og_embed)
         await og_message.add_reaction(self.reaction_emojis[message_info['reacts'] + 1])
