@@ -577,4 +577,11 @@ class PostgresController():
         WHERE channel_id = $2
         """.format(self.schema)
 
+        sql2 = """
+        SELECT message_id FROM {}.channels
+        WHERE channel_id = $1;
+        """.format(self.schema)
+
+        message_id = await self.pool.fetchval(sql2, channel_id)
         await self.pool.execute(sql, channel, channel_id)
+        return message_id
