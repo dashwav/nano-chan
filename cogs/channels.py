@@ -58,7 +58,7 @@ class Channels():
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = await self.bot.postgres_controller.get_message_id(
+            message_id = await self.bot.postgres_controller.get_message_info(
                 ctx.channel.id, target_channel.id)
         except Exception as e:
             await ctx.send("something broke", delete_after=3)
@@ -67,10 +67,13 @@ class Channels():
             return
         og_message = await ctx.channel.get_message(message_id)
         for reaction in og_message.reactions:
-            async for user in reaction.users:
+            async for user in reaction.users():
+                if user.bot:
+                    continue
                 await og_message.remove_reaction(reaction.emoji, user)
                 await self.remove_perms(user, target_channel)
         await og_message.delete()
+        await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id)
         await ctx.message.delete()
 
     @channel_message.command()
@@ -79,7 +82,7 @@ class Channels():
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = await self.bot.postgres_controller.get_message_id(
+            message_id = await self.bot.postgres_controller.get_message_info(
                 ctx.channel.id, target_channel.id)
         except:
             await ctx.send("something broke", delete_after=3)
@@ -119,7 +122,6 @@ class Channels():
         Adds a user to channels perms
         """
         try:
-            self.bot.logger.info(f'trying to apply perms')
             await channel.set_permissions(user, read_messages=True,
                                                         send_messages=True)
         except Exception as e:
@@ -130,7 +132,6 @@ class Channels():
         removes a users perms on a channel
         """
         try:
-            self.bot.logger.info(f'trying to remove perms')
             await channel.set_permissions(user, read_messages=False,
                                                         send_messages=False)
         except Exception as e:
