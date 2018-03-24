@@ -119,7 +119,7 @@ async def make_tables(pool: Pool, schema: str):
     """.format(schema)
 
     reaction_spam = """
-    CREATE TABLE IF NOT EXISTS {}.channel_index (
+    CREATE TABLE IF NOT EXISTS {}.reaction_spam (
         user_id BIGINT,
         message_id BIGINT,
         logtime TIMESTAMP DEFAULT current_timestamp,
@@ -594,6 +594,6 @@ class PostgresController():
         """
 
         sql = """
-        DELETE FROM {}.spam;
+        DELETE FROM {}.reaction_spam;
         """.format(self.schema)
         await self.pool.execute(sql)
