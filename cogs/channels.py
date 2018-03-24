@@ -102,6 +102,29 @@ class Channels():
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
 
+    @channel_message.command(aliases=['fix'])
+    async def update(self, ctx, target_channel: discord.TextChannel):
+        """
+        This will update the title of the embed to the currrent title of the channel
+        """
+        if not isinstance(target_channel, discord.TextChannel):
+            await ctx.send("that is not a valid channel fam", delete_after=4)
+            return
+        try:
+            message_id = await self.bot.postgres_controller.get_message_info(
+                ctx.channel.id, target_channel.id)
+        except:
+            await ctx.send("something broke", delete_after=3)
+            return
+        if not message_id:
+            return
+        og_message = await ctx.channel.get_message(message_id)
+        og_embed = og_message.embeds[0]
+        og_embed.title = f'#{target_channel.name}'
+        await og_message.edit(embed=og_embed)
+        await ctx.send(":ok_hand:", delete_after=3)
+        await ctx.message.delete()
+
     async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
         """
         Called when an emoji is added
