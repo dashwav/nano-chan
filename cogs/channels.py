@@ -101,7 +101,7 @@ class Channels():
                 return 
         channel = self.bot.get_channel(target_channel)
         user = self.bot.get_user(user_id)
-        await self.add_perms(user, target_channel)
+        await self.add_perms(user, channel)
 
     async def on_raw_reaction_remove(self, emoji, message_id, channel_id, user_id):
         """
@@ -112,7 +112,7 @@ class Channels():
             return
         channel = self.bot.get_channel(target_channel)
         user = self.bot.get_user(user_id)
-        await self.remove_perms(user, target_channel)
+        await self.remove_perms(user, channel)
     
     async def add_perms(self, user, channel):
         """
