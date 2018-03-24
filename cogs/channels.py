@@ -46,7 +46,7 @@ class Channels():
         message = await ctx.send(embed=local_embed)
         await message.add_reaction(self.reaction_emojis[0])
         await self.bot.postgres_controller.add_channel_message(
-            message.id, target_channel, ctx.channel.id)
+            message.id, target_channel.id, ctx.channel.id)
         await ctx.message.delete()
 
     @channel_message.command(aliases=['rem'])
