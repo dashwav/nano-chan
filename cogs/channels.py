@@ -29,7 +29,7 @@ class Channels():
 
     @commands.group()
     @commands.guild_only()
-    @checks.has_permissions(manage_channels=True)
+    @checks.has_permissions(manage_roles=True)
     async def channel_message(self, ctx):
          if ctx.invoked_subcommand is None:
             await ctx.send(':thinking:')
