@@ -15,17 +15,12 @@ class Logging():
             return
         if message.author.bot:
             return
-        guild = self.bot.get_guild(self.bot.guild_id)
-        a_irl_member = guild.get_member(message.author.id)
-        found_role = False
-        for role in a_irl_member.roles:
-            if role.name.lower() == 'member':
-                found_role = True
+        found_role = True
         if found_role:
             try:
                 mod_info = self.bot.get_channel(259728514914189312)
                 local_embed = discord.Embed(
-                    title=f'DM report from {a_irl_member.name}#{a_irl_member.discriminator}:',
+                    title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                     description=message.clean_content
                 )
                 if message.attachments:
