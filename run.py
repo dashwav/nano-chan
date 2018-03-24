@@ -3,7 +3,7 @@ Actually runs the code
 """
 from asyncio import get_event_loop
 from bot import Nanochan
-from cogs import Spoils, Filter, Janitor, Logging, Stats, Owner, Reactions, Fightclub
+from cogs import Spoils, Filter, Channels, Janitor, Logging, Stats, Owner, Reactions, Fightclub
 
 
 def run():
@@ -17,7 +17,8 @@ def run():
       Filter(bot),
       Reactions(bot),
       Janitor(bot),
-      Stats(bot)
+      Stats(bot),
+      Channels(bot)
     ]
     bot.start_bot(cogs)
 

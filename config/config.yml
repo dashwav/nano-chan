@@ -1,37 +1,67 @@
-token: ""
+token: "MzMzODAzOTA1MzM3MjYyMDgw.DJU7Rg.apoWyQii5u87IqDxJ6EFfOpAkMk"
 
-guild_id: 123456789
+guild_id: 148606162810568704
 
-mod_log: 123456798
+mod_log: 232371423069339648
 
-owner_id: 123456789
+owner_id: 164546159140929538
+
+mod_info: 378684962934751239
+
+dm_forward:
+    - 164546159140929538 # Me
+    - 129472068348674048 # Rex
+    - 162003952424976384  # Nieaiah
+    - 156174092100304897 # Curt
+    - 104393870590115840 # Aaragon
+    - 106177308544520192    # Moi
+    - 140475835240022016  # Cuttooth
+    - 280067157298249729 # Gauss
+    - 192055221797519360  #Zhwoo
+    - 140948779833622528 # Esberk
+    - 137805962034675712  # NLO
+    - 185822257442979840  #Hidi
+    - 229846181931515904 #Cotor
+    - 126881841293688832 # Evan
+    - 131668201615392769 # Nuka
+    - 150661565669048321 # Gänsejunge
+    - 190290507564449792 # Amixtra
+    - 189675727073837056 # Walter
+    - 183566578128912384 # Dondon
+    - 96052924576206848  # Rai
 
 emoji_ignore_channels:
     #Channels to ignore when counting emojis
-    -123456789
+    - 329500167118258176
+    - 220762067739738113
+    - 343953048940314625 
 
 traffic_ignore_channels:
     # Channels to ignore when counting traffic
-    - 123456789
+    - 356763188936572928
+    - 356762642141937664
+    - 356763119768436736
+    - 176429411443146752
 
 spoiler_channels:
     # Channel ids to check
-    - 123456789
+    - 191334329845022721
 
 filter_channels:
     #channel ids to filter
-    - 123456789
+    - 191102386633179136
 
 filter_allowed:
     - ".iam Clover"
     - ".iam Member"
 
 postgres_credentials:
-    host: ""
-    port: ""
-    user: ""
-    database: ""
-    password: ""
+    host: "localhost"
+    user: "nanochanuser"
+    database: "nanochan"
+    password: "zoomeyesxd"
 
 # Wait time in seconds (default 10 min)
-wait_time: 600
+wait_time: 1800
+
+clover_days: 3

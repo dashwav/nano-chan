@@ -17,6 +17,7 @@ class Janitor():
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+        self.owner = None
         try:
             self.bg_task = self.bot.loop.create_task(self.daily_prune())
             self.owner_task = self.bot.loop.create_task(self.setup_owner_dm())

@@ -11,3 +11,8 @@ class Birthdays():
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+
+
+"""
+Wow this never went anywhere
+"""

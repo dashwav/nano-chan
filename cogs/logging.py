@@ -15,7 +15,13 @@ class Logging():
             return
         if message.author.bot:
             return
+<<<<<<< HEAD
         found_role = True
+=======
+        for role in a_irl_member.roles:
+            if role.name.lower() == 'member':
+                found_role = True
+>>>>>>> ee485404179f038f3b8afa3075639aed03b2f907
         if found_role:
             try:
                 mod_info = self.bot.get_channel(259728514914189312)

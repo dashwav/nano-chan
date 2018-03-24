@@ -109,6 +109,15 @@ async def make_tables(pool: Pool, schema: str):
         PRIMARY KEY (userid)
     );""".format(schema)
 
+    channel_index = """
+    CREATE TABLE IF NOT EXISTS {}.channel_index (
+        message_id BIGINT,
+        host_channel BIGINT,
+        target_channel BIGINT,
+        PRIMARY KEY (host_channel, target_channel)
+    );
+    """.format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -116,6 +125,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(clovers)
     await pool.execute(emojis)
     await pool.execute(servers)
+    await pool.execute(channel_index)
 
 
 class PostgresController():
@@ -502,3 +512,52 @@ class PostgresController():
         for record in records:
             ret_list.append(dict(record))
         return ret_list
+
+    async def add_channel_message(self, message_id, target_channel, host_channel):
+        """
+        Adds a link in the database
+        """
+        sql = """
+        INSERT INTO {}.channel_index VALUES ($1, $2, $3);
+        """.format(self.schema)
+        
+        await self.pool.execute(sql, message_id, target_channel, host_channel)
+
+    async def get_message_info(self, host_channel, target_channel):
+        """
+        returns the info on a message
+        """
+        sql = """
+        SELECT message_id FROM {}.channel_index
+        WHERE host_channel = $1 AND target_channel = $2;
+        """.format(self.schema)
+
+        try:
+            return await self.pool.fetchval(sql, host_channel, target_channel)
+        except:
+            return None
+
+    async def get_target_channel(self, host_channel, message_id):
+        """
+        Returns the target channel of a message
+        """
+        sql = """
+        SELECT target_channel FROM {}.channel_index
+        WHERE host_channel = $1 AND message_id = $2;
+        """.format(self.schema)
+
+        try:
+            return await self.pool.fetchval(sql, host_channel, message_id)
+        except:
+            return None
+
+    async def rem_channel_message(self, target_channel, host_channel):
+        """
+        Deletes a link from the database
+        """
+        sql = """
+        DELETE from {}.channel_index
+        WHERE host_channel = $1 AND target_channel = $2;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, host_channel, target_channel)
