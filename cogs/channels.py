@@ -116,8 +116,8 @@ class Channels():
                 time = self.bot.timestamp()
                 mod_info = self.bot.get_channel(259728514914189312)
                 await mod_info.send(
-                    f'**{time} | SPAM:** {user} has reacted {reacts} '\
-                    f'times today in #{channel}'
+                    f'**{time} | REACTION SPAM:** {user} has reacted {reacts} '\
+                    f'times today on the permission message for #{channel}'
                 )
         await self.add_perms(user, channel)
 
