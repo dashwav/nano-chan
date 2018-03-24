@@ -99,6 +99,7 @@ class Channels():
         target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
         if not target_channel:
                 return 
+        channel = self.bot.get_channel(target_channel)
         user = self.bot.get_user(user_id)
         await self.add_perms(user, target_channel)
 
@@ -109,6 +110,7 @@ class Channels():
         target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
         if not target_channel:
             return
+        channel = self.bot.get_channel(target_channel)
         user = self.bot.get_user(user_id)
         await self.remove_perms(user, target_channel)
     
