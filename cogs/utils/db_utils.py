@@ -109,14 +109,14 @@ async def make_tables(pool: Pool, schema: str):
         PRIMARY KEY (userid)
     );""".format(schema)
 
-    channels = """
-    CREATE TABLE IF NOT EXISTS {}.channels (
+    channel_index = """
+    CREATE TABLE IF NOT EXISTS {}.channel_index (
         message_id BIGINT,
-        channel_id BIGINT,
-        channels BIGINT ARRAY,
-        reactions INT,
-        PRIMARY KEY (message_id)
-    );""".format(schema)
+        host_channel BIGINT,
+        target_channel BIGINT,
+        PRIMARY KEY (host_channel, target_channel)
+    );
+    """.format(schema)
 
     await pool.execute(reacts)
     await pool.execute(fightclub)
@@ -125,7 +125,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(clovers)
     await pool.execute(emojis)
     await pool.execute(servers)
-    await pool.execute(channels)
+    await pool.execute(channel_index)
 
 
 class PostgresController():
@@ -513,75 +513,51 @@ class PostgresController():
             ret_list.append(dict(record))
         return ret_list
 
-
-    async def add_channel_message(self, message_id, channel_id, channels):
+    async def add_channel_message(self, message_id, target_channel, host_channel):
         """
-        Adds a message and its related channels to the DB
-        """
-        sql = """
-        INSERT INTO {}.channels VALUES ($1, $2, $3, 0);
-        """.format(self.schema)
-
-        await self.pool.execute(sql, message_id, channel_id, channels)
-
-    async def add_and_get_message(self, logger, channel_id, channel):
-        """
-        Adds a channel and returns the message id
+        Adds a link in the database
         """
         sql = """
-        SELECT message_id FROM {}.channels
-        WHERE channel_id = $1;
+        INSERT INTO {}.channel_index VALUES ($1, $2, $3);
         """.format(self.schema)
+        
+        await self.pool.execute(sql, message_id, target_channel, host_channel)
 
-        react_sql = """
-        SELECT reactions FROM {}.channels
-        WHERE channel_id = $1;
+    async def get_message_info(self, host_channel, target_channel):
+        """
+        returns the info on a message
+        """
+        sql = """
+        SELECT message_id FROM {}.channel_index
+        WHERE host_channel = $1 AND target_channel = $2;
         """.format(self.schema)
 
         try:
-            await self.add_perm_channel(channel_id, channel)
-        except Exception as e:
-            logger.warning(f'{e}')
+            return await self.pool.fetchval(sql, host_channel, target_channel)
+        except:
             return None
-        message_id = await self.pool.fetchval(sql, channel_id)
-        reactions = await self.pool.fetchval(react_sql, channel_id)
-        ret_dict = {'message_id': message_id, 'reacts': reactions}
-        return ret_dict
 
-    async def add_perm_channel(self, channel_id, channel):
+    async def get_target_channel(self, host_channel, message_id):
         """
-        Adds a channel to a preexisting message
+        Returns the target channel of a message
         """
         sql = """
-        UPDATE {}.channels
-        SET channels = array_append(channels,$1::bigint)
-        WHERE channel_id = $2;
+        SELECT target_channel FROM {}.channel_index
+        WHERE host_channel = $1 AND message_id = $2;
         """.format(self.schema)
 
-        sql2 = """
-        UPDATE {}.channels
-        SET reactions = reactions + 1
-        WHERE channel_id = $1;
-        """.format(self.schema)
+        try:
+            return await self.pool.fetchval(sql, host_channel, message_id)
+        except:
+            return None
 
-        await self.pool.execute(sql, channel, channel_id)
-        await self.pool.execute(sql2, channel_id)
-
-    async def rem_perm_channel(self, channel_id, channel):
+    async def rem_channel_message(self, target_channel, host_channel):
         """
-        Removes a channel from a preexisting message
+        Deletes a link from the database
         """
         sql = """
-        UPDATE {}.channels
-        SET channels = array_remove(channels, $1)
-        WHERE channel_id = $2
+        DELETE from {}.channel_index
+        WHERE host_channel = $1 AND target_channel = $2;
         """.format(self.schema)
 
-        sql2 = """
-        SELECT message_id FROM {}.channels
-        WHERE channel_id = $1;
-        """.format(self.schema)
-
-        message_id = await self.pool.fetchval(sql2, channel_id)
-        await self.pool.execute(sql, channel, channel_id)
-        return message_id
+        await self.pool.execute(sql, host_channel, target_channel)
