@@ -521,7 +521,7 @@ class PostgresController():
         INSERT INTO {}.channel_index VALUES ($1, $2, $3);
         """.format(self.schema)
         
-        await self.pool.execute(sql, message_id, target_channel, host_channel)
+        await self.pool.execute(sql, message_id, host_channel, target_channel)
 
     async def get_message_info(self, host_channel, target_channel):
         """
