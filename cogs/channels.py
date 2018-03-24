@@ -126,7 +126,7 @@ class Channels():
         await ctx.message.delete()
 
     @channel_message.command(aliases=['color'])
-    async def set_color(self, ctx, target_channel: discord.TextChannel, color):
+    async def set_color(self, ctx, target_channel: discord.TextChannel, red, green, blue):
         """
         This will update the color of the embed to a given color code
         """
@@ -143,7 +143,7 @@ class Channels():
             return
         og_message = await ctx.channel.get_message(message_id)
         og_embed = og_message.embeds[0]
-        og_embed.color = color
+        og_embed.color = discord.Color.from_rgb(red, green, blue)
         await og_message.edit(embed=og_embed)
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
