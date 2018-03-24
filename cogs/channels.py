@@ -15,7 +15,7 @@ class Channels():
 
     def __init__(self, bot):
         super().__init__()
-        self.reaction_emojis = [ 
+        self.reaction_emojis = [ '\N{heavy check mark}'
             '0\u20e3', '1\u20e3', '2\u20e3', '3\u20e3', '4\u20e3',
             '5\u20e3', '6\u20e3', '7\u20e3', '8\u20e3', '9\u20e3',
             '\N{REGIONAL INDICATOR SYMBOL LETTER A}',
@@ -41,7 +41,7 @@ class Channels():
             return
         local_embed = discord.Embed(
             title=f'#{target_channel.name}',
-            description=f'{description}',
+            description=f'{description[:2046]}',
             type="rich"
         )
         message = await ctx.send(embed=local_embed)
@@ -51,7 +51,8 @@ class Channels():
                 message.id, target_channel.id, ctx.channel.id)
         except UniqueViolationError:
             await message.delete()
-            await ctx.send("There already exists a link to that channel here.")
+            await ctx.send(
+                f"There already exists a link to {target_channel.name} here.")
         await ctx.message.delete()
 
     @channel_message.command(aliases=['rem'])
@@ -96,9 +97,10 @@ class Channels():
             return
         og_message = await ctx.channel.get_message(message_id)
         og_embed = og_message.embeds[0]
-        og_embed.description = edit
+        og_embed.description = edit[:2046]
         await og_message.edit(embed=og_embed)
         await ctx.send(":ok_hand:", delete_after=3)
+        await ctx.message.delete()
 
     async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
         """
