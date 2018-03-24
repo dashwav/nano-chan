@@ -118,6 +118,15 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    reaction_spam = """
+    CREATE TABLE IF NOT EXISTS {}.channel_index (
+        user_id BIGINT,
+        message_id BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (logtime)
+    );
+    """.format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -126,6 +135,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(emojis)
     await pool.execute(servers)
     await pool.execute(channel_index)
+    await pool.execute(reaction_spam)
 
 
 class PostgresController():
@@ -561,3 +571,29 @@ class PostgresController():
         """.format(self.schema)
 
         await self.pool.execute(sql, host_channel, target_channel)
+
+    async def add_user_reaction(self, user_id, message_id):
+        """
+        Logs a reaction to the db
+        """
+        sql = """
+        INSERT INTO {}.reaction_spam VALUES ($1, $2);
+        """.format(self.schema)
+
+        sql2 = """
+        SELECT COUNT(*) FROM {}.reaction_spam
+        WHERE user_id = $1 AND message_id = $2;
+        """.format(self.schema)
+
+        await self.pool.execute(sql, user_id, message_id)
+        return await self.pool.fetchval(sql2, user_id, message_id)
+
+    async def reset_user_reactions(self):
+        """
+        Resets tracker for reactions
+        """
+
+        sql = """
+        DELETE FROM {}.spam;
+        """.format(self.schema)
+        await self.pool.execute(sql)
