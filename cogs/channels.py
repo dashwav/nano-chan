@@ -2,8 +2,8 @@
 This cog will create messages that will manage channel perms with reacts.
 """
 import discord
-import asyncpg.exceptions.UniqueViolationError as UniqueViolationError
 import datetime
+from asyncpg.exceptions import UniqueViolationError
 from collections import defaultdict
 from .utils import helpers, checks
 from discord.ext import commands
