@@ -146,7 +146,7 @@ class Channels():
         try:
             og_embed.set_image(url)
         except Exception as e:
-            self.bot.logger.warning(f'e')
+            self.bot.logger.warning(f'{e}')
             await ctx.send('something broke again', delete_after=3)
         await og_message.edit(embed=og_embed)
         await ctx.send(":ok_hand:", delete_after=3)
