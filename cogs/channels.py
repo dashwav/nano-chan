@@ -96,24 +96,20 @@ class Channels():
         """
         Called when an emoji is added
         """
-        if not await self.bot.postgres_controller.get_message_info(message_id):
-            return
-        user = self.bot.get_user(user_id)
         target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
         if not target_channel:
-            return
+                return 
+        user = self.bot.get_user(user_id)
         await self.add_perms(user, target_channel)
 
     async def on_raw_reaction_remove(self, emoji, message_id, channel_id, user_id):
         """
         Called when an emoji is removed
         """
-        if not await self.bot.postgres_controller.get_message_info(message_id):
-            return
-        user = self.bot.get_user(user_id)
         target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
         if not target_channel:
             return
+        user = self.bot.get_user(user_id)
         await self.remove_perms(user, target_channel)
     
     async def add_perms(self, user, channel):
