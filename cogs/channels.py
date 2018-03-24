@@ -153,7 +153,7 @@ class Channels():
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
 
-    @channel_message.command()
+    @channel_message.command(aliases=['set_thumb'])
     async def set_thumbnail(self, ctx, target_channel: discord.TextChannel, image_url):
         """
         This will update the image in the embed to the given url
@@ -173,6 +173,35 @@ class Channels():
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_thumbnail(url=image_url)
+        except Exception as e:
+            self.bot.logger.warning(f'{e}')
+            await ctx.send('something broke again', delete_after=3)
+            return
+        await og_message.edit(embed=og_embed)
+        await ctx.send(":ok_hand:", delete_after=3)
+        await ctx.message.delete()
+
+
+    @channel_message.command()
+    async def set_footer(self, ctx, target_channel: discord.TextChannel, *, footer):
+        """
+        This will update the footer in the embed to the given message
+        """
+        if not isinstance(target_channel, discord.TextChannel):
+            await ctx.send("that is not a valid channel fam", delete_after=4)
+            return
+        try:
+            message_id = await self.bot.postgres_controller.get_message_info(
+                ctx.channel.id, target_channel.id)
+        except:
+            await ctx.send("something broke", delete_after=3)
+            return
+        if not message_id:
+            return
+        og_message = await ctx.channel.get_message(message_id)
+        og_embed = og_message.embeds[0]
+        try:
+            og_embed.set_footer(text=footer)
         except Exception as e:
             self.bot.logger.warning(f'{e}')
             await ctx.send('something broke again', delete_after=3)
