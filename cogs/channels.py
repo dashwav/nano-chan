@@ -126,7 +126,7 @@ class Channels():
         await ctx.message.delete()
 
     @channel_message.command()
-    async def set_image(self, ctx, target_channel: discord.TextChannel, url):
+    async def set_image(self, ctx, target_channel: discord.TextChannel, image_url):
         """
         This will update the image in the embed to the given url
         """
@@ -144,10 +144,11 @@ class Channels():
         og_message = await ctx.channel.get_message(message_id)
         og_embed = og_message.embeds[0]
         try:
-            og_embed.set_image(url)
+            og_embed.set_image(url=image_url)
         except Exception as e:
             self.bot.logger.warning(f'{e}')
             await ctx.send('something broke again', delete_after=3)
+            return
         await og_message.edit(embed=og_embed)
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
