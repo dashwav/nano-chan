@@ -143,7 +143,11 @@ class Channels():
             return
         og_message = await ctx.channel.get_message(message_id)
         og_embed = og_message.embeds[0]
-        og_embed.set_image(url)
+        try:
+            og_embed.set_image(url)
+        except Exception as e:
+            self.bot.logger.warning(f'e')
+            await ctx.send('something broke again', delete_after=3)
         await og_message.edit(embed=og_embed)
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
