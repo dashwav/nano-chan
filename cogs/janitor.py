@@ -47,9 +47,8 @@ class Janitor():
     def remove_clover(self, member) -> list:
         member_roles = member.roles
         for index, role in enumerate(member_roles):
-            if role.name.lower() == 'clover':
-                clover_index = index
-        del member_roles[clover_index]
+            if role.name.lower() == 'clover' or role.name.lower() == 'dedicated':
+                del member_roles[index]
         return member_roles
 
     def remove_key(self, member) -> list:
