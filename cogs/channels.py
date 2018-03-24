@@ -15,7 +15,7 @@ class Channels():
 
     def __init__(self, bot):
         super().__init__()
-        self.reaction_emojis = [ '\u2705'
+        self.reaction_emojis = [ '✅'
             '0\u20e3', '1\u20e3', '2\u20e3', '3\u20e3', '4\u20e3',
             '5\u20e3', '6\u20e3', '7\u20e3', '8\u20e3', '9\u20e3',
             '\N{REGIONAL INDICATOR SYMBOL LETTER A}',
