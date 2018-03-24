@@ -118,12 +118,20 @@ class Channels():
         """
         Adds a user to channels perms
         """
-        await channel.set_permissions(user, read_messages=True,
+        try:
+            self.bot.logger.info(f'trying to apply perms')
+            await channel.set_permissions(user, read_messages=True,
                                                         send_messages=True)
-            
+        except Exception as e:
+            self.bot.logger.warning(f'{e}')  
+
     async def remove_perms(self, user, channel):
         """
         removes a users perms on a channel
         """
-        await channel.set_permissions(user, read_messages=False,
+        try:
+            self.bot.logger.info(f'trying to remove perms')
+            await channel.set_permissions(user, read_messages=False,
                                                         send_messages=False)
+        except Exception as e:
+            self.bot.logger.warning(f'{e}')  
