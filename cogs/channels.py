@@ -2,6 +2,7 @@
 This cog will create messages that will manage channel perms with reacts.
 """
 import discord
+import asyncpg.exceptions.UniqueViolationError as UniqueViolationError
 import datetime
 from collections import defaultdict
 from .utils import helpers, checks
@@ -45,8 +46,12 @@ class Channels():
         )
         message = await ctx.send(embed=local_embed)
         await message.add_reaction(self.reaction_emojis[0])
-        await self.bot.postgres_controller.add_channel_message(
-            message.id, target_channel.id, ctx.channel.id)
+        try:
+            await self.bot.postgres_controller.add_channel_message(
+                message.id, target_channel.id, ctx.channel.id)
+        except UniqueViolationError:
+            await message.delete()
+            await ctx.send("There already exists a link to that channel here.")
         await ctx.message.delete()
 
     @channel_message.command(aliases=['rem'])
