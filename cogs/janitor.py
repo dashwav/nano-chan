@@ -356,7 +356,7 @@ class Janitor():
         return role_list
 
     def rem_role(self, member, role) -> list:
-        member_roles = member.roles.copy
+        member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
             if role.name.lower() == role:
                 key_index = index
