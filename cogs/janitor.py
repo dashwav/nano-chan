@@ -295,7 +295,9 @@ class Janitor():
                       f'Resetting *No-Lifer* role ...\n'
         local_embed.add_field(name="Progress:",
                 value=value_string)
-        values = value_string.split('(?=\n)')
+        values = value_string.split('\n')
+        for index, val in value:
+            value[index] = val+='\n'
         message = await ctx.send(embed=local_embed)
         key_role = None
         for role in ctx.channel.guild.roles:
