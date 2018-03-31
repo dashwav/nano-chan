@@ -359,12 +359,11 @@ class Janitor():
         role_list.append(role)
         return role_list
 
-    def rem_role(self, member, role) -> list:
+    def rem_role(self, member, role_name) -> list:
         key_index = None
-        self.bot.logger.info(role)
         member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
-            if role.name.lower() == role:
+            if role.name.lower() == role_name:
                 key_index = index
         del member_roles[key_index]
         return member_roles
