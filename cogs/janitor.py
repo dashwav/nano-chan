@@ -346,7 +346,7 @@ class Janitor():
                 found_role = role
         if not found_role:
             return None
-        return found_role.memebers
+        return found_role.members
 
 
     def add_role(self, role_list, role):
