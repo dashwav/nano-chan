@@ -280,6 +280,9 @@ class Janitor():
 
     @commands.command()
     async def month_end(self, ctx):
+        """
+        help? lmao bruh thats it. just run it at the end of the month and u good
+        """
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
         local_embed = discord.Embed(
             title=f'Resetting Roles...',
