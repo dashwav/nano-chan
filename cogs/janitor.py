@@ -309,7 +309,8 @@ class Janitor():
             l_embed = message.embeds[0]
             l_embed.set_field_at(0 , name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
-        except:
+        except Exception as e:
+            self.bot.logger.warning(f'Error cleaning :key: {e}')
             values[0] = f'Clearing :key: role :x: \n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
