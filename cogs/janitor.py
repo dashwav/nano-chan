@@ -323,9 +323,12 @@ class Janitor():
                 await message.edit(embed = l_embed)
                 self.bot.logger.warning(f'ayy yo i didn"t find this one {role}')
             for member in members:
-                temp_roles = self.rem_role(member, role)
-                temp_roles = self.add_role(temp_roles, key_role)
-                await member.edit(roles=temp_roles)
+                try:
+                    temp_roles = self.rem_role(member, role)
+                    temp_roles = self.add_role(temp_roles, key_role)
+                    await member.edit(roles=temp_roles)
+                except Exception as e:
+                    self.bot.logger.warning(f'Error removing {role} from {member}:\n\n{e}')
             values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:\n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
