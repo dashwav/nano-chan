@@ -310,7 +310,7 @@ class Janitor():
             l_embed.set_field_at(0 , name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         except:
-            values[0] = f'Clearing :key: role :x:'
+            values[0] = f'Clearing :key: role :x: \n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
@@ -322,6 +322,7 @@ class Janitor():
                 l_embed.set_field_at(0, name="Progress:", value="".join(values))
                 await message.edit(embed = l_embed)
                 self.bot.logger.warning(f'ayy yo i didn"t find this one {role}')
+                continue
             for member in members:
                 try:
                     temp_roles = self.rem_role(member, role)
@@ -359,6 +360,8 @@ class Janitor():
         return role_list
 
     def rem_role(self, member, role) -> list:
+        key_index = None
+        self.bot.logger.info(role)
         member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
             if role.name.lower() == role:
