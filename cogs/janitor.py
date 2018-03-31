@@ -305,7 +305,7 @@ class Janitor():
                 key_role = role
         try:
             await self.rem_all_members(ctx, key_role)
-            values[0] = f'Clearing :key: role :white_check_mark:'
+            values[0] = f'Clearing :key: role :white_check_mark: \n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0 , name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
@@ -317,7 +317,7 @@ class Janitor():
         for counter, role in enumerate(roles_to_wipe):
             members = await self.get_all_members(ctx, role)
             if not members:
-                values[counter+1] = f'Resetting **{role.title()}** role :x:'
+                values[counter+1] = f'Resetting **{role.title()}** role :x:\n'
                 l_embed = message.embeds[0]
                 l_embed.set_field_at(0, name="Progress:", value="".join(values))
                 await message.edit(embed = l_embed)
@@ -326,7 +326,7 @@ class Janitor():
                 temp_roles = self.rem_role(member, role)
                 temp_roles = self.add_role(temp_roles, key_role)
                 await member.edit(roles=temp_roles)
-            values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:'
+            values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:\n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
