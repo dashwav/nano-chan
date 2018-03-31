@@ -339,7 +339,9 @@ class Janitor():
     async def rem_all_members(self, ctx, rem_role):
         for member in rem_role.members:
             roles_list = member.roles.copy()
+            self.bot.logger.info(roles_list)
             for counter, role in enumerate(roles_list):
+                self.bot.logger.info(role)
                 if role == rem_role:
                     roles_list = roles_list.pop(counter)
                     await member.edit(roles=roles_list)
