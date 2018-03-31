@@ -313,7 +313,7 @@ class Janitor():
             l_embed.description = "".join(values)
             await message.edit(embed = l_embed)
         for counter, role in enumerate(roles_to_wipe):
-            members = self.get_all_members(ctx, role)
+            members = await self.get_all_members(ctx, role)
             if not members:
                 values[counter+1] = f'Resetting **{role.title()}** role :x:'
                 l_embed = message.embeds[0]
