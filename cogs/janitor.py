@@ -321,7 +321,7 @@ class Janitor():
                 await message.edit(embed = l_embed)
                 self.bot.logger.warning(f'ayy yo i didn"t find this one {role}')
             for member in members:
-                temp_roles = self.rem_role(member, role.name)
+                temp_roles = self.rem_role(member, role)
                 temp_roles = self.add_role(temp_roles, key_role)
                 await member.edit(roles=temp_roles)
             values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:'
