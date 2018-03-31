@@ -2,6 +2,7 @@
 This cog is to be used primarily for small janitorial tasks
 (removing clover once member is hit, pruning clovers)
 """
+import discord
 from discord import AuditLogAction
 from discord.ext import commands
 from .utils import checks
@@ -52,7 +53,7 @@ class Janitor():
         return member_roles
 
     def remove_key(self, member) -> list:
-        member_roles = member.roles
+        member_roles = member.roles.copy
         for index, role in enumerate(member_roles):
             if role.name.lower() == '🔑':
                 key_index = index
@@ -277,3 +278,85 @@ class Janitor():
                 self.bot.logger.warning(
                     f'Error posting prune info to mod_log: {e}')
 
+    @commands.command()
+    async def month_end(self, ctx):
+        roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
+        local_embed = discord.Embed(
+            title=f'Resetting Roles...',
+            description=f'Please be patient, this might take a while...'
+        )
+        value_string =f'Clearing :key: role ... \n'\
+                      f'Resetting *Member* role ...\n'\
+                      f'Resetting *Active* role ...\n'\
+                      f'Resetting *Regular* role ...\n'\
+                      f'Resetting *Contributor* role ...\n'\
+                      f'Resetting *Addicted* role ...\n'\
+                      f'Resetting *Insomniac* role ...\n'\
+                      f'Resetting *No-Lifer* role ...\n'
+        local_embed.add_field(name="Progress:",
+                value=value_string)
+        values = value_string.split('\n')
+        message = await ctx.send(embed=local_embed)
+        key_role = None
+        for role in ctx.channel.guild.roles:
+            if role.name.lower() == '🔑':
+                key_role = role
+        try:
+            await self.rem_all_members(ctx, key_role)
+            values[0] = f'Clearing :key: role :white_check_mark:'
+            l_embed = message.embeds[0]
+            l_embed.description = "".join(values)
+            await message.edit(embed = l_embed)
+        except:
+            values[0] = f'Clearing :key: role role :x:'
+            l_embed = message.embeds[0]
+            l_embed.description = "".join(values)
+            await message.edit(embed = l_embed)
+        for counter, role in enumerate(roles_to_wipe):
+            members = self.get_all_members(ctx, role)
+            if not members:
+                values[counter+1] = f'Resetting **{role.title()}** role :x:'
+                l_embed = message.embeds[0]
+                l_embed.description = "".join(values)
+                await message.edit(embed = l_embed)
+                self.bot.logger.warning(f'ayy yo i didn"t find this one {role}')
+            for member in members:
+                temp_roles = self.rem_role(member, role.name)
+                temp_roles = self.add_role(temp_roles, key_role)
+                await member.edit(roles=temp_roles)
+            values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:'
+            l_embed = message.embeds[0]
+            l_embed.description = "".join(values)
+            await message.edit(embed = l_embed)
+
+    async def rem_all_members(self, ctx, rem_role):
+        for member in rem_role.members:
+            roles_list = member.roles.copy()
+            for counter, role in enumerate(roles_list):
+                if role == rem_role:
+                    roles_list = roles_list.pop(counter)
+                    await member.edit(roles=roles_list)
+                    continue
+
+
+    async def get_all_members(self, ctx, role_name):
+        found_role = None
+        for role in ctx.channel.guild.roles:
+            if role.name.lower() == role_name:
+                found_role = role
+        if not found_role:
+            return None
+        return found_role.memebers
+
+
+    def add_role(self, role_list, role):
+        role_list.append(role)
+        return role_list
+
+    def rem_role(self, member, role) -> list:
+        member_roles = member.roles.copy
+        for index, role in enumerate(member_roles):
+            if role.name.lower() == role:
+                key_index = index
+        del member_roles[key_index]
+        return member_roles
