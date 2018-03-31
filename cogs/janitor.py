@@ -343,7 +343,7 @@ class Janitor():
             for counter, role in enumerate(roles_list):
                 self.bot.logger.info(role)
                 if role == rem_role:
-                    roles_list = roles_list.pop(counter)
+                    del roles_list[counter]
                     await member.edit(roles=roles_list)
                     continue
 
