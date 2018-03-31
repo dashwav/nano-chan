@@ -310,7 +310,7 @@ class Janitor():
             l_embed.set_field_at(0 , name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         except:
-            values[0] = f'Clearing :key: role role :x:'
+            values[0] = f'Clearing :key: role :x:'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
