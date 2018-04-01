@@ -128,13 +128,13 @@ class Fightclub():
             return
         try:
             aggressor = await self.bot.postgres_controller.get_fightclub_member(
-                ctx.message.author, aggro_team)
+                ctx.message.author)
             if aggressor is None:
                 raise ValueError('aggressor doesnt exist yet')
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             aggressor = await self.bot.postgres_controller.add_fightclub_member(
-                ctx.message.author, def_team)
+                ctx.message.author, aggro_team_team)
         try:
             defender = await self.bot.postgres_controller.get_fightclub_member(
                 target)
@@ -143,7 +143,7 @@ class Fightclub():
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             defender = await self.bot.postgres_controller.add_fightclub_member(
-                target)
+                target, def_team)
         aggro_elo = self.expected(aggressor['elo'], defender['elo'])
         def_elo = self.expected(defender['elo'], aggressor['elo'])
         if target.bot:
