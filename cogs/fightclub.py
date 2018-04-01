@@ -16,7 +16,6 @@ class Fightclub():
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        self.channel = bot.get_channel(403805028697243648)
         try:
             self.bg_task = self.bot.loop.create_task(self.team_stats())
         except:
