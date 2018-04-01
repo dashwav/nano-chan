@@ -74,7 +74,7 @@ class Fightclub():
                 self.bot.logger.warning('shits fucked yo')
                 return
             for role in ctx.channel.guild.roles:
-                if role.name.lower() in ['member', 'active', 'regular', 'no-exp']:
+                if role.name.lower() in ['member', 'active', 'regular', 'no-exp' '🔑']:
                     for member in role.members:
                         if member.id % 10 in [1,2,3,4,5]:
                             team = team_1
