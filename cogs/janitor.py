@@ -46,14 +46,14 @@ class Janitor():
             self.bot.logger.warning(f'Error getting dm channel: {e}')
 
     def remove_clover(self, member) -> list:
-        member_roles = member.roles
+        member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
             if role.name.lower() == 'clover' or role.name.lower() == 'dedicated':
                 del member_roles[index]
         return member_roles
 
     def remove_key(self, member) -> list:
-        member_roles = member.roles.copy
+        member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
             if role.name.lower() == '🔑':
                 key_index = index
