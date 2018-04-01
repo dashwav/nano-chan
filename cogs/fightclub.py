@@ -22,12 +22,12 @@ class Fightclub():
             self.bot.logger.warning("team_loop didn't work")
 
     async def team_stats(self):
-        self.bot.warning(f'trying this thing')
+        self.bot.logger.warning(f'trying this thing')
         try:
             guild = self.bot.get_guild(148606162810568704)
             channel = guild.get_channel(403805028697243648)
         except Exception as e:
-            self.bot.warning(f'{e}')
+            self.bot.logger.warning(f'{e}')
         while not self.bot.is_closed():
             try:
                 await asyncio.sleep(10)
