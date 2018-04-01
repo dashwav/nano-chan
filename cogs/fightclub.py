@@ -20,30 +20,33 @@ class Fightclub():
         try:
             self.bg_task = self.bot.loop.create_task(self.team_stats())
         except:
-            pass
+            self.bot.logger.warning("team_loop didn't work")
 
     async def team_stats(self):
         while not self.bot.is_closed():
-            await asyncio.sleep(120)
-            full_list = await self.bot.postgres_controller.get_fightclub_stats()
-            team_1_elo = 1000
-            team_1_users = 0
-            team_2_elo = 1000
-            team_2_users = 0
-            for entry in full_list:
-                if entry['team'] == 429898985734537237:
-                    team_1_elo += entry['elo']
-                    team_1_users += 1
-                if entry['team'] == 429899025043423232:
-                    team_2_elo += entry['elo']
-                    team_2_users += 1
-            team_1_elo = team_1_elo / team_1_users
-            team_2_elo = team_2_elo / team_2_users
-            l_embed = discord.Embed(
-                name='Team Stats:',
-                description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
-            )
-            await self.channel.send(embed=l_embed)
+            try:
+                await asyncio.sleep(120)
+                full_list = await self.bot.postgres_controller.get_fightclub_stats()
+                team_1_elo = 1000
+                team_1_users = 0
+                team_2_elo = 1000
+                team_2_users = 0
+                for entry in full_list:
+                    if entry['team'] == 429898985734537237:
+                        team_1_elo += entry['elo']
+                        team_1_users += 1
+                    if entry['team'] == 429899025043423232:
+                        team_2_elo += entry['elo']
+                        team_2_users += 1
+                team_1_elo = team_1_elo / team_1_users
+                team_2_elo = team_2_elo / team_2_users
+                l_embed = discord.Embed(
+                    name='Team Stats:',
+                    description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
+                )
+                await self.channel.send(embed=l_embed)
+            except Exception as e:
+                self.bot.logger.warning(f'Issue creating dm for team stats')
 
     @commands.command()
     @commands.is_owner()
