@@ -74,7 +74,7 @@ class Fightclub():
                 self.bot.logger.warning('shits fucked yo')
                 return
             for role in ctx.channel.guild.roles:
-                if role.name.lower() in ['member', 'active', 'regular', 'no-exp' '🔑']:
+                if role.id in [375012340401176586]:
                     for member in role.members:
                         if member.id % 10 in [1,2,3,4,5]:
                             team = team_1
@@ -84,7 +84,8 @@ class Fightclub():
                         role_list.append(team)
                         try:
                             await member.edit(roles=role_list)
-                        except:
+                        except Exception as e:
+                            self.bot.logger.warning(f'error assigning role {e}')
                             pass
         except Exception as e:
             self.bot.logger.warning(f'fucked up the team shit {e}')
