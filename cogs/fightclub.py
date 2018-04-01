@@ -46,6 +46,7 @@ class Fightclub():
                     name='Team Stats:',
                     description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
                 )
+                self.bot.logger.info(f'{team_1_elo} {team_2_elo}')
                 await channel.send(embed=l_embed)
             except Exception as e:
                 self.bot.logger.warning(f'Issue creating dm for team stats {e}')
