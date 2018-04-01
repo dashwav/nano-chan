@@ -23,6 +23,7 @@ class Fightclub():
             self.bot.logger.warning("team_loop didn't work")
 
     async def team_stats(self):
+        channel = self.bot.get_channel(403805028697243648)
         while not self.bot.is_closed():
             try:
                 await asyncio.sleep(10)
@@ -44,7 +45,7 @@ class Fightclub():
                     name='Team Stats:',
                     description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
                 )
-                await self.channel.send(embed=l_embed)
+                await channel.send(embed=l_embed)
             except Exception as e:
                 self.bot.logger.warning(f'Issue creating dm for team stats {e}')
 
