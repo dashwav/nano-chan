@@ -30,7 +30,7 @@ class Fightclub():
             self.bot.logger.warning(f'{e}')
         while not self.bot.is_closed():
             try:
-                await asyncio.sleep(10)
+                await asyncio.sleep(120)
                 full_list = await self.bot.postgres_controller.get_fightclub_stats()
                 team_1_elo = 1000
                 team_1_users = 0
@@ -46,7 +46,7 @@ class Fightclub():
                 team_1_elo = team_1_elo / team_1_users
                 team_2_elo = team_2_elo / team_2_users
                 l_embed = discord.Embed(
-                    name='Team Stats:',
+                    title='Team Stats:',
                     description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
                 )
                 self.bot.logger.info(f'{team_1_elo} {team_2_elo}')
