@@ -31,10 +31,10 @@ class Fightclub():
             team_2_elo = 1000
             team_2_users = 0
             for entry in full_list:
-                if entry['team'] == 429899429085184010:
+                if entry['team'] == 429898985734537237:
                     team_1_elo += entry['elo']
                     team_1_users += 1
-                if entry['team'] == 429899429085184010:
+                if entry['team'] == 429899025043423232:
                     team_2_elo += entry['elo']
                     team_2_users += 1
             team_1_elo = team_1_elo / team_1_users
@@ -53,9 +53,9 @@ class Fightclub():
         team_1 = None
         team_2 = None
         for role in ctx.channel.guild.roles:
-            if role.id == 429899429085184010:
+            if role.id == 429898985734537237:
                 team_1 = role
-            if role.id == 429899429085184010:
+            if role.id == 429899025043423232:
                 team_2 == role
         if not team_1 or not team_2:
             return
@@ -77,9 +77,9 @@ class Fightclub():
         team_1 = None
         team_2 = None
         for role in ctx.channel.guild.roles:
-            if role.id == 429899429085184010:
+            if role.id == 429898985734537237:
                 team_1 = role
-            if role.id == 429899429085184010:
+            if role.id == 429899025043423232:
                 team_2 == role
         if not team_1:
             await ctx.send('shit nigga')
@@ -109,10 +109,10 @@ class Fightclub():
         aggro_team = 0
         def_team = 0
         for role in ctx.message.author.roles:
-            if role.id in [429899429085184010, 429899429085184010]:
+            if role.id in [429898985734537237, 429899025043423232]:
                 aggro_team = role.id
         for role in target.roles:
-            if role.id in [429899429085184010, 429899429085184010]:
+            if role.id in [429898985734537237, 429899025043423232]:
                 def_team = role.id
         if aggro_team == 0:                  
             await ctx.send("you need to pick a side before you fight anyone my man `-assign` in this channel to get assigned")
