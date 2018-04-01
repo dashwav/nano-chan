@@ -25,7 +25,7 @@ class Fightclub():
     async def team_stats(self):
         while not self.bot.is_closed():
             try:
-                await asyncio.sleep(120)
+                await asyncio.sleep(10)
                 full_list = await self.bot.postgres_controller.get_fightclub_stats()
                 team_1_elo = 1000
                 team_1_users = 0
