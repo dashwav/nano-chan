@@ -50,9 +50,8 @@ class Fightclub():
                 team_2_elo = team_2_elo / team_2_users
                 l_embed = discord.Embed(
                     title='Team Stats:',
-                    description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}\nGod Emperor Dashwav: {god_emperor}'
+                    description=f'Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}\nGod Emperor Dashwav: {god_emperor:.2f}'
                 )
-                self.bot.logger.info(f'{team_1_elo} {team_2_elo}')
                 await channel.send(embed=l_embed)
             except Exception as e:
                 self.bot.logger.warning(f'Issue creating dm for team stats {e}')
