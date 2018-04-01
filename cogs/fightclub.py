@@ -134,7 +134,7 @@ class Fightclub():
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             aggressor = await self.bot.postgres_controller.add_fightclub_member(
-                ctx.message.author, aggro_team_team)
+                ctx.message.author, aggro_team)
         try:
             defender = await self.bot.postgres_controller.get_fightclub_member(
                 target)
