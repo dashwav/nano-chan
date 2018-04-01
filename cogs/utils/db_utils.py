@@ -3,6 +3,7 @@ Database utility functions.
 """
 from datetime import datetime, timedelta
 from typing import Optional
+import random
 from .enums import Change
 try:
     from asyncpg import Record, InterfaceError, UniqueViolationError, create_pool
@@ -106,6 +107,7 @@ async def make_tables(pool: Pool, schema: str):
         aggroloss INT,
         defwins INT,
         defloss INT,
+        team INT,
         PRIMARY KEY (userid)
     );""".format(schema)
 
@@ -441,17 +443,17 @@ class PostgresController():
     Fightclub DB stuff
     """
 
-    async def add_fightclub_member(self, member):
+    async def add_fightclub_member(self, member, team):
         """
         Adds a user to the fight club db
         """
         sql = """
-        INSERT INTO {}.fightclub VALUES ($1, $2, 1200, 0, 0, 0, 0)
+        INSERT INTO {}.fightclub VALUES ($1, $2, 1200, 0, 0, 0, 0, $3)
         ON CONFLICT (userid)
         DO NOTHING;
         """.format(self.schema)
 
-        await self.pool.execute(sql, member.id, member.name)
+        await self.pool.execute(sql, member.id, member.name, team)
         return await self.get_fightclub_member(member)
 
     async def update_fightclub_member(self, member, data):

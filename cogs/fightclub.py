@@ -1,5 +1,6 @@
 import discord
 import random as rng
+import asyncio
 from discord.ext import commands
 
 
@@ -15,6 +16,80 @@ class Fightclub():
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+        self.channel = bot.get_channel(403805028697243648)
+        try:
+            self.bg_task = self.bot.loop.create_task(self.team_stats())
+        except:
+            pass
+
+    async def team_stats(self):
+        while not self.bot.is_closed():
+            await asyncio.sleep(120)
+            full_list = await self.bot.postgres_controller.get_fightclub_stats()
+            team_1_elo = 1000
+            team_1_users = 0
+            team_2_elo = 1000
+            team_2_users = 0
+            for entry in full_list:
+                if entry['team'] == 429899429085184010:
+                    team_1_elo += entry['elo']
+                    team_1_users += 1
+                if entry['team'] == 429899429085184010:
+                    team_2_elo += entry['elo']
+                    team_2_users += 1
+            team_1_elo = team_1_elo / team_1_users
+            team_2_elo = team_2_elo / team_2_users
+            l_embed = discord.Embed(
+                name='Team Stats:',
+                description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
+            )
+            await self.channel.send(embed=l_embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def assign_teams(self, ctx):
+        """
+        """
+        team_1 = None
+        team_2 = None
+        for role in ctx.channel.guild.roles:
+            if role.id == 429899429085184010:
+                team_1 = role
+            if role.id == 429899429085184010:
+                team_2 == role
+        if not team_1 or not team_2:
+            return
+        for role in ctx.channel.guild.roles:
+            if role.name.lower() in ['member', 'active', 'regular', 'no-exp']:
+                for member in role.members:
+                    if member.id % 10 in [1,2,3,4,5]:
+                        team = team_1
+                    else:
+                        team = team_2
+                    role_list = member.roles.copy()
+                    role_list.append(team)
+                    await member.edit(roles=role_list)
+    
+    @commands.command()
+    async def assign(self, ctx):
+        """
+        """
+        team_1 = None
+        team_2 = None
+        for role in ctx.channel.guild.roles:
+            if role.id == 429899429085184010:
+                team_1 = role
+            if role.id == 429899429085184010:
+                team_2 == role
+        if not team_1 or not team_2:
+            return
+        if ctx.author.id % 10 in [1,2,3,4,5]:
+            team = team_1
+        else:
+            team = team_2
+        role_list = ctx.author.roles.copy()
+        role_list.append(team)
+        await ctx.author.edit(roles=role_list)
 
     @commands.command()
     @commands.cooldown(rate=1, per=30.0, type=commands.BucketType.user)
@@ -25,16 +100,32 @@ class Fightclub():
             return
         if ctx.message.author == target:
             return
-
+        aggro_team = 0
+        def_team = 0
+        for role in ctx.message.author.roles:
+            if role.id in [429899429085184010, 429899429085184010]:
+                aggro_team = role.id
+        for role in target.roles:
+            if role.id in [429899429085184010, 429899429085184010]:
+                def_team = role.id
+        if aggro_team == 0:                  
+            await ctx.send("you need to pick a side before you fight anyone my man `-assign` in this channel to get assigned")
+            return
+        if def_team == 0:
+            await ctx.send("attacking a neutural? thats a pussy ass move tbh")
+            return
+        if aggro_team == def_team:
+            await ctx.send("lmao thats friendly fire you retard")
+            return
         try:
             aggressor = await self.bot.postgres_controller.get_fightclub_member(
-                ctx.message.author)
+                ctx.message.author, aggro_team)
             if aggressor is None:
                 raise ValueError('aggressor doesnt exist yet')
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             aggressor = await self.bot.postgres_controller.add_fightclub_member(
-                ctx.message.author)
+                ctx.message.author, def_team)
         try:
             defender = await self.bot.postgres_controller.get_fightclub_member(
                 target)
@@ -48,6 +139,8 @@ class Fightclub():
         def_elo = self.expected(defender['elo'], aggressor['elo'])
         if target.bot:
             roll = rng.randint(-1000, 1000)
+        elif target.id == 164546159140929538:
+            roll = rng.randint(-99999999, 1000)
         else:
             roll = rng.randint(0, 1000)
         if roll > 499:
@@ -265,6 +358,7 @@ class Fightclub():
                 continue
             string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
         return string
+
 
     def expected(self, A, B):
         """
