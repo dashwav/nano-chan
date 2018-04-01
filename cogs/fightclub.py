@@ -82,13 +82,13 @@ class Fightclub():
                 team_1 = role
                 continue
             if role.id == 429899025043423232:
-                team_2 == role
+                team_2 = role
                 continue
         if not team_1:
             await ctx.send('no mealies :sad:')
             return
         if not team_2:
-            await ctx.send('no mealies :sad:')
+            await ctx.send('no stealies :sad:')
             return
         if ctx.author.id % 10 in [1,2,3,4,5]:
             team = team_1
