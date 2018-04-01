@@ -92,7 +92,7 @@ class Fightclub():
         await ctx.author.edit(roles=role_list)
 
     @commands.command()
-    @commands.cooldown(rate=1, per=30.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=2.0, type=commands.BucketType.user)
     async def fight(self, ctx, target: discord.Member):
         """
         """
