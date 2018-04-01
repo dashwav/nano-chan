@@ -59,25 +59,32 @@ class Fightclub():
     async def assign_teams(self, ctx):
         """
         """
-        team_1 = None
-        team_2 = None
-        for role in ctx.channel.guild.roles:
-            if role.id == 429898985734537237:
-                team_1 = role
-            if role.id == 429899025043423232:
-                team_2 == role
-        if not team_1 or not team_2:
-            return
-        for role in ctx.channel.guild.roles:
-            if role.name.lower() in ['member', 'active', 'regular', 'no-exp']:
-                for member in role.members:
-                    if member.id % 10 in [1,2,3,4,5]:
-                        team = team_1
-                    else:
-                        team = team_2
-                    role_list = member.roles.copy()
-                    role_list.append(team)
-                    await member.edit(roles=role_list)
+        try:
+            team_1 = None
+            team_2 = None
+            for role in ctx.channel.guild.roles:
+                if role.id == 429898985734537237:
+                    team_1 = role
+                if role.id == 429899025043423232:
+                    team_2 == role
+            if not team_1:
+                self.bot.logger.warning('shits fucked')
+                return
+            if not team_2:
+                self.bot.logger.warning('shits fucked yo')
+                return
+            for role in ctx.channel.guild.roles:
+                if role.name.lower() in ['member', 'active', 'regular', 'no-exp']:
+                    for member in role.members:
+                        if member.id % 10 in [1,2,3,4,5]:
+                            team = team_1
+                        else:
+                            team = team_2
+                        role_list = member.roles.copy()
+                        role_list.append(team)
+                        await member.edit(roles=role_list)
+        except Exception as e:
+            self.bot.logger.warning(f'fucked up the team shit {e}')
     
     @commands.command()
     async def assign(self, ctx):
