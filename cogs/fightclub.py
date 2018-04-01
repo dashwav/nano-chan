@@ -46,7 +46,7 @@ class Fightclub():
                 )
                 await self.channel.send(embed=l_embed)
             except Exception as e:
-                self.bot.logger.warning(f'Issue creating dm for team stats')
+                self.bot.logger.warning(f'Issue creating dm for team stats {e}')
 
     @commands.command()
     @commands.is_owner()
