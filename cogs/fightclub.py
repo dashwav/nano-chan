@@ -82,7 +82,10 @@ class Fightclub():
                             team = team_2
                         role_list = member.roles.copy()
                         role_list.append(team)
-                        await member.edit(roles=role_list)
+                        try:
+                            await member.edit(roles=role_list)
+                        except:
+                            pass
         except Exception as e:
             self.bot.logger.warning(f'fucked up the team shit {e}')
     
