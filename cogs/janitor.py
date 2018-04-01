@@ -279,6 +279,7 @@ class Janitor():
                     f'Error posting prune info to mod_log: {e}')
 
     @commands.command()
+    @commands.has_permissions(create_channel=True)
     async def month_end(self, ctx):
         """
         help? lmao bruh thats it. just run it at the end of the month and u good
