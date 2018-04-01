@@ -66,7 +66,7 @@ class Fightclub():
                 if role.id == 429898985734537237:
                     team_1 = role
                 if role.id == 429899025043423232:
-                    team_2 == role
+                    team_2 = role
             if not team_1:
                 self.bot.logger.warning('shits fucked')
                 return
