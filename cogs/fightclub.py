@@ -77,7 +77,7 @@ class Fightclub():
         team_1 = None
         team_2 = None
         for role in ctx.channel.guild.roles:
-            self.bot.logger.info(role.id)
+            self.bot.logger.info(f'{role.name} - {role.id}')
             if role.id == 429898985734537237:
                 team_1 = role
                 continue
