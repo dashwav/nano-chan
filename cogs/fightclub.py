@@ -82,6 +82,7 @@ class Fightclub():
             if role.id == 429899429085184010:
                 team_2 == role
         if not team_1 or not team_2:
+            await ctx.send('shit nigga')
             return
         if ctx.author.id % 10 in [1,2,3,4,5]:
             team = team_1
