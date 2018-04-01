@@ -98,7 +98,7 @@ class Fightclub():
         role_list.append(team)
         await ctx.author.edit(roles=role_list)
         await ctx.send(f'You have been added to {team.name}', delete_after=3)
-        await ctx.delete()
+        await ctx.message.delete()
 
     @commands.command()
     @commands.cooldown(rate=1, per=2.0, type=commands.BucketType.user)

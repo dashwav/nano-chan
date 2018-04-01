@@ -107,7 +107,7 @@ async def make_tables(pool: Pool, schema: str):
         aggroloss INT,
         defwins INT,
         defloss INT,
-        team INT,
+        team BIGINT,
         PRIMARY KEY (userid)
     );""".format(schema)
 
