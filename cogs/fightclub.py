@@ -87,6 +87,7 @@ class Fightclub():
                         except Exception as e:
                             self.bot.logger.warning(f'error assigning role {e}')
                             pass
+            await ctx.send('aight nigga we done')
         except Exception as e:
             self.bot.logger.warning(f'fucked up the team shit {e}')
     
