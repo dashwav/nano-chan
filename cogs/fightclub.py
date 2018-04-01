@@ -77,10 +77,13 @@ class Fightclub():
         team_1 = None
         team_2 = None
         for role in ctx.channel.guild.roles:
+            self.bot.logger.info(role.id)
             if role.id == 429898985734537237:
                 team_1 = role
+                continue
             if role.id == 429899025043423232:
                 team_2 == role
+                continue
         if not team_1:
             await ctx.send('shit nigga')
             return
