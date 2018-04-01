@@ -50,7 +50,7 @@ class Fightclub():
                 team_2_elo = team_2_elo / team_2_users
                 l_embed = discord.Embed(
                     title='Team Stats:',
-                    description=f'Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}\nGod Emperor Dashwav: {god_emperor:.2f}'
+                    description=f'Mealies elo: **{team_1_elo:.2f}**\nStealies elo: **{team_2_elo:.2f}**\nGod Emperor Dashwav: **{god_emperor:.2f}**'
                 )
                 await channel.send(embed=l_embed)
             except Exception as e:
