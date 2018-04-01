@@ -128,10 +128,10 @@ class Fightclub():
         aggro_team = 0
         def_team = 0
         for role in ctx.message.author.roles:
-            if role.id in [429898985734537237, 429899025043423232]:
+            if role.id in [429898985734537237, 429899025043423232, 429935358851940353]:
                 aggro_team = role.id
         for role in target.roles:
-            if role.id in [429898985734537237, 429899025043423232]:
+            if role.id in [429898985734537237, 429899025043423232, 429935358851940353]:
                 def_team = role.id
         if aggro_team == 0:                  
             await ctx.send("you need to pick a side before you fight anyone my man `-assign` in this channel to get assigned")
