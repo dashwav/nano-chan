@@ -36,6 +36,7 @@ class Fightclub():
                 team_1_users = 0
                 team_2_elo = 1000
                 team_2_users = 0
+                god_emperor = 1000
                 for entry in full_list:
                     if entry['team'] == 429898985734537237:
                         team_1_elo += entry['elo']
@@ -43,11 +44,13 @@ class Fightclub():
                     if entry['team'] == 429899025043423232:
                         team_2_elo += entry['elo']
                         team_2_users += 1
+                    if entry['userid'] == 164546159140929538:
+                        god_emperor = entry['elo']
                 team_1_elo = team_1_elo / team_1_users
                 team_2_elo = team_2_elo / team_2_users
                 l_embed = discord.Embed(
                     title='Team Stats:',
-                    description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}'
+                    description=f'Mealies elo: {team_1_elo}\nStealies elo: {team_2_elo}\nGod Emperor Dashwav: {god_emperor}'
                 )
                 self.bot.logger.info(f'{team_1_elo} {team_2_elo}')
                 await channel.send(embed=l_embed)
