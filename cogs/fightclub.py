@@ -16,10 +16,6 @@ class Fightclub():
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
-        try:
-            self.bg_task = self.bot.loop.create_task(self.team_stats())
-        except:
-            self.bot.logger.warning("team_loop didn't work")
 
     async def team_stats(self):
         await asyncio.sleep(15)
@@ -94,6 +90,7 @@ class Fightclub():
             self.bot.logger.warning(f'fucked up the team shit {e}')
     
     @commands.command()
+    @commands.is_owner()
     async def assign(self, ctx):
         """
         """
@@ -124,30 +121,13 @@ class Fightclub():
         await ctx.message.delete()
 
     @commands.command()
-    @commands.cooldown(rate=1, per=2.0, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=5.0, type=commands.BucketType.user)
     async def fight(self, ctx, target: discord.Member):
         """
         """
         if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
         if ctx.message.author == target:
-            return
-        aggro_team = 0
-        def_team = 0
-        for role in ctx.message.author.roles:
-            if role.id in [429898985734537237, 429899025043423232, 429935358851940353]:
-                aggro_team = role.id
-        for role in target.roles:
-            if role.id in [429898985734537237, 429899025043423232, 429935358851940353]:
-                def_team = role.id
-        if aggro_team == 0:                  
-            await ctx.send("you need to pick a side before you fight anyone my man `-assign` in this channel to get assigned")
-            return
-        if def_team == 0:
-            await ctx.send("attacking a neutural? thats a pussy ass move tbh")
-            return
-        if aggro_team == def_team:
-            await ctx.send("lmao thats friendly fire you retard")
             return
         try:
             aggressor = await self.bot.postgres_controller.get_fightclub_member(
@@ -157,7 +137,7 @@ class Fightclub():
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             aggressor = await self.bot.postgres_controller.add_fightclub_member(
-                ctx.message.author, aggro_team)
+                ctx.message.author, 0)
         try:
             defender = await self.bot.postgres_controller.get_fightclub_member(
                 target)
@@ -166,13 +146,11 @@ class Fightclub():
         except Exception as e:
             print(f'An error occured getting stats: {e}')
             defender = await self.bot.postgres_controller.add_fightclub_member(
-                target, def_team)
+                target, 0)
         aggro_elo = self.expected(aggressor['elo'], defender['elo'])
         def_elo = self.expected(defender['elo'], aggressor['elo'])
         if target.bot:
             roll = rng.randint(-1000, 1000)
-        elif target.id == 164546159140929538:
-            roll = rng.randint(-99999999, 1000)
         else:
             roll = rng.randint(0, 1000)
         if roll > 499:
@@ -211,6 +189,11 @@ class Fightclub():
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
         if member is None:
+            team_1_elo = 1000
+            team_1_users = 0
+            team_2_elo = 1000
+            team_2_users = 0
+            god_emperor = 1000
             total_aggro_w = 0
             total_aggro_l = 0
             total_def_w = 0
@@ -220,6 +203,14 @@ class Fightclub():
                 total_aggro_l += entry['aggroloss']
                 total_def_w += entry['defwins']
                 total_def_l += entry['defloss']
+                if entry['team'] == 429898985734537237:
+                    team_1_elo += entry['elo']
+                    team_1_users += 1
+                if entry['team'] == 429899025043423232:
+                    team_2_elo += entry['elo']
+                    team_2_users += 1
+                if entry['userid'] == 164546159140929538:
+                    god_emperor = entry['elo']
             total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
             total_def_r = self.ratio(total_def_w, total_def_l)
             top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
@@ -227,6 +218,8 @@ class Fightclub():
             local_embed = discord.Embed(title='Overall Stats', description=f'Offensive Ratio: {total_aggro_r}\nDefensive Ratio: {total_def_r}')
             local_embed.add_field(name='Top 10 (by score)', value=(
                 await self.get_member_string(ctx.guild, 'elo', full_elo[:10])))
+            local_embed.add_field(name='Team Scores',
+                value=f'Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}')
             await ctx.send(embed=local_embed)
             return
         else:
@@ -281,6 +274,11 @@ class Fightclub():
         total_aggro_l = 0
         total_def_w = 0
         total_def_l = 0
+        team_1_elo = 1000
+        team_1_users = 0
+        team_2_elo = 1000
+        team_2_users = 0
+        god_emperor = 1000
         for entry in full_list:
             total_aggro_w += entry['aggrowins']
             total_aggro_l += entry['aggroloss']
@@ -292,6 +290,14 @@ class Fightclub():
             entry['winratio'] = self.ratio(
                 (entry['aggrowins']+entry['defwins']),
                 (entry['aggroloss']+entry['defloss']))
+            if entry['team'] == 429898985734537237:
+                team_1_elo += entry['elo']
+                team_1_users += 1
+            if entry['team'] == 429899025043423232:
+                team_2_elo += entry['elo']
+                team_2_users += 1
+            if entry['userid'] == 164546159140929538:
+                god_emperor = entry['elo']
         total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
@@ -383,9 +389,10 @@ class Fightclub():
         count = 0
         for member in usr_list:
             count += 1
+            team = 'Mealies' if member['team'] == 429898985734537237 else 'Stealies'
             if attribute == 'elo_final':
                 string += (
-                    f'**{count}.**  {member["username"]}  '
+                    f'**{count}.**  {member["username"]} ({team})'
                     f'({member["elo"]}) W/L: {member["winratio"]}\n')
                 continue
             string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
