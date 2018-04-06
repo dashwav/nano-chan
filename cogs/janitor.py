@@ -48,6 +48,13 @@ class Janitor():
     def remove_clover(self, member) -> list:
         member_roles = member.roles.copy()
         for index, role in enumerate(member_roles):
+            if role.name.lower() == 'clover':
+                del member_roles[index]
+        return member_roles
+
+    def remove_clover_prune(self, member) -> list:
+        member_roles = member.roles.copy()
+        for index, role in enumerate(member_roles):
             if role.name.lower() == 'clover' or role.name.lower() == 'dedicated':
                 del member_roles[index]
         return member_roles
@@ -201,7 +208,7 @@ class Janitor():
         for member in clovers:
             if member.id in members_prunable:
                 try:
-                    new_roles = self.remove_clover(member)
+                    new_roles = self.remove_clover_prune(member)
                     await member.edit(
                         roles=new_roles,
                         reason="Pruned due to inactivity"
