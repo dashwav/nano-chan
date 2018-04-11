@@ -72,6 +72,7 @@ class Nanochan(Bot):
         return current.strftime('%H:%M:%S')
 
     async def on_ready(self):
+        await self.change_presence(game=discord.Game(name=f'!faq in #commands-channel'))
         self.logger.info(f'\nLogged in as\n{self.user.name}'
                          f'\nVersion:\n {self.version}'
                          f'\n{self.user.id}\n------')
