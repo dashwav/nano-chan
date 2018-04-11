@@ -74,7 +74,7 @@ class Stats:
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
             target_count[record['emoji_id']] += 1
-        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        day_str = f'in the last {days} days' if days != -1 else f'ever'
         temp_str = f'Most used emoji {day_str}:\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
@@ -109,7 +109,7 @@ class Stats:
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
             target_count[record['emoji_id']] += 1
-        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        day_str = f'in the last {days} days' if days != -1 else f'ever'
         temp_str = f'Most used emoji {day_str}:\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
@@ -143,7 +143,7 @@ class Stats:
             user_count[row['user_id']] += 1
             if row['reaction']:
                 target_count[row['target_id']] += 1
-        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        day_str = f'in the last {days} days' if days != -1 else f'ever'
         temp_str = f'Top 5 users {day_str}:\n--------\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             user_t = self.bot.get_user(key)
