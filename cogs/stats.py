@@ -60,7 +60,7 @@ class Stats:
             await ctx.send('bruh thats not even a command')
 
     @stats.command()
-    async def me(self, ctx):
+    async def me(self, ctx, days: int=-1):
         """
         Returns stats on a user
         """
@@ -69,19 +69,20 @@ class Stats:
         user = ctx.message.author
         user_count = defaultdict(int)
         target_count = defaultdict(int)
-        stats = await self.bot.postgres_controller.get_user_emojis(user)
+        stats = await self.bot.postgres_controller.get_user_emojis(user, days)
         for record in stats['user']:
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
             target_count[record['emoji_id']] += 1
-        temp_str = 'Most used emoji:\n'
+        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        temp_str = f'Most used emoji {day_str}:\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
             if emoji_t:
                 temp_str += f'{emoji_t} - {user_count[key]}\n'
             else:
                 temp_str += f'{key} - {user_count[key]}\n'
-        temp_str += f'\n\n Most reacted on you:\n'
+        temp_str += f'\n\n Most reacted on you {day_str}:\n'
         for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
             if emoji_t:
@@ -97,26 +98,26 @@ class Stats:
 
 
     @stats.command()
-    @checks.has_permissions(manage_roles=True)
-    async def user(self, ctx, user: discord.Member):
+    async def user(self, ctx, user: discord.Member, days: int=-1):
         """
         Returns stats on a user
         """
         user_count = defaultdict(int)
         target_count = defaultdict(int)
-        stats = await self.bot.postgres_controller.get_user_emojis(user)
+        stats = await self.bot.postgres_controller.get_user_emojis(user, days)
         for record in stats['user']:
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
             target_count[record['emoji_id']] += 1
-        temp_str = 'Most used emoji:\n'
+        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        temp_str = f'Most used emoji {day_str}:\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
             if emoji_t:
                 temp_str += f'{emoji_t} - {user_count[key]}\n'
             else:
                 temp_str += f'{key} - {user_count[key]}\n'
-        temp_str += f'\n\n Most reacted on them:\n'
+        temp_str += f'\n\n Most reacted on them {day_str}:\n'
         for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
             emoji_t = self.bot.get_emoji(key)
             if emoji_t:
@@ -131,25 +132,26 @@ class Stats:
         await ctx.send(embed=local_embed)
 
     @stats.command()
-    async def emoji(self, ctx, emoji: discord.Emoji):
+    async def emoji(self, ctx, emoji: discord.Emoji, days: int=-1):
         """
         Returns stats on an Emoji
         """
-        emoji_stats = await self.bot.postgres_controller.get_emoji_stats(emoji)
+        emoji_stats = await self.bot.postgres_controller.get_emoji_stats(emoji, days)
         user_count = defaultdict(int)
         target_count = defaultdict(int)
         for row in emoji_stats:
             user_count[row['user_id']] += 1
             if row['reaction']:
                 target_count[row['target_id']] += 1
-        temp_str = f'Top 5 users:\n--------\n'
+        day_str = f'in the last {days} days' if days != -1 else f'ever.'
+        temp_str = f'Top 5 users {day_str}:\n--------\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             user_t = self.bot.get_user(key)
             if user_t:
                 temp_str += f'**{user_t.name}**#{user_t.discriminator}: {user_count[key]}\n'
             else:
                 temp_str += f'**{key}**: {user_count[key]}\n'
-        temp_str += f'\n\nTop 5 targets:\n--------\n'
+        temp_str += f'\n\nTop 5 targets {day_str}:\n--------\n'
         for key in sorted(target_count, key=target_count.get, reverse=True)[:5]:
             user_t = self.bot.get_user(key)
             if user_t:

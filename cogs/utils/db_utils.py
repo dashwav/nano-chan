@@ -285,33 +285,36 @@ class PostgresController():
             logger.warning(f'Error retrieving emoji count: {e}')
             return None
 
-    async def get_user_emojis(self, user):
+    async def get_user_emojis(self, user, days_to_subtract):
         """
         Returns a dict with stats about the user (probably)
         """
         user_sql = """
         SELECT * FROM {}.emojis
-        WHERE user_id = $1;
+        WHERE user_id = $1 AND logtime > $2;
         """.format(self.schema)
         target_sql = """
         SELECT * FROM {}.emojis
-        WHERE target_id = $1 AND reaction = True;
+        WHERE target_id = $1 AND logtime > $2 AND reaction = True;
         """.format(self.schema)
 
-        user_stats = await self.pool.fetch(user_sql, user.id)
-        target_stats = await self.pool.fetch(target_sql, user.id)
+        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+
+        user_stats = await self.pool.fetch(user_sql, user.id, date_delta)
+        target_stats = await self.pool.fetch(target_sql, user.id, date_delta)
         ret_dict = {'user': user_stats, 'target': target_stats}
         return ret_dict
 
-    async def get_emoji_stats(self, emoji):
+    async def get_emoji_stats(self, emoji, days_to_subtract):
         """
         Returns a dict with stats about the emoji
         """
         sql = """
         SELECT * FROM {}.emojis
-        WHERE emoji_id = $1;
+        WHERE emoji_id = $1 AND logtime > $2;
         """.format(self.schema)
-        return await self.pool.fetch(sql, emoji.id)
+        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        return await self.pool.fetch(sql, emoji.id, date_delta)
 
     """
     Spam stuff
