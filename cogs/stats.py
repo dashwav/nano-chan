@@ -71,11 +71,11 @@ class Stats:
         target_count = defaultdict(int)
         stats = await self.bot.postgres_controller.get_user_emojis(user, days)
         for record in stats['user']:
-            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376]: #nsfw-roleplay, meta, brainpower
+            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
-            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376]: #nsfw-roleplay, meta, brainpower
+            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             target_count[record['emoji_id']] += 1
         day_str = f'in the last {days} days' if days != -1 else f'ever'
@@ -110,11 +110,11 @@ class Stats:
         target_count = defaultdict(int)
         stats = await self.bot.postgres_controller.get_user_emojis(user, days)
         for record in stats['user']:
-            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376]: #nsfw-roleplay, meta, brainpower
+            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             user_count[record['emoji_id']] += 1
         for record in stats['target']:
-            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376]: #nsfw-roleplay, meta, brainpower
+            if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             target_count[record['emoji_id']] += 1
         day_str = f'in the last {days} days' if days != -1 else f'ever'
@@ -148,7 +148,7 @@ class Stats:
         user_count = defaultdict(int)
         target_count = defaultdict(int)
         for row in emoji_stats:
-            if row['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376]: #nsfw-roleplay, meta, brainpower
+            if row['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             user_count[row['user_id']] += 1
             if row['reaction']:
