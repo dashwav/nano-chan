@@ -297,9 +297,10 @@ class PostgresController():
         SELECT * FROM {}.emojis
         WHERE target_id = $1 AND logtime > $2 AND reaction = True;
         """.format(self.schema)
-
-        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
-
+        if days_to_subtract != -1:
+            date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        else:
+            date_delta = datetime.utcnow() - timedelta(days=9999)
         user_stats = await self.pool.fetch(user_sql, user.id, date_delta)
         target_stats = await self.pool.fetch(target_sql, user.id, date_delta)
         ret_dict = {'user': user_stats, 'target': target_stats}
@@ -313,7 +314,10 @@ class PostgresController():
         SELECT * FROM {}.emojis
         WHERE emoji_id = $1 AND logtime > $2;
         """.format(self.schema)
-        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        if days_to_subtract != -1:
+            date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        else:
+            date_delta = datetime.utcnow() - timedelta(days=9999)
         return await self.pool.fetch(sql, emoji.id, date_delta)
 
     """
