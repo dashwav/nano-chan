@@ -18,7 +18,7 @@ class Owner():
         self.bot = bot
 
     @commands.command()
-    @commands.is_owner()
+    @checks.is_admin()
     async def set_playing(self, ctx, *, game=None):
         if game:
             await self.bot.change_presence(game=discord.Game(name=game))
