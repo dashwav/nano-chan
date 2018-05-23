@@ -198,9 +198,11 @@ class Stats:
         for key in sorted(count_dict, key=count_dict.get, reverse=True):
             desc += f'{key}: {count_dict[key]}\n'
         if len(desc) > 2048:
+            desc = ''
             desc_over = ''
             count = 0
             temp = desc.split('\n')
+            desc = ''
             for emoji in temp:
                 count += len(emoji) + 1
                 self.bot.logger.info(count)
