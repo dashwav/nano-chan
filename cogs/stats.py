@@ -198,8 +198,14 @@ class Stats:
         for key in sorted(count_dict, key=count_dict.get, reverse=True):
             desc += f'{key}: {count_dict[key]}\n'
         if len(desc) > 2048:
-            desc_over = desc[2048:]
-            desc = desc[:2047]
+            count = 0
+            temp = desc.split('\n')
+            for emoji in temp:
+                count += len(emoji)
+                if count > 2048:
+                    desc_over += emoji
+                else:
+                    desc += emoji
         local_embed = discord.Embed(
             title=f'Emoji use over the past {days} day/s:',
             description=desc
