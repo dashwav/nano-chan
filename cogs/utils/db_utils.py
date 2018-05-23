@@ -277,8 +277,10 @@ class PostgresController():
         SELECT count(emoji_id) FROM {}.emojis
         WHERE emoji_id = $1 AND logtime > $2;
         """.format(self.schema)
-
-        date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        if days_to_subtract != -1:
+            date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        else:
+            date_delta = datetime.utcnow() - timedelta(days=9999)
         try:
             return await self.pool.fetchval(sql, emoji.id, date_delta)
         except Exception as e:
