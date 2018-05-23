@@ -198,6 +198,7 @@ class Stats:
         for key in sorted(count_dict, key=count_dict.get, reverse=True):
             desc += f'{key}: {count_dict[key]}\n'
         if len(desc) > 2048:
+            desc_over = ''
             count = 0
             temp = desc.split('\n')
             for emoji in temp:
