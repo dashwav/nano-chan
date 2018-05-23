@@ -202,7 +202,7 @@ class Stats:
             count = 0
             temp = desc.split('\n')
             for emoji in temp:
-                count += len(emoji+1)
+                count += len(emoji) + 1
                 self.bot.logger.info(count)
                 if count > 2047:
                     desc_over += f'{emoji}\n'
