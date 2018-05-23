@@ -147,14 +147,20 @@ class Stats:
         emoji_stats = await self.bot.postgres_controller.get_emoji_stats(emoji, days)
         user_count = defaultdict(int)
         target_count = defaultdict(int)
+        total_count = 0
+        reaction_count = 0
         for row in emoji_stats:
             if row['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
             user_count[row['user_id']] += 1
+            total_count += 1
             if row['reaction']:
                 target_count[row['target_id']] += 1
+                reaction_count += 1
         day_str = f'in the last {days} days' if days != -1 else f'ever'
-        temp_str = f'Top 5 users {day_str}:\n--------\n'
+        temp_str = f'Emoji used in messages {day_str}: {total_count-reaction_count}\n'
+        temp_str += f'Emoji used in reactions {day_str}: {reaction_count}\n'
+        temp_str += f'Top 5 users {day_str}:\n--------\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             user_t = self.bot.get_user(key)
             if user_t:
