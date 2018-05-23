@@ -202,11 +202,11 @@ class Stats:
             count = 0
             temp = desc.split('\n')
             for emoji in temp:
-                count += len(emoji)
-                if count > 2048:
-                    desc_over += emoji
+                count += len(emoji+1)
+                if count > 2047:
+                    desc_over += f'{emoji}\n'
                 else:
-                    desc += emoji
+                    desc += f'{emoji}\n'
         local_embed = discord.Embed(
             title=f'Emoji use over the past {days} day/s:',
             description=desc
