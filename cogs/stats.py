@@ -185,6 +185,7 @@ class Stats:
     @checks.has_permissions(manage_emojis=True)
     async def emojis(self, ctx, days: int=1):
         count_dict = defaultdict(int)
+        desc_over = None
         for emoji in ctx.guild.emojis:
             try:
                 count_dict[emoji] = await \
@@ -196,10 +197,17 @@ class Stats:
         desc = ''
         for key in sorted(count_dict, key=count_dict.get, reverse=True):
             desc += f'{key}: {count_dict[key]}\n'
+        if len(desc) > 2048:
+            desc_over = desc[:2047]
         local_embed = discord.Embed(
             title=f'Emoji use over the past {days} day/s:',
             description=desc
         )
+        if desc_over:
+            local_embed.add_field(
+                name='------cont-----',
+                value=desc_over
+            )
         await ctx.send(embed=local_embed)
             
 
