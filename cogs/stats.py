@@ -157,9 +157,9 @@ class Stats:
             if row['reaction']:
                 target_count[row['target_id']] += 1
                 reaction_count += 1
-        day_str = f'in the last {days} days' if days != -1 else f'ever'
+        day_str = f'in the last {days} days' if days != -1 else f'since forever'
         temp_str = f'Emoji used in messages {day_str}: {total_count-reaction_count}\n'
-        temp_str += f'Emoji used in reactions {day_str}: {reaction_count}\n'
+        temp_str += f'Emoji used in reactions {day_str}: {reaction_count}\n\n'
         temp_str += f'Top 5 users {day_str}:\n--------\n'
         for key in sorted(user_count, key=user_count.get, reverse=True)[:5]:
             user_t = self.bot.get_user(key)
