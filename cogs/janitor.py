@@ -286,7 +286,7 @@ class Janitor():
                     f'Error posting prune info to mod_log: {e}')
 
     @commands.command()
-    @commands.has_permissions(create_channel=True)
+    @commands.has_permissions(kick_members=True)
     async def month_end(self, ctx):
         """
         help? lmao bruh thats it. just run it at the end of the month and u good
@@ -330,6 +330,7 @@ class Janitor():
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         for counter, role in enumerate(roles_to_wipe):
+            self.bot.logger.info(values)
             members = await self.get_all_members(ctx, role)
             if not members:
                 values[counter+1] = f'Resetting **{role.title()}** role :x:\n'
