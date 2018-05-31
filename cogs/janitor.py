@@ -87,6 +87,7 @@ class Janitor():
         has_member = False
         has_dedicated = False
         has_permrole = False
+        has_adv_role = False
         member_roles = message.author.roles
         for index, role in enumerate(member_roles):
             if role.name.lower() == 'clover':
@@ -97,8 +98,10 @@ class Janitor():
                 has_dedicated = True
             elif role.name.lower() in ['muse', 'dev','lewd', 'swole', 'artsy', 'shokugeki', 'degenerate', 'simulcast', 'legacy', 'meta', 'stylish']:
                 has_permrole = True
-            elif role.name.lower() == 'member':
+            elif role.name.lower() in ['member']:
                 has_member = True
+            elif role.name.lower() in ['active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']:
+                has_adv_role = True
         if has_clover and has_member:
             member_roles = self.remove_clover(message.author)
             try:
@@ -116,6 +119,18 @@ class Janitor():
                 except Exception as e:
                     self.bot.logger.warning(
                         f'Issue logging action to db: {e})')
+            except Exception as e:
+                self.bot.logger.warning(
+                    f'Error updating users roles: {e}')
+        if has_clover and has_member:
+            member_roles = self.remove_clover(message.author)
+            try:
+                await message.author.edit(
+                    roles=member_roles,
+                    reason="User had clover and another advanced role")
+                self.bot.logger.info(
+                    f'{message.author.display_name}'
+                    ' had clover removed because of another advanced role')
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error updating users roles: {e}')
