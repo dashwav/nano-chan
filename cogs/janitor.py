@@ -309,7 +309,10 @@ class Janitor():
         values = value_string.split('\n')
         for index, val in enumerate(values):
             values[index] = val +'\n'
-        message = await ctx.send(embed=local_embed)
+        try:
+            message = await ctx.send(embed=local_embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Error sending month_end message: {e}')
         key_role = None
         for role in ctx.channel.guild.roles:
             if role.name.lower() == '🔑':
