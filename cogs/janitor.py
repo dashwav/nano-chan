@@ -330,7 +330,6 @@ class Janitor():
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         for counter, role in enumerate(roles_to_wipe):
-            self.bot.logger.info(values)
             members = await self.get_all_members(ctx, role)
             if not members:
                 values[counter+1] = f'Resetting **{role.title()}** role :x:\n'
