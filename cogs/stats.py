@@ -202,18 +202,21 @@ class Stats:
             embed_image = True
         if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
             return
-        message = await channel.get_message(record[0]['id'])
-        msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
+        try:
+            message = await channel.get_message(record[0]['id'])
+            msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
                   f'`Reacts`: {record[0]["count"]}\nText`:\n```{message.content}```\n'
-        if message.attachments:
-            desc = ''
-            for file in message.attachments:
-                if embed_image:
-                    desc += f'{file.url}'
-                else:
-                    desc += f'**(!!might be nsfw!!)**:\n'\
-                            f'<{file.url}>\n**(!!might be nsfw!!)**'
-            msg_str += f'`Attachments` \n{desc}'
+            if message.attachments:
+                desc = ''
+                for file in message.attachments:
+                    if embed_image:
+                        desc += f'{file.url}'
+                    else:
+                        desc += f'**(!!might be nsfw!!)**:\n'\
+                                f'<{file.url}>\n**(!!might be nsfw!!)**'
+                msg_str += f'`Attachments` \n{desc}'
+        except discord.errors.NotFound:
+            msg_str = f'Message not found, probably deleted.'
         await ctx.send(msg_str)
 
 
