@@ -188,8 +188,9 @@ class Stats:
         record = await self.bot.postgres_controller.get_top_post_by_emoji(
             emoji, days
         )
-        channel = self.bot.get_channel(record['ch_id'])
-        message = await channel.get_message(record['id'])
+        print(record)
+        channel = self.bot.get_channel(record[0]['ch_id'])
+        message = await channel.get_message(record[0]['id'])
         await ctx.send(
             f'Author: {message.author}\nContent(text):{message.content}')
 
