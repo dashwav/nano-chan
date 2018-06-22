@@ -189,7 +189,7 @@ class Stats:
         await ctx.send(embed=local_embed)
 
     @stats.command()
-    async def top(self, ctx, emoji: discord.Emoji, days: int=1, channel=None):
+    async def top(self, ctx, emoji: discord.Emoji, days: int=-1, channel=None):
         """
         Returns top post in timespan with reacts
         """
