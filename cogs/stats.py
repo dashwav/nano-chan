@@ -191,8 +191,14 @@ class Stats:
         print(record)
         channel = self.bot.get_channel(record[0]['ch_id'])
         message = await channel.get_message(record[0]['id'])
-        await ctx.send(
-            f'Author: {message.author}\nContent(text):{message.content}')
+        msg_str = f'Author: {message.author}\nChannel: {message.channel}\n'\
+                  f'Content(text):{message.content}\n'
+        if message.attachments:
+            desc = ''
+            for file in message.attachments:
+                desc += f'{file.url}\n'
+            msg_str.append(f'Attachments (!!might be nsfw!!):\n{desc}')
+        await ctx.send(msg_str)
 
 
 
