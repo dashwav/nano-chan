@@ -7,6 +7,12 @@ from collections import defaultdict
 from .utils import helpers, checks
 from discord.ext import commands
 
+ALLOWED_CHANNELS = [
+    378684962934751239,
+    282640120388255744,
+    220762067739738113,
+    176429411443146752
+]
 
 class Stats:
     """
@@ -56,6 +62,8 @@ class Stats:
         """
         This is the base command for the fun shit
         """
+        if ctx.message.channel.id not in ALLOWED_CHANNELS:
+            return
         if ctx.invoked_subcommand is None:
             await ctx.send('bruh thats not even a command')
 
