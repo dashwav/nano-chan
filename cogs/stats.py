@@ -196,7 +196,7 @@ class Stats:
             return
         message = await channel.get_message(record[0]['id'])
         msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
-                  f'`Text`:{message.content}\n'
+                  f'`Reacts: {record["count"]}`Text`:\n```{message.content}```\n'
         if message.attachments:
             desc = ''
             for file in message.attachments:
