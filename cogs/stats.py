@@ -203,7 +203,7 @@ class Stats:
                     desc += f'{file.url}'
                 else:
                     desc += f'**(!!might be nsfw!!)**:\n'\
-                            f'{file.url}\n**(!!might be nsfw!!)**'
+                            f'<{file.url}>\n**(!!might be nsfw!!)**'
             msg_str += f'`Attachments` \n{desc}'
         await ctx.send(msg_str)
 
