@@ -188,6 +188,7 @@ class Stats:
         channel = None
         if ctx.message.channel_mentions:
             channel = ctx.message.channel_mentions[0]
+        print(channel)
         record = await self.bot.postgres_controller.get_top_post_by_emoji(
             emoji, days, channel
         )
