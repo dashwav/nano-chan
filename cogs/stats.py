@@ -181,12 +181,13 @@ class Stats:
         await ctx.send(embed=local_embed)
 
     @stats.command()
-    async def top(self, ctx, emoji: discord.Emoji, days: int=1):
+    async def top(self, ctx, emoji: discord.Emoji, days: int=1, 
+                  channel: discord.channel=None):
         """
         Returns top post in timespan with reacts
         """
         record = await self.bot.postgres_controller.get_top_post_by_emoji(
-            emoji, days
+            emoji, days, channel
         )
         print(record)
         channel = self.bot.get_channel(record[0]['ch_id'])

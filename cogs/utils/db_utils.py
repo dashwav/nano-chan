@@ -322,23 +322,34 @@ class PostgresController():
             date_delta = datetime.utcnow() - timedelta(days=9999)
         return await self.pool.fetch(sql, emoji.id, date_delta)
 
-    async def get_top_post_by_emoji(self, emoji, days_to_subtract):
+    async def get_top_post_by_emoji(self, emoji, days_to_subtract, channel):
         """
         Returns the id for the message with highest reacts of given emoi
         """
-        sql = """
-        SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
-        FROM {}.emojis
-        WHERE emoji_id = $1 AND logtime > $2 AND reaction = true
-        GROUP BY message_id, channel_id
-        ORDER BY count DESC
-        LIMIT 1
-        """.format(self.schema)
         if days_to_subtract != -1:
             date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
         else:
             date_delta = datetime.utcnow() - timedelta(days=9999)
-        return await self.pool.fetch(sql, emoji.id, date_delta)
+        if channel:
+            sql = """
+            SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
+            FROM {}.emojis
+            WHERE emoji_id = $1 AND logtime > $2 AND reaction = true AND channel_id = $3
+            GROUP BY message_id, channel_id
+            ORDER BY count DESC
+            LIMIT 1
+            """.format(self.schema)
+            return await self.pool.fetch(sql, emoji.id, date_delta, channel.id)
+        else:
+            sql = """
+            SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
+            FROM {}.emojis
+            WHERE emoji_id = $1 AND logtime > $2 AND reaction = true
+            GROUP BY message_id, channel_id
+            ORDER BY count DESC
+            LIMIT 1
+            """.format(self.schema)
+            return await self.pool.fetch(sql, emoji.id, date_delta)
 
 
     """
