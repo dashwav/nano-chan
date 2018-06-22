@@ -212,7 +212,7 @@ class Stats:
                 message = await channel.get_message(record['id'])
                 if len(message.clean_content) > 600:
                     msg_content = f'{message.clean_content[:500]} ... `(message shortened)`'
-                else
+                else:
                     msg_content = f'{message.clean_content[:500]}' if message.content != '' else ''
                 msg_str = f'`Author`: {message.author.mention} ({message.author})\n'\
                           f'`Channel`: {message.channel.mention}\n'\
