@@ -11,7 +11,7 @@ ALLOWED_CHANNELS = [
     378684962934751239,
     282640120388255744,
     220762067739738113,
-    176429411443146752
+    176429411443146752,
 ]
 
 class Stats:
@@ -204,7 +204,7 @@ class Stats:
             return
         message = await channel.get_message(record[0]['id'])
         msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
-                  f'`Reacts: {record["count"]}`Text`:\n```{message.content}```\n'
+                  f'`Reacts: {record[0]["count"]}`Text`:\n```{message.content}```\n'
         if message.attachments:
             desc = ''
             for file in message.attachments:
