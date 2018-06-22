@@ -197,7 +197,7 @@ class Stats:
             desc = ''
             for file in message.attachments:
                 desc += f'{file.url}\n'
-            msg_str.append(f'Attachments (!!might be nsfw!!):\n{desc}')
+            msg_str += f'Attachments (!!might be nsfw!!):\n{desc}'
         await ctx.send(msg_str)
 
 
