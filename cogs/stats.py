@@ -200,7 +200,7 @@ class Stats:
             desc = ''
             for file in message.attachments:
                 if embed_image:
-                    desc += f'{file.url}\'
+                    desc += f'{file.url}'
                 else:
                     desc += f'**(!!might be nsfw!!)**:\n'\
                             f'{file.url}\n**(!!might be nsfw!!)**'
