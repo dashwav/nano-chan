@@ -193,32 +193,43 @@ class Stats:
         """
         Returns top post in timespan with reacts
         """
-        record = await self.bot.postgres_controller.get_top_post_by_emoji(
+        day_str = f'in the last {days} days' if days != -1 else f'since forever'
+        all_records = await self.bot.postgres_controller.get_top_post_by_emoji(
             emoji, days, channel
         )
-        channel = self.bot.get_channel(record[0]['ch_id'])
-        embed_image = False
-        if channel.id in [183215451634008065]: 
-            embed_image = True
-        if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
-            return
-        try:
-            message = await channel.get_message(record[0]['id'])
-            msg_content = f'```{message.content}```' if message.content != '' else ''
-            msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
-                  f'`Reacts`: {record[0]["count"]}\n`Text`:\n{msg_content}\n'
-            if message.attachments:
-                desc = ''
-                for file in message.attachments:
-                    if embed_image:
-                        desc += f'{file.url}'
-                    else:
-                        desc += f'**(!!might be nsfw!!)**:\n'\
-                                f'<{file.url}>\n**(!!might be nsfw!!)**'
-                msg_str += f'`Attachments` \n{desc}'
-        except discord.errors.NotFound:
-            msg_str = f'Message not found, probably deleted.'
-        await ctx.send(msg_str)
+        l_embed = discord.Embed(
+            title=f'Top 3 Posts with {emoji} reacts {day_str}',
+            desc=f'___'
+        )
+        for record, index in all_records:
+            channel = self.bot.get_channel(record[0]['ch_id'])
+            embed_image = False
+            if channel.id in [183215451634008065]: 
+                embed_image = True
+            if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
+                return
+            try:
+                message = await channel.get_message(record[0]['id'])
+                msg_content = f'```{message.clean_content}```' if message.content != '' else ''
+                msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
+                    f'`Reacts`: {record[0]["count"]}\n`Text`:\n{msg_content}\n'
+                if message.attachments:
+                    desc = ''
+                    for file in message.attachments:
+                        if embed_image:
+                            desc += f'{file.url}'
+                        else:
+                            desc += f'**(!!might be nsfw!!)**:\n'\
+                                    f'<{file.url}>\n**(!!might be nsfw!!)**'
+                    msg_str += f'`Attachments` \n{desc}'
+            except discord.errors.NotFound:
+                msg_str = f'Message not found, probably deleted.'
+            l_embed.add_field(
+                name=f'{index}',
+                value=msg_str,
+                inline=True,
+            )
+        await ctx.send(l_embed)
 
 
 
