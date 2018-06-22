@@ -339,7 +339,7 @@ class PostgresController():
             ORDER BY count DESC
             LIMIT 1
             """.format(self.schema)
-            return await self.pool.fetch(sql, emoji.id, date_delta, channel_id)
+            return await self.pool.fetch(sql, emoji.id, date_delta, int(channel_id))
         else:
             sql = """
             SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
