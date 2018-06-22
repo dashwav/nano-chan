@@ -210,7 +210,7 @@ class Stats:
                 return
             try:
                 message = await channel.get_message(record[0]['id'])
-                msg_content = f'```{message.clean_content}```' if message.content != '' else ''
+                msg_content = f'{message.clean_content}' if message.content != '' else ''
                 msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
                     f'`Reacts`: {record[0]["count"]}\n`Text`:\n{msg_content}\n'
                 if message.attachments:
