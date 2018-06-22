@@ -211,8 +211,9 @@ class Stats:
             try:
                 message = await channel.get_message(record['id'])
                 msg_content = f'{message.clean_content}' if message.content != '' else ''
-                msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
-                    f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'
+                msg_str = f'`Author`: {message.author.mention} ({message.author})\n'\
+                          f'`Channel`: {message.channel.mention}\n'\
+                          f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:
@@ -225,7 +226,7 @@ class Stats:
             except discord.errors.NotFound:
                 msg_str = f'Message not found, probably deleted.'
             l_embed.add_field(
-                name=f'{index}',
+                name=f'**{index+1}.**',
                 value=msg_str,
                 inline=True,
             )
