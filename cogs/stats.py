@@ -201,18 +201,18 @@ class Stats:
             title=f'Top 3 Posts with {emoji} reacts {day_str}',
             desc=f'___'
         )
-        for record, index in all_records:
-            channel = self.bot.get_channel(record[0]['ch_id'])
+        for index, record in enumerate(all_records):
+            channel = self.bot.get_channel(record['ch_id'])
             embed_image = False
             if channel.id in [183215451634008065]: 
                 embed_image = True
             if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
                 return
             try:
-                message = await channel.get_message(record[0]['id'])
+                message = await channel.get_message(record['id'])
                 msg_content = f'{message.clean_content}' if message.content != '' else ''
                 msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
-                    f'`Reacts`: {record[0]["count"]}\n`Text`:\n{msg_content}\n'
+                    f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:

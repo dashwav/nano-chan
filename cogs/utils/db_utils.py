@@ -337,7 +337,7 @@ class PostgresController():
             WHERE emoji_id = $1 AND logtime > $2 AND reaction = true AND channel_id = $3
             GROUP BY message_id, channel_id
             ORDER BY count DESC
-            LIMIT 1
+            LIMIT 3
             """.format(self.schema)
             return await self.pool.fetch(sql, emoji.id, date_delta, int(channel_id))
         else:
@@ -347,7 +347,7 @@ class PostgresController():
             WHERE emoji_id = $1 AND logtime > $2 AND reaction = true
             GROUP BY message_id, channel_id
             ORDER BY count DESC
-            LIMIT 1
+            LIMIT 3
             """.format(self.schema)
             return await self.pool.fetch(sql, emoji.id, date_delta)
 
