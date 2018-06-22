@@ -200,10 +200,11 @@ class Stats:
             desc = ''
             for file in message.attachments:
                 if embed_image:
-                    desc += f'{file.url}\n'
+                    desc += f'{file.url}\'
                 else:
-                    desc += f'<{file.url}>\n'
-            msg_str += f'Attachments (!!might be nsfw!!):\n{desc}'
+                    desc += f'**(!!might be nsfw!!)**:\n'\
+                            f'{file.url}\n**(!!might be nsfw!!)**'
+            msg_str += f'`Attachments` \n{desc}'
         await ctx.send(msg_str)
 
 
