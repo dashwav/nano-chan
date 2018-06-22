@@ -180,6 +180,20 @@ class Stats:
         )
         await ctx.send(embed=local_embed)
 
+    @stats.command()
+    async def top(self, ctx, emoji: discord.Emoji, days: int=1):
+        """
+        Returns top post in timespan with reacts
+        """
+        record = await self.bot.postgres_controller.get_top_post_by_emoji(
+            emoji, days
+        )
+        channel = self.bot.get_channel(record['ch_id'])
+        message = await channel.get_message(record['id'])
+        await ctx.send(
+            f'Author: {message.author}\nContent(text):{message.content}')
+
+
 
     @commands.command()
     @checks.has_permissions(manage_emojis=True)
