@@ -229,7 +229,7 @@ class Stats:
                 value=msg_str,
                 inline=True,
             )
-        await ctx.send(l_embed)
+        await ctx.send(embed=l_embed)
 
 
 
