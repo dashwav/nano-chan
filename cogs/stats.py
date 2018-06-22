@@ -191,7 +191,7 @@ class Stats:
         print(record)
         channel = self.bot.get_channel(record[0]['ch_id'])
         embed_image = False
-        if channel.id not in [183215451634008065]: 
+        if channel.id in [183215451634008065]: 
             embed_image = True
         message = await channel.get_message(record[0]['id'])
         msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
