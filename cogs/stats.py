@@ -188,11 +188,12 @@ class Stats:
         record = await self.bot.postgres_controller.get_top_post_by_emoji(
             emoji, days, channel
         )
-        print(record)
         channel = self.bot.get_channel(record[0]['ch_id'])
         embed_image = False
         if channel.id in [183215451634008065]: 
             embed_image = True
+        if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
+            return
         message = await channel.get_message(record[0]['id'])
         msg_str = f'`Author`: {message.author}\n`Channel`: {message.channel.mention}\n'\
                   f'`Text`:{message.content}\n'
