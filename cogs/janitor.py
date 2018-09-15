@@ -242,7 +242,10 @@ class Janitor():
         if prune_info['pruned']:
             try:
                 await mod_log.send(
-                    f'Pruned {prune_info["amount"]} clovers 🍀🔫')
+                    local_embed = discord.Embed(
+                        color = 0x419400
+                        title = 'Clovers pruned'
+                        description = f'Pruned{prune_info["amount"]} clovers 🍀🔫' )
             except Exception as e:
                 self.bot.logger.warning(
                     f'Error posting prune info to mod_log: {e}')
