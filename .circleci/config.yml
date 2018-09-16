@@ -52,7 +52,8 @@ jobs:
       - run:
           name: Start Bot
           command: |
-            python3 run.py
+            . venv/bin/activate
+            python run.py
 
       - store_artifacts:
           path: test-reports
