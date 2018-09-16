@@ -41,9 +41,9 @@ jobs:
       # https://pytest.org
       # https://nose.readthedocs.io
       - run:
-          name: Wait for 10 Seconds
+          name: Wait for 5 Seconds
           command: |
-            sleep 10
+            sleep 5
       
       - run:
           name: Start Bot
