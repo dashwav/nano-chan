@@ -2,6 +2,7 @@
 Discord bot that spaces out spoiler comments
 """
 import yaml
+import os
 import discord
 from discord.ext.commands import Bot
 from time import time
@@ -14,7 +15,7 @@ class Nanochan(Bot):
     """
     actual bot class
     """
-    def __init__(self, config, logger,
+    def __init__(self, config, logger, test,
                  postgres_controller: PostgresController):
         """
         init for bot class
@@ -22,7 +23,10 @@ class Nanochan(Bot):
         self.postgres_controller = postgres_controller
         self.start_time = int(time())
         self.version = discord.__version__
-        self.credentials = config['token']
+        if test:
+            self.credentials = os.environ['TOKEN']
+        else:
+            self.credentials = config['token']
         self.guild_id = config['guild_id']
         self.mod_log = config['mod_log']
         self.mod_info = config['mod_info']
@@ -54,7 +58,7 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        return cls(config, logger, postgres_controller)
+        return cls(config, logger, False, postgres_controller)
 
     @classmethod
     async def get_test_instance(cls):
@@ -71,8 +75,9 @@ class Nanochan(Bot):
         logger.addHandler(console_handler)
         logger.setLevel(INFO)
         postgres_cred = config['postgres_credentials']
-        postgres_controller = 'lmao nothing here'
-        return cls(config, logger, postgres_controller)
+        postgres_controller = await PostgresController.get_instance(
+            logger=logger, connect_kwargs=postgres_cred)
+        return cls(config, logger, True, postgres_controller)
 
     def start_bot(self, cogs):
         """
