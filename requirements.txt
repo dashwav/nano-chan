@@ -1,6 +1,6 @@
 aiohttp==3.3.0
 aiohttp-wrapper==1.0.0
-async-timeout==2.0.0
+async-timeout==3.0
 asyncio==3.4.3
 asyncpg==0.12.0
 cffi==1.11.4
