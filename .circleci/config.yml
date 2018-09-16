@@ -53,7 +53,7 @@ jobs:
           name: Start Bot
           command: |
             . venv/bin/activate
-            python run.py test
+            python run.py test & sleep 30 ; kill $!
 
       - store_artifacts:
           path: test-reports
