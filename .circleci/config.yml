@@ -40,10 +40,18 @@ jobs:
       # other common Python testing frameworks include pytest and nose
       # https://pytest.org
       # https://nose.readthedocs.io
+
       - run:
           name: Wait for 5 Seconds
           command: |
             sleep 5
+
+      - run:
+          name: Create new user and database
+          command: |
+            sudo -u postgres psql -p 5433 -c "CREATE USER user with password 'password';"
+            sudo -u postgres psql -p 5433 -c "CREATE DATABASE nanochan;"
+            sudo -u postgres psql -p 5433 -c "GRANT ALL PRIVILEGES ON DATABASE nanochan TO user;"
       
       - run:
           name: Start Bot
