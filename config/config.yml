@@ -35,7 +35,7 @@ postgres_credentials:
     host: "localhost"
     user: "user"
     database: "nanochan"
-    password: "password"
+    password: ""
 
 # Wait time in seconds (default 10 min)
 wait_time: 1800
