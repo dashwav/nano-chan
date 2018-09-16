@@ -56,6 +56,24 @@ class Nanochan(Bot):
             logger=logger, connect_kwargs=postgres_cred)
         return cls(config, logger, postgres_controller)
 
+    @classmethod
+    async def get_test_instance(cls):
+        """
+        async method to everything except the postgres_controller
+        """
+        with open("config/config.yml", 'r') as yml_config:
+            config = yaml.load(yml_config)
+        logger = getLogger('nanochan')
+        console_handler = StreamHandler()
+        console_handler.setFormatter(Formatter(
+            '%(asctime)s %(levelname)s %(name)s: %(message)s')
+        )
+        logger.addHandler(console_handler)
+        logger.setLevel(INFO)
+        postgres_cred = config['postgres_credentials']
+        postgres_controller = 'lmao nothing here'
+        return cls(config, logger, postgres_controller)
+
     def start_bot(self, cogs):
         """
         actually start the bot
