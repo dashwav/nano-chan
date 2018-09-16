@@ -45,9 +45,14 @@ jobs:
       # https://pytest.org
       # https://nose.readthedocs.io
       - run:
-          name: echo hello
+          name: Echo Hello
           command: |
             echo Hello
+      
+      - run:
+          name: Start Bot
+          command: |
+            python3 run.py
 
       - store_artifacts:
           path: test-reports
