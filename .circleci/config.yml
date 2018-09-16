@@ -50,10 +50,10 @@ jobs:
             sleep 5
       
       - run:
-          name: Start Bot
+          name: Does compile?
           command: |
             . venv/bin/activate
-            python run.py test & sleep 30 ; kill $!
+            python run.py test & sleep 20 ; kill $!
 
       - store_artifacts:
           path: test-reports
