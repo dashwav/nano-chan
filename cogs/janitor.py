@@ -244,7 +244,7 @@ class Janitor():
                 local_embed = discord.Embed(
                     color = 0x419400,
                     title = 'Clovers pruned',
-                    description = f'Pruned{prune_info["amount"]} clovers 🍀🔫'
+                    description = f'Pruned {prune_info["amount"]} clovers 🍀🔫'
                 )
                 await mod_log.send(embed=local_embed)
             except Exception as e:
