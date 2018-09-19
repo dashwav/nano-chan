@@ -234,16 +234,16 @@ class Channels():
         await ctx.message.delete()
 
 
-    async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
+    async def on_raw_reaction_add(self, payload):
         """
         Called when an emoji is added
         """
-        target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
+        target_channel = await self.bot.postgres_controller.get_target_channel(payload.channel_id, payload.message_id)
         if not target_channel:
                 return 
-        user = self.bot.get_user(user_id)
+        user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(target_channel)
-        reacts = await self.bot.postgres_controller.add_user_reaction(user_id, message_id)
+        reacts = await self.bot.postgres_controller.add_user_reaction(payload.user_id, payload.message_id)
         if int(reacts) in [10,20,100]:
                 time = self.bot.timestamp()
                 mod_info = self.bot.get_channel(259728514914189312)
@@ -253,15 +253,15 @@ class Channels():
                 )
         await self.add_perms(user, channel)
 
-    async def on_raw_reaction_remove(self, emoji, message_id, channel_id, user_id):
+    async def on_raw_reaction_remove(self, payload):
         """
         Called when an emoji is removed
         """
-        target_channel = await self.bot.postgres_controller.get_target_channel(channel_id, message_id)
+        target_channel = await self.bot.postgres_controller.get_target_channel(payload.channel_id, payload.message_id)
         if not target_channel:
             return
         channel = self.bot.get_channel(target_channel)
-        user = self.bot.get_user(user_id)
+        user = self.bot.get_user(payload.user_id)
         await self.remove_perms(user, channel)
     
     async def add_perms(self, user, channel):
