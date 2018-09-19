@@ -217,7 +217,7 @@ class Stats:
                 msg_str = f'`Author`: {message.author.mention} ({message.author})\n'\
                           f'`Channel`: {message.channel.mention}\n'\
                           f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'\
-                          f'`Message Link`: {message.jump_url}'
+                          f'`Message Link`: {message.jump_url}\n'
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:
