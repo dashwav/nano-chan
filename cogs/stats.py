@@ -44,17 +44,17 @@ class Stats:
         except Exception as e:
             self.bot.logger.warning(f'Error adding emoji to db: {e}')
 
-    async def on_raw_reaction_add(self, emoji, message_id, channel_id, user_id):
+    async def on_raw_reaction_add(self, payload):
         """
         Called when an emoji is added
         """
-        channel = self.bot.get_channel(channel_id)
-        user = self.bot.get_user(user_id)
-        message = await channel.get_message(message_id)
+        channel = self.bot.get_channel(payload.channel_id)
+        user = self.bot.get_user(payload.user_id)
+        message = await channel.get_message(payload.message_id)
         for server_emoji in channel.guild.emojis:
-            if emoji.id == server_emoji.id:
+            if payload.emoji.id == server_emoji.id:
                 await self.bot.postgres_controller.add_emoji(
-                    emoji, message_id, user, message.author, channel, True, emoji.animated)
+                    payload.emoji, payload.message_id, user, message.author, channel, True, payload.emoji.animated)
 
     @commands.group(aliases=['s'])
     @commands.guild_only()
