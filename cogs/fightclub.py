@@ -184,7 +184,7 @@ class Fightclub():
     @commands.command()
     @commands.is_owner()
     async def fight_stats(self, ctx, *, member: discord.Member = None):
-        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
@@ -246,7 +246,7 @@ class Fightclub():
     @commands.command()
     @commands.is_owner()
     async def full_leaderboard(self, ctx, *, amt: int=80):
-        if ctx.channel.id not in [367217621701099520, 403805028697243648]:
+        if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
