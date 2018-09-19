@@ -216,7 +216,8 @@ class Stats:
                     msg_content = f'{message.clean_content[:500]}' if message.content != '' else ''
                 msg_str = f'`Author`: {message.author.mention} ({message.author})\n'\
                           f'`Channel`: {message.channel.mention}\n'\
-                          f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'
+                          f'`Reacts`: {record["count"]}\n`Text`:\n{msg_content}\n'\
+                          f'`Message Link`: {message.jump_url}'
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:
