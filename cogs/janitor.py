@@ -237,6 +237,7 @@ class Janitor():
         self.bot.logger.info(f'Prune info: {prune_info}')
         try:
             await self.bot.postgres_controller.reset_message_deleted()
+            await self.bot.postgres_controller.reset_user_reactions()
         except Exception as e:
             self.bot.logger.warning(f'Issue resetting spam db: {e}')
         if prune_info['pruned']:
