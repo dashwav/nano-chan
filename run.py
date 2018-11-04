@@ -4,7 +4,7 @@ Actually runs the code
 import sys
 from asyncio import get_event_loop
 from bot import Nanochan
-from cogs import Spoils, Filter, Channels, Janitor, Logging, Stats, Owner, Reactions, Fightclub
+from cogs import Logging, Owner, Stats
 
 
 def run(test: bool):
@@ -14,15 +14,9 @@ def run(test: bool):
     else:
         bot = loop.run_until_complete(Nanochan.get_instance())
     cogs = [
-      Fightclub(bot),
       Logging(bot),
       Owner(bot),
-      Spoils(bot),
-      Filter(bot),
-      Reactions(bot),
-      Janitor(bot),
       Stats(bot),
-      Channels(bot)
     ]
     bot.start_bot(cogs)
 
