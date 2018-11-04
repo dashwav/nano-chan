@@ -14,7 +14,6 @@ def run(test: bool):
     else:
         bot = loop.run_until_complete(Nanochan.get_instance())
     cogs = [
-      Logging(bot),
       Owner(bot),
       Stats(bot),
     ]
