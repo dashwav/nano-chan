@@ -129,6 +129,21 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    messages = """
+    CREATE TABLE IF NOT EXISTS {}.messages (
+        guildid TEXT,
+        messageid TEXT,
+        authorid TEXT,
+        authorname TEXT,
+        channelid TEXT,
+        channelname TEXT,
+        pinned BOOLEAN,
+        content VARCHAR(2000),
+        createdat TIMESTAMP,
+        PRIMARY KEY (messageid)
+    );
+    """.format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -138,6 +153,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(servers)
     await pool.execute(channel_index)
     await pool.execute(reaction_spam)
+    await pool.execute(messages)
 
 
 class PostgresController():
