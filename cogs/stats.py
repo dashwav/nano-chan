@@ -348,7 +348,7 @@ class Stats:
                     continue 
                 self.bot.logger.info(
                     f'Downloading messages from: {ch.name}')
-                await bot_message.edit(content=f'**Downloaded channels:** {channel_count}\n**Currently downloading**: {ch.mention}')
+                await bot_message.edit(content=f'**Downloaded messages:** {totalcount}\n**Downloaded channels:** {channel_count}\n**Currently downloading**: {ch.mention}')
                 try:
                     message_history = ch.history(
                         limit=None, reverse=True)
@@ -362,6 +362,8 @@ class Stats:
                         continue
                     if totalcount % 100 == 0:
                         self.bot.logger.info(f'Messages downloaded: {totalcount}')
+                    if totalcount % 1000 == 0:
+                        await bot_message.edit(content=f'**Downloaded messages:** {totalcount}\n**Downloaded channels:** {channel_count}\n**Currently downloading**: {ch.mention}')
                     try:
                         await self.bot.postgres_controller.add_message(
                             message
