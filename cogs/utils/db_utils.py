@@ -248,11 +248,11 @@ class PostgresController():
         """.format(self.schema)
         await self.pool.execute(
             sql,
-            message.guild.id,
-            message.id,
-            message.author.id,
+            str(message.guild.id),
+            str(message.id),
+            str(message.author.id),
             message.author.name,
-            message.channel.id,
+            str(message.channel.id),
             message.channel.name,
             message.pinned,
             message.clean_content,
