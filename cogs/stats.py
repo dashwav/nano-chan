@@ -360,6 +360,8 @@ class Stats:
                     totalcount += 1
                     if message.author.bot:
                         continue
+                    if totalcount % 100 == 0:
+                        self.bot.logger.info(f'Messages downloaded: {totalcount}')
                     try:
                         await self.bot.postgres_controller.add_message(
                             message
