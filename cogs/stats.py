@@ -339,7 +339,7 @@ class Stats:
             f'Starting to pull messages, this will take a while')
         totalcount = 0
         errorcount = 0
-        message = await ctx.send('About to start pulling info')
+        bot_message = await ctx.send('About to start pulling info')
         channel_count = -1
         for ch in ctx.message.guild.channels:
             channel_count += 1
@@ -348,7 +348,7 @@ class Stats:
                     continue 
                 self.bot.logger.info(
                     f'Downloading messages from: {ch.name}')
-                await message.edit(content=f'**Downloaded channels:** {channel_count}\n**Currently downloading**: {ch.mention}')
+                await bot_message.edit(content=f'**Downloaded channels:** {channel_count}\n**Currently downloading**: {ch.mention}')
                 try:
                     message_history = ch.history(
                         limit=None, reverse=True)
