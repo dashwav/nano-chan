@@ -349,7 +349,7 @@ class Stats:
         for ch in ctx.message.guild.channels:
             channel_count += 1
             if isinstance(ch, discord.TextChannel):
-                if ch.id in channel_ids:
+                if str(ch.id) in channel_ids:
                     channel_count += 1
                     self.bot.logger.info(f'Ignoring channel: {ch.name}')
                     continue 
