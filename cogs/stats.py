@@ -322,6 +322,9 @@ class Stats:
         This will go through all the channels
         and download them.
         """
+        channel_ids = []
+        totalcount = 0
+        errorcount = 0
         confirm = await helpers.custom_confirm(
             ctx,
             f'\nAre you sure you want to do this?'
@@ -330,21 +333,23 @@ class Stats:
             return
         confirm2 = await helpers.custom_confirm(
             ctx,
-            f'\nSeriously this is going to take at least 4 hours,'
-            ' and it could even go up to a week. Only respond with'
-            ' confirm if you **really** mean it\n')
-        if not confirm2:
-            return
+            f'\nWould you like to pick up where you stopped? type confirm to start from the beginnin'
+            'or anything else to start fresh.\n')
+        if confirm2:
+            past_archive = await self.bot.postgres_controller.get_archive_dump_progress(
+                ctx.guild.id,
+                self.bot.logger
+            )
+            channel_ids = past_archive['channel_ids']
+            totalcount = past_archive['message_count']
         self.bot.logger.info(
             f'Starting to pull messages, this will take a while')
-        totalcount = 0
-        errorcount = 0
         bot_message = await ctx.send('About to start pulling info')
         channel_count = -1
         for ch in ctx.message.guild.channels:
             channel_count += 1
             if isinstance(ch, discord.TextChannel):
-                if ch.id in {148609211977302017, 149945199873884160, 266805623579082758, 266805579115134976}:
+                if ch.id in channel_ids:
                     continue 
                 self.bot.logger.info(
                     f'Downloading messages from: {ch.name}')

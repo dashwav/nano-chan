@@ -259,6 +259,37 @@ class PostgresController():
             message.created_at
         )
 
+    async def get_archive_dump_progress(self, guild_id, logger):
+        """
+        Pickup where we left off
+        """
+        channel_id_sql = """
+        SELECT DISTINCT channelid FROM {}.messages
+        WHERE guildid = $1;
+        """.format(self.schema)
+
+        message_count_sql = """
+        SELECT count(*) FROM {}.messages
+        WHERE guildid = $1;
+        """.format(self.schema)
+
+        channel_ids = []
+        messages = 0
+        try:
+            channel_id_resp = await self.pool.fetch(channel_id_sql, str(guild_id))
+            for row in channel_id_resp:
+                channel_ids.append(row['channelid'])
+        except Exception as e:
+            logger.warning(f'1: Error retrieving progress: {e}')
+        try:
+            messages = await self.pool.fetchval(message_count_sql, str(guild_id))
+        except Exception as e:
+            logger.warning(f'2: Error retrieving progress: {e}')
+        return {
+            'channel_ids': channel_ids,
+            'message_count': messages
+        }
+
     async def add_emoji(self, emoji, message_id, user, target, channel, is_reaction, is_animated):
         """
         Adds emoji to emoji tracking table
