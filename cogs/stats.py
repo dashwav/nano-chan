@@ -350,6 +350,7 @@ class Stats:
             channel_count += 1
             if isinstance(ch, discord.TextChannel):
                 if ch.id in channel_ids:
+                    channel_count += 1
                     continue 
                 self.bot.logger.info(
                     f'Downloading messages from: {ch.name}')
