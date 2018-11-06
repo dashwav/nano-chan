@@ -14,6 +14,7 @@ ALLOWED_CHANNELS = [
     176429411443146752,
 ]
 
+
 class Stats:
     """
     Main stats class
@@ -26,21 +27,20 @@ class Stats:
     async def on_message(self, message):
         if not isinstance(message.channel, discord.TextChannel):
             return
-        found_emojis = []
-        confirmed_emojis = []
-        if message.channel.id == 191102386633179136:
+        if message.author.bot:
             return
-        for word in message.content.split():
-            if '<:' or '<a:' in word:
-                found_emojis.append(word)
-        for emoji_id in found_emojis:
-            for emoji in message.guild.emojis:
-                if emoji_id == str(emoji):
-                    confirmed_emojis.append(emoji)
+        if message.channel.id in [
+            191102386633179136,  # Join-logs
+            282640120388255744,  # Bottest
+            259728514914189312,  # Staff-discussion
+            230958006701916160,  # Reply to ping
+            220762067739738113,  # server-logs
+            304366022276939776,  # Action-logs
+
+        ]:
+            return
         try:
-            for emoji in confirmed_emojis:
-                await self.bot.postgres_controller.add_emoji(
-                    emoji, message.id, message.author, message.author, message.channel, False, emoji.animated)
+            await self.bot.postgres_controller.add_message(message)
         except Exception as e:
             self.bot.logger.warning(f'Error adding emoji to db: {e}')
 
