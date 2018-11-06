@@ -251,6 +251,7 @@ class Stats:
         """
         Returns top post in timespan with reacts
         """
+        channel_id = channel.id if channel else None
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
         all_records = await self.bot.postgres_controller.get_top_post_by_emoji_and_user(
              user.id, emoji, days, channel.id
