@@ -253,7 +253,7 @@ class Stats:
         """
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
         all_records = await self.bot.postgres_controller.get_top_post_by_emoji_and_user(
-             user.id, emoji, days, channel
+             user.id, emoji, days, channel.id
         )
         l_embed = discord.Embed(
             title=f'Top 3 Posts with {emoji} reacts {day_str} on {user.name}',
