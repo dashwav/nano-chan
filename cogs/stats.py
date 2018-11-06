@@ -300,9 +300,10 @@ class Stats:
         """
         Returns top post in timespan with reacts
         """
+        channel_id = channel.id if channel else None
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
         all_records = await self.bot.postgres_controller.get_top_post_by_reacts(
-            days, channel
+            days, channel_id
         )
         l_embed = discord.Embed(
             title=f'Top 3 Posts with reacts {day_str}',
