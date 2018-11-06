@@ -351,6 +351,36 @@ class PostgresController():
             """.format(self.schema)
             return await self.pool.fetch(sql, emoji.id, date_delta)
 
+    async def get_top_post_by_emoji_and_user(self, user_id, emoji, days_to_subtract, channel_id):
+        """
+        Returns the id for the message with highest reacts of given emoi for a user
+        """
+        if days_to_subtract != -1:
+            date_delta = datetime.utcnow() - timedelta(days=days_to_subtract)
+        else:
+            date_delta = datetime.utcnow() - timedelta(days=9999)
+        if channel_id:
+            sql = """
+            SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
+            FROM {}.emojis
+            WHERE emoji_id = $1 AND logtime > $2 AND reaction = true AND channel_id = $3
+            AND target_id = $4
+            GROUP BY message_id, channel_id
+            ORDER BY count DESC
+            LIMIT 3
+            """.format(self.schema)
+            return await self.pool.fetch(sql, emoji.id, date_delta, int(channel_id), int(user_id))
+        else:
+            sql = """
+            SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
+            FROM {}.emojis
+            WHERE emoji_id = $1 AND logtime > $2 AND reaction = true AND target_id = $3
+            GROUP BY message_id, channel_id
+            ORDER BY count DESC
+            LIMIT 3
+            """.format(self.schema)
+            return await self.pool.fetch(sql, emoji.id, date_delta, int(user_id))
+
 
     """
     Spam stuff
