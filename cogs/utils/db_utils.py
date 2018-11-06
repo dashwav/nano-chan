@@ -393,7 +393,7 @@ class PostgresController():
             sql = """
             SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
             FROM {}.emojis
-            WHERE logtime > $2 AND reaction = true AND channel_id = $3
+            WHERE logtime > $1 AND reaction = true AND channel_id = $2
             GROUP BY message_id, channel_id
             ORDER BY count DESC
             LIMIT 3
@@ -403,7 +403,7 @@ class PostgresController():
             sql = """
             SELECT message_id as id, channel_id as ch_id, count(message_id) AS count
             FROM {}.emojis
-            WHERE logtime > $2 AND reaction = true
+            WHERE logtime > $1 AND reaction = true
             GROUP BY message_id, channel_id
             ORDER BY count DESC
             LIMIT 3
