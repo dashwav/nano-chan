@@ -247,7 +247,7 @@ class Stats:
         await ctx.send(embed=l_embed)
 
     @top_stats.command(name='user')
-    async def top_user(self, ctx, user: discord.Member, emoji: discord.Emoji, days: int=-1, channel=None):
+    async def top_user(self, ctx, user: discord.Member, emoji: discord.Emoji, days: int=-1, channel: discord.TextChannel=None):
         """
         Returns top post in timespan with reacts
         """
