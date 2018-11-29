@@ -71,7 +71,7 @@ class Janitor():
         member_roles = member.roles.copy()
         role_list = []
         for index, role in enumerate(member_roles):
-            if role.name.lower() in ['muse', 'dev','lewd', 'swole', 'artsy', 'shokugeki', 'degenerate', 'simulcast', 'legacy', 'meta', 'stylish']:
+            if role.name.lower() in ['legacy', 'dedicated', 'updated']:
                 role_list.append(role)
         for role in role_list:
             member_roles.remove(role)
