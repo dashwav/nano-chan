@@ -96,7 +96,7 @@ class Janitor():
                 has_key = True
             elif role.name.lower() == 'dedicated':
                 has_dedicated = True
-            elif role.name.lower() in ['muse', 'dev','lewd', 'swole', 'artsy', 'shokugeki', 'degenerate', 'simulcast', 'legacy', 'meta', 'stylish']:
+            elif role.name.lower() in ['legacy', 'updated']:
                 has_permrole = True
             elif role.name.lower() in ['member']:
                 has_member = True
