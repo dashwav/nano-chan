@@ -313,12 +313,13 @@ class Janitor():
         """
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
         color_roles = ['-2-', '-5-', '-10-', '-15-', '-20-', '-25-']
+        all_roles = ctx.channel.guild.roles
         local_embed = discord.Embed(
             title=f'Resetting Roles...',
             description=f'Please be patient, this might take a while...'
         )
         value_string =f'Clearing :key: role ... \n'\
-                      f'Resetting *Color* roles ... \n'\
+                      f'Clearing *Color* roles ... \n'\
                       f'Resetting *Member* role ...\n'\
                       f'Resetting *Active* role ...\n'\
                       f'Resetting *Regular* role ...\n'\
@@ -336,7 +337,7 @@ class Janitor():
         except Exception as e:
             self.bot.logger.warning(f'Error sending month_end message: {e}')
         key_role = None
-        for role in ctx.channel.guild.roles:
+        for role in all_roles:
             if role.name.lower() == '🔑':
                 key_role = role
         try:
@@ -352,15 +353,19 @@ class Janitor():
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         try:
-            for role in color_roles:
-                await self.rem_all_members(ctx, role)
-            values[1] = f'Clearing *Color* roles :white_check_mark: \n'
+            for clear_color in color_roles
+                clear_role = none
+                for role in all_roles:
+                    if role.name.lower() == clear_color:
+                    clear_role = role
+                await self.rem_all_members(ctx, clear_role)
+            values[1] = f'Clearing **Color** roles :white_check_mark: \n'
             l_embed = message.embeds[0]
             l_embed = set_field_at(0, name="Postgress:", value="".join(values))
             await message.edit(embed = l_embed)
         except Exception as e:
             self.bot.logger.warning(f'Error cleaning colors {e}')
-            values[1] = f'Clearing *Color* roles :x: \n'
+            values[1] = f'Clearing **Color** roles :x: \n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
