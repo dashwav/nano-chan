@@ -312,11 +312,13 @@ class Janitor():
         help? lmao bruh thats it. just run it at the end of the month and u good
         """
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
+        color_roles = ['-2-', '-5-', '-10-', '-15-', '-20-', '-25-']
         local_embed = discord.Embed(
             title=f'Resetting Roles...',
             description=f'Please be patient, this might take a while...'
         )
         value_string =f'Clearing :key: role ... \n'\
+                      f'Resetting *Color* roles ... \n'\
                       f'Resetting *Member* role ...\n'\
                       f'Resetting *Active* role ...\n'\
                       f'Resetting *Regular* role ...\n'\
@@ -349,10 +351,23 @@ class Janitor():
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
+        try:
+            for role in color_roles:
+                await self.rem_all_members(ctx, role)
+            values[1] = f'Clearing *Color* roles :white_check_mark: \n'
+            l_embed = message.embeds[0]
+            l_embed = set_field_at(0, name="Postgress:", value="".join(values))
+            await message.edit(embed = l_embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Error cleaning colors {e}')
+            values[1] = f'Clearing *Color* roles :x: \n'
+            l_embed = message.embeds[0]
+            l_embed.set_field_at(0, name="Progress:", value="".join(values))
+            await message.edit(embed = l_embed)
         for counter, role in enumerate(roles_to_wipe):
             members = await self.get_all_members(ctx, role)
             if not members:
-                values[counter+1] = f'Resetting **{role.title()}** role :x:\n'
+                values[counter+2] = f'Resetting **{role.title()}** role :x:\n'
                 l_embed = message.embeds[0]
                 l_embed.set_field_at(0, name="Progress:", value="".join(values))
                 await message.edit(embed = l_embed)
@@ -365,7 +380,7 @@ class Janitor():
                     await member.edit(roles=temp_roles)
                 except Exception as e:
                     self.bot.logger.warning(f'Error removing {role} from {member}:\n\n{e}')
-            values[counter+1] = f'Resetting **{role.title()}** role :white_check_mark:\n'
+            values[counter+2] = f'Resetting **{role.title()}** role :white_check_mark:\n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
