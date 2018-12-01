@@ -352,7 +352,7 @@ class Janitor():
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         try:
-            for counter, role in enumerate(color_roles):
+            for role in color_roles:
                 await self.rem_all_members(ctx, role)
             values[1] = f'Clearing *Color* roles :white_check_mark: \n'
             l_embed = message.embeds[0]
