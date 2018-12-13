@@ -12,6 +12,8 @@ class Pingy():
         self.bot = bot
 
     @commands.command()
+    @commands.guild_only()
+    @checks.has_permissions(manage_roles=True)
     async def pingy(self, ctx, *roles: commands.clean_content):
         """
         Pings all the roles in the command
