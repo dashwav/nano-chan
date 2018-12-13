@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord.utils import find
+from .utils import checks
 
 
 class Pingy():
