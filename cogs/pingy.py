@@ -29,11 +29,14 @@ class Pingy():
                 continue
             found_roles.append(guild_role)
         if not found_roles:
+            await ctx.send(":joy: lmao no roles there bud :100:")
+            await ctx.message.delete()
             return
         mention_str = ""
         for role in found_roles:
             await role.edit(mentionable=True)
             mention_str += f'{role.mention} '
         await ctx.send(mention_str)
+        await ctx.message.delete()
         for role in found_roles:
             await role.edit(mentionable=False)
