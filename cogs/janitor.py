@@ -353,15 +353,15 @@ class Janitor():
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         try:
-            for clear_color in color_roles
-                clear_role = none
+            for clear_color in color_roles:
+                clear_role = None
                 for role in all_roles:
                     if role.name.lower() == clear_color:
-                    clear_role = role
+                        clear_role = role
                 await self.rem_all_members(ctx, clear_role)
             values[1] = f'Clearing **Color** roles :white_check_mark: \n'
             l_embed = message.embeds[0]
-            l_embed = set_field_at(0, name="Postgress:", value="".join(values))
+            l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
         except Exception as e:
             self.bot.logger.warning(f'Error cleaning colors {e}')
