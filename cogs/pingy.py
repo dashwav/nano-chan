@@ -17,7 +17,7 @@ class Pingy():
         Pings all the roles in the command
         """
         if not roles:
-            await ctx.send(":thinking:")
+            await ctx.send(":thinking:", delete_after=3)
             await ctx.message.delete()
         guild_roles = ctx.guild.roles
         found_roles = []
@@ -29,7 +29,7 @@ class Pingy():
                 continue
             found_roles.append(guild_role)
         if not found_roles:
-            await ctx.send(":joy: lmao no roles there bud :100:")
+            await ctx.send(":joy: lmao no roles there bud :100:", delete_after=3)
             await ctx.message.delete()
             return
         mention_str = ""
