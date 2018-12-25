@@ -105,7 +105,7 @@ class Moderation:
         confirm = await helpers.confirm(ctx, member, '')
         if confirm:
             try:
-                await member.add_roles(timeout_role)
+                # await member.add_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
