@@ -158,8 +158,8 @@ class Moderation:
         try:
             await channel.set_permissions(user, read_messages=True)
         except Exception as e:
-            self.bot.logger.warning(f'{e}')  
-    
+            self.bot.logger.warning(f'{e}')
+
     async def remove_perms(self, user, channel):
         """
         removes a users perms on a channel
@@ -167,5 +167,4 @@ class Moderation:
         try:
             await channel.set_permissions(user, read_messages=False)
         except Exception as e:
-            self.bot.logger.warning(f'{e}')  
-
+            self.bot.logger.warning(f'{e}')
