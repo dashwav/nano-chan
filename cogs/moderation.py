@@ -108,6 +108,7 @@ class Moderation:
                 await member.add_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
+                    print(row)
                     channel = await self.bot.get_channel(row['host_channel'])
                     message = await channel.get_message(row['message_id'])
                     reacted_users = await message.reactions[0].users().flatten()
@@ -135,6 +136,7 @@ class Moderation:
             try:
                 await member.remove_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
+                print(all_channels)
                 for row in all_channels:
                     print(row)
                     channel = await self.bot.get_channel(row['host_channel'])
