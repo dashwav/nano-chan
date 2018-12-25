@@ -4,7 +4,7 @@ Actually runs the code
 import sys
 from asyncio import get_event_loop
 from bot import Nanochan
-from cogs import Spoils, Filter, Tutoring, Pingy, Channels, Janitor, Logging, Stats, Owner, Reactions, Fightclub
+from cogs import Spoils, Filter, Tutoring, Pingy, Channels, Janitor, Moderation, Logging, Stats, Owner, Reactions, Fightclub
 
 
 def run(test: bool):
@@ -24,7 +24,8 @@ def run(test: bool):
       Stats(bot),
       Channels(bot),
       Pingy(bot),
-      Tutoring(bot)
+      Tutoring(bot),
+      Moderation(bot)
     ]
     bot.start_bot(cogs)
 
