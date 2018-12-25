@@ -118,16 +118,14 @@ class Moderation:
                     if not message:
                         continue
                     for reaction in message.reactions:
-                        reacted_users = await reaction.users().flatten()
-                        found = find(lambda m: m.id == member.id, reacted_users)
-                        self.bot.logger.info(f'{channel.name} - {found}')
-                        if found:
-                            self.bot.logger.info(f'{row}')
-                            try:
-                                target_channel = self.bot.get_channel(row['target_channel'])
-                                await self.remove_perms(member, target_channel)
-                            except Exception as e:
-                                self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
+                        async for user in reaction.users():
+                            if user.id == member.id:
+                                self.bot.logger.info(f'{row}')
+                                try:
+                                    target_channel = self.bot.get_channel(row['target_channel'])
+                                    await self.remove_perms(member, target_channel)
+                                except Exception as e:
+                                    self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error timing out user!: {e}')
                 await ctx.send('❌', delete_after=3)
