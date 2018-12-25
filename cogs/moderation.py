@@ -117,7 +117,8 @@ class Moderation:
                         continue
                     for reaction in message.reactions:
                         reacted_users = await reaction.users().flatten()
-                        if member in reacted_users:
+                        found = find(lambda m: m.id == member.id, reacted_users)
+                        if found:
                             self.bot.logger.info(f'{row}')
                             try:
                                 target_channel = self.bot.get_channel(row['target_channel'])
