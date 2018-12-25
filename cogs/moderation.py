@@ -115,8 +115,7 @@ class Moderation:
                         message = await channel.get_message(row['message_id'])
                     except:
                         continue
-                    if not message:
-                        continue
+                    self.bot.logger.info(f'{row}')
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
                         try:
