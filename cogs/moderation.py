@@ -108,9 +108,9 @@ class Moderation:
                 await member.add_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
-                    self.bot.logger.warning(f'{row["host_channel"]}')
                     channel = self.bot.get_channel(row['host_channel'])
-                    self.bot.logger.warning(f'{channel}')
+                    if not channel:
+                        continue
                     message = await channel.get_message(row['message_id'])
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
