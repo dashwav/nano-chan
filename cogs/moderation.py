@@ -114,9 +114,11 @@ class Moderation:
                     try:
                         message = await channel.get_message(row['message_id'])
                     except:
+                        message = self.bot.get_message(row['message_id'])
+                    if not message:
                         continue
                     for reaction in message.reactions:
-                        reacted_users = await reaction.users(after=member).flatten()
+                        reacted_users = await reaction.users().flatten()
                         found = find(lambda m: m.id == member.id, reacted_users)
                         self.bot.logger.info(f'{channel.name} - {found}')
                         if found:
