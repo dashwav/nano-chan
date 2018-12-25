@@ -115,15 +115,15 @@ class Moderation:
                         message = await channel.get_message(row['message_id'])
                     except:
                         continue
-                    
-                    reacted_users = await message.reactions[0].users().flatten()
-                    if member in reacted_users:
-                        self.bot.logger.info(f'{row}')
-                        try:
-                            target_channel = self.bot.get_channel(row['target_channel'])
-                            await self.remove_perms(member, target_channel)
-                        except Exception as e:
-                            self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
+                    for reaction in message.reactions:
+                        reacted_users = await reaction.users().flatten()
+                        if member in reacted_users:
+                            self.bot.logger.info(f'{row}')
+                            try:
+                                target_channel = self.bot.get_channel(row['target_channel'])
+                                await self.remove_perms(member, target_channel)
+                            except Exception as e:
+                                self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error timing out user!: {e}')
                 await ctx.send('❌', delete_after=3)
