@@ -115,9 +115,10 @@ class Moderation:
                         message = await channel.get_message(row['message_id'])
                     except:
                         continue
-                    self.bot.logger.info(f'{row}')
+                    
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
+                        self.bot.logger.info(f'{row}')
                         try:
                             target_channel = self.bot.get_channel(row['target_channel'])
                             await self.remove_perms(member, target_channel)
