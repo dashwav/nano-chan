@@ -116,7 +116,7 @@ class Moderation:
                     except:
                         continue
                     for reaction in message.reactions:
-                        reacted_users = await reaction.users(after=member.id).flatten()
+                        reacted_users = await reaction.users(after=member).flatten()
                         found = find(lambda m: m.id == member.id, reacted_users)
                         self.bot.logger.info(f'{channel.name} - {found}')
                         if found:
