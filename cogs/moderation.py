@@ -115,7 +115,7 @@ class Moderation:
                             target_channel = self.bot.get_channel(row['target_channel'])
                             await self.remove_perms(member, target_channel)
                         except Exception as e:
-                            self.bot.logger.warning(f'Error removing user from channel!: {row['target_channel']}{e}')
+                            self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error timing out user!: {e}')
                 await ctx.send('❌', delete_after=3)
@@ -142,7 +142,7 @@ class Moderation:
                             target_channel = self.bot.get_channel(row['target_channel'])
                             await self.add_perms(member, target_channel)
                         except Exception as e:
-                            self.bot.logger.warning(f'Error removing user from channel!: {row['target_channel']}{e}')
+                            self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error untiming out user!: {e}')
                 await ctx.send('❌', delete_after=3)

@@ -35,7 +35,7 @@ class Tutoring():
                         target_channel = self.bot.get_channel(row['target_channel'])
                         await self.remove_perms(member, target_channel)
                     except Exception as e:
-                        self.bot.logger.warning(f'Error removing user from channel!: {row['target_channel']}{e}')
+                        self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             self.studying_timers.append(self.bot.loop.create_task(self.study_end(minutes, member)))
         except Exception as e:
             self.bot.logger.warning(f'Error letting user study!: {e}')
@@ -61,7 +61,7 @@ class Tutoring():
                             target_channel = self.bot.get_channel(row['target_channel'])
                             await self.add_perms(member, target_channel)
                         except Exception as e:
-                            self.bot.logger.warning(f'Error removing user from channel!: {row['target_channel']}{e}')
+                            self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error letting user slack of!: {e}')
                 await ctx.send('❌', delete_after=3)
@@ -84,7 +84,7 @@ class Tutoring():
                         target_channel = self.bot.get_channel(row['target_channel'])
                         await self.add_perms(member, target_channel)
                     except Exception as e:
-                        self.bot.logger.warning(f'Error removing user from channel!: {row['target_channel']}{e}')
+                        self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
         except Exception as e:
             self.bot.logger.warning(f'Error letting user finish studying: {e}')
             return
