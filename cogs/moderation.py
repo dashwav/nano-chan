@@ -112,6 +112,8 @@ class Moderation:
                     if not channel:
                         continue
                     message = await channel.get_message(row['message_id'])
+                    if not message:
+                        continue
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
                         try:
