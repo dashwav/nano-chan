@@ -127,11 +127,12 @@ class Moderation:
     @checks.has_permissions(manage_roles=True)
     async def untimeout(self, ctx, member: discord.Member):
         timeout_id = 195717833789800448
-        channel_backup = []
+        guild_roles = ctx.guild.roles
+        timeout_role = find(lambda m: m.id == timeout_id, guild_roles)
         confirm = await helpers.confirm(ctx, member, '')
         if confirm:
             try:
-                await member.remove_roles(timeout_id)
+                await member.remove_roles(timeout_role)
                 all_channels = self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
