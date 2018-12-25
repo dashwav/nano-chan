@@ -118,7 +118,7 @@ class Moderation:
                     for reaction in message.reactions:
                         reacted_users = await reaction.users().flatten()
                         found = find(lambda m: m.id == member.id, reacted_users)
-                        print(f'{channel.name} - {Found}')
+                        print(f'{channel.name} - {found}')
                         if found:
                             self.bot.logger.info(f'{row}')
                             try:
