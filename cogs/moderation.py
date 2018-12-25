@@ -120,6 +120,7 @@ class Moderation:
                     for reaction in message.reactions:
                         coubt = 0
                         async for user in reaction.users():
+                            coubt += 1
                             if user.id == member.id:
                                 self.bot.logger.info(f'{row}')
                                 try:
