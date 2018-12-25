@@ -646,6 +646,19 @@ class PostgresController():
         except:
             return None
 
+    async def get_all_channels(self):
+        """
+        Returns all of the reaction channels
+        """
+        sql = """
+        SELECT target_channel, message_id, host_channel FROM {}.channel_index;
+        """.format(self.schema)
+
+        try:
+            return await self.pool.fetch(sql)
+        except:
+            return None
+
     async def get_target_channel(self, host_channel, message_id):
         """
         Returns the target channel of a message
