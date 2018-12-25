@@ -118,6 +118,7 @@ class Moderation:
                     if not message:
                         continue
                     for reaction in message.reactions:
+                        coubt = 0
                         async for user in reaction.users():
                             if user.id == member.id:
                                 self.bot.logger.info(f'{row}')
@@ -126,6 +127,7 @@ class Moderation:
                                     await self.remove_perms(member, target_channel)
                                 except Exception as e:
                                     self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
+                        self.bot.logger.warning(f'{row["target_channel"]} - {coubt}')
             except Exception as e:
                 self.bot.logger.warning(f'Error timing out user!: {e}')
                 await ctx.send('❌', delete_after=3)
