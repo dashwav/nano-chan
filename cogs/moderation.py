@@ -114,7 +114,7 @@ class Moderation:
                     try:
                         message = await channel.get_message(row['message_id'])
                     except:
-                        message = self.bot.get_message(row['message_id'])
+                        continue
                     if not message:
                         continue
                     for reaction in message.reactions:
