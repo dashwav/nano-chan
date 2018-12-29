@@ -99,13 +99,12 @@ class Moderation:
     @commands.command()
     @checks.has_permissions(manage_roles=True)
     async def timeout(self, ctx, member: discord.Member):
-        timeout_id = 195717833789800448
         guild_roles = ctx.guild.roles
-        timeout_role = find(lambda m: m.id == timeout_id, guild_roles)
+        timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
         if confirm:
             try:
-                # await member.add_roles(timeout_role)
+                await member.add_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
@@ -139,18 +138,15 @@ class Moderation:
     @commands.command()
     @checks.has_permissions(manage_roles=True)
     async def untimeout(self, ctx, member: discord.Member):
-        timeout_id = 195717833789800448
         guild_roles = ctx.guild.roles
-        timeout_role = find(lambda m: m.id == timeout_id, guild_roles)
+        timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
         if confirm:
             try:
                 await member.remove_roles(timeout_role)
                 all_channels = await self.bot.postgres_controller.get_all_channels()
-                print(all_channels)
                 for row in all_channels:
-                    print(row)
-                    channel = await self.bot.get_channel(row['host_channel'])
+                    channel = self.bot.get_channel(row['host_channel'])
                     message = await channel.get_message(row['message_id'])
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
