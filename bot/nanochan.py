@@ -38,6 +38,7 @@ class Nanochan(Bot):
         self.wait_time = config['wait_time']
         self.clover_days = config['clover_days']
         self.dm_forward = config['dm_forward']
+        self.timeout_id = config['timeout_id']
         self.logger = logger
         super().__init__('-')
 
