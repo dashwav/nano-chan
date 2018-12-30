@@ -147,7 +147,14 @@ class Moderation:
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
-                    message = await channel.get_message(row['message_id'])
+                    if not channel:
+                        continue
+                    try:
+                        message = await channel.get_message(row['message_id'])
+                    except:
+                        continue
+                    if not message:
+                        continue
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
                         try:
