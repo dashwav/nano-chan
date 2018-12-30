@@ -67,7 +67,7 @@ class Moderation:
 
     @commands.command()
     @checks.has_permissions(manage_messages=True)
-    async def purge(self, ctx, *args,  mentions=None):
+    async def purge(self, ctx, *args, mentions=None):
         deleted = []
         try:
             count = int(next(iter(args or []), 'fugg'))
@@ -102,6 +102,7 @@ class Moderation:
         guild_roles = ctx.guild.roles
         timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
+        removed_from_channels = []
         if confirm:
             try:
                 await member.add_roles(timeout_role)
@@ -123,15 +124,22 @@ class Moderation:
                             if user.id == member.id:
                                 self.bot.logger.info(f'{row}')
                                 try:
-                                    target_channel = self.bot.get_channel(row['target_channel'])
+                                    target_channel = self.bot.get_channel(
+                                        row['target_channel'])
                                     await self.remove_perms(member, target_channel)
+                                    removed_from_channels.append(target_channel.name)
                                 except Exception as e:
-                                    self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
-                        self.bot.logger.warning(f'{row["target_channel"]} - {coubt}')
+                                    self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')  # noqa
+                        self.bot.logger.warning(f'{row["target_channel"]} - {coubt}') # noqa
             except Exception as e:
                 self.bot.logger.warning(f'Error timing out user!: {e}')
                 await ctx.send('❌', delete_after=3)
                 return
+            # send output to log channel
+            mod_info = self.bot.get_channel(self.bot.mod_info)
+            time = self.bot.timestamp()
+            ret = ', '.join(removed_from_channels)
+            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully TO\'ed and removed from channels: ```{ret}```')  # noqa
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
@@ -141,6 +149,7 @@ class Moderation:
         guild_roles = ctx.guild.roles
         timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
+        removed_from_channels = []
         if confirm:
             try:
                 await member.remove_roles(timeout_role)
@@ -160,12 +169,18 @@ class Moderation:
                         try:
                             target_channel = self.bot.get_channel(row['target_channel'])
                             await self.add_perms(member, target_channel)
+                            removed_from_channels.append(target_channel.name)
                         except Exception as e:
                             self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')
             except Exception as e:
                 self.bot.logger.warning(f'Error untiming out user!: {e}')
                 await ctx.send('❌', delete_after=3)
                 return
+            # send output to log channel
+            mod_info = self.bot.get_channel(self.bot.mod_info)
+            time = self.bot.timestamp()
+            ret = ', '.join(removed_from_channels)
+            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully un-TO\'ed and re-added to channels:  ```{ret}```')  # noqa
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
