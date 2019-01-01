@@ -136,10 +136,9 @@ class Moderation:
                 await ctx.send('❌', delete_after=3)
                 return
             # send output to log channel
-            mod_info = self.bot.get_channel(self.bot.mod_info)
             time = self.bot.timestamp()
             ret = ', '.join(removed_from_channels)
-            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully TO\'ed and removed from channels: ```{ret}```')  # noqa
+            await ctx.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully TO\'ed and removed from channels: ```{ret}```')  # noqa
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
@@ -177,10 +176,9 @@ class Moderation:
                 await ctx.send('❌', delete_after=3)
                 return
             # send output to log channel
-            mod_info = self.bot.get_channel(self.bot.mod_info)
             time = self.bot.timestamp()
             ret = ', '.join(removed_from_channels)
-            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully un-TO\'ed and re-added to channels:  ```{ret}```')  # noqa
+            await ctx.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully un-TO\'ed and re-added to channels:  ```{ret}```')  # noqa
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
