@@ -111,7 +111,7 @@ class Moderation:
                     await member.add_roles(timeout_role)
                     reply += 'Successfully added TO role\n'
                 except (HTTPException, AttributeError) as e:
-                    reply += f'Error removing user to TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
+                    reply += f'Error adding user to TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
                     pass
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
@@ -168,7 +168,7 @@ class Moderation:
                     else:
                         raise AttributeError
                 except (HTTPException, AttributeError) as e:
-                    reply += f'Error removing user to TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
+                    reply += f'Error removing user from TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
                     pass
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
