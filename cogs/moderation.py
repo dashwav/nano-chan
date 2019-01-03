@@ -3,6 +3,7 @@ This cog is the moderation toolkit this is for tasks such as
 kicking/banning users.
 """
 import discord
+from discord import HTTPException
 from discord.ext import commands
 from discord.utils import find
 from .utils import helpers, checks
@@ -103,9 +104,15 @@ class Moderation:
         timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
         removed_from_channels = []
+        reply = ''
         if confirm:
             try:
-                await member.add_roles(timeout_role)
+                try:
+                    await member.add_roles(timeout_role)
+                    reply += 'Successfully added TO role\n'
+                except (HTTPException, AttributeError) as e:
+                    reply += f'Error adding user to TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
+                    pass
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
@@ -136,10 +143,10 @@ class Moderation:
                 await ctx.send('❌', delete_after=3)
                 return
             # send output to log channel
-            mod_info = self.bot.get_channel(self.bot.mod_info)
             time = self.bot.timestamp()
             ret = ', '.join(removed_from_channels)
-            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully TO\'ed and removed from channels: ```{ret}```')  # noqa
+            reply += f'**User: {member.name}#{member.discriminator}: **Successfully removed from channels: ``` {ret}```'  # noqa
+            await ctx.send(f'**{time}** | {reply}')
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
@@ -150,9 +157,19 @@ class Moderation:
         timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
         removed_from_channels = []
+        reply = ''
         if confirm:
+            member_roles = member.roles
             try:
-                await member.remove_roles(timeout_role)
+                try:
+                    if timeout_role in member_roles:
+                        await member.remove_roles(timeout_role)
+                        reply += 'Successfully removed TO role\n'
+                    else:
+                        raise AttributeError
+                except (HTTPException, AttributeError) as e:
+                    reply += f'Error removing user from TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
+                    pass
                 all_channels = await self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
@@ -177,10 +194,10 @@ class Moderation:
                 await ctx.send('❌', delete_after=3)
                 return
             # send output to log channel
-            mod_info = self.bot.get_channel(self.bot.mod_info)
             time = self.bot.timestamp()
             ret = ', '.join(removed_from_channels)
-            await mod_info.send(f'**{time} | User: {member.name}#{member.discriminator}: **Successfully un-TO\'ed and re-added to channels:  ```{ret}```')  # noqa
+            reply += f'**User: {member.name}#{member.discriminator}: **Successfully re-added to channels:  ``` {ret}```'  # noqa
+            await ctx.send(f'**{time}** | {reply}')
         else:
             await ctx.send("Cancelled timeout", delete_after=3)
 
