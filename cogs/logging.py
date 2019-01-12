@@ -16,7 +16,7 @@ class Logging():
                 return
             if len(message.attachments) > 0:
                 await message.channel.send('Worst Girl')
-                return
+            return
         if message.author.bot:
             return
         found_role = True
