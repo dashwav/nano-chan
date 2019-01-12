@@ -15,7 +15,7 @@ class Logging():
         if not isinstance(message.channel, discord.DMChannel):
             if message.channel.id != 367217621701099520:
                 return
-            if len(message.attachments) = 0:
+            if len(message.attachments) == 0:
                 if random.randint(1, 10) > 8:
                     return
                 await message.channel.send(
