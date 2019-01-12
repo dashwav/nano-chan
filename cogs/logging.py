@@ -12,7 +12,10 @@ class Logging():
 
     async def on_message(self, message):
         if not isinstance(message.channel, discord.DMChannel):
-            return
+            if message.channel.id != 367217621701099520:
+                return
+            if len(message.attachments) > 0:
+                await message.channel.send('Worst Girl')
         if message.author.bot:
             return
         found_role = True
