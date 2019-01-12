@@ -13,7 +13,7 @@ class Logging():
 
     async def on_message(self, message):
         if not isinstance(message.channel, discord.DMChannel):
-            if message.channel.id != 367217621701099520:
+            if message.channel.id != 429536153251741706:
                 return
             if len(message.attachments) > 0:
                 if random.randint(1, 10) > 8:
