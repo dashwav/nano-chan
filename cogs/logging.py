@@ -55,8 +55,8 @@ class Logging():
                     await self.bot.postgres_controller.add_new_clover(after)
                     await mod_info.send(
                         local_embed = discord.Embed(
-                            color = 0x419400
-                            title = 'Clover'
+                            color = 0x419400,
+                            title = 'Clover',
                             description = f'**{time}: **Successfully applied clover to '
                                 f'{after.mention}. [Joined: {join}]')
                 elif role.name.lower() == 'member':
