@@ -58,7 +58,7 @@ class Logging():
                             color = 0x419400,
                             title = 'Clover',
                             description = f'**{time}: **Successfully applied clover to '
-                                f'{after.mention}. [Joined: {join}]')
+                                f'{after.mention}. [Joined: {join}]'))
                 elif role.name.lower() == 'member':
                     for role in before.roles:
                         if '🔑' in role.name.lower():
