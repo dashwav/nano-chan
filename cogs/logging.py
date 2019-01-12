@@ -67,10 +67,10 @@ class Logging():
                             return
                     await mod_info.send(
                         local_embed = discord.Embed(
-                            color = 0x3498DB
-                            title = 'Member'
+                            color = 0x3498DB,
+                            title = 'Member',
                             description = f'**{time} **Successfully applied member to '
-                                f'{after.mention}. [Joined: {join}]')
+                                f'{after.mention}. [Joined: {join}]'))
 
 def setup(bot):
     bot.add_cog(Logging(bot))
