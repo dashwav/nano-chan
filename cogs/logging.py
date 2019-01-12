@@ -2,6 +2,7 @@
 Cog for logging info to mod-info
 """
 import discord
+import random
 
 
 class Logging():
@@ -14,8 +15,29 @@ class Logging():
         if not isinstance(message.channel, discord.DMChannel):
             if message.channel.id != 367217621701099520:
                 return
-            if len(message.attachments) > 0:
-                await message.channel.send('Worst Girl')
+            if len(message.attachments) = 0:
+                if random.randint(1, 10) > 8:
+                    return
+                await message.channel.send(
+                    random.choice([
+                        # doing it this way cause i don't want to actually implement probability
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Ew.',
+                        'LMAO :joy: :joy:',
+                        'Why is this even in the show'
+                    ])
+                )
             return
         if message.author.bot:
             return
