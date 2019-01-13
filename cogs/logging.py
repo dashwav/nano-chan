@@ -81,7 +81,7 @@ class Logging():
                             title='Clover',
                             description=f'**{time}: **Successfully applied clover to '
                                         f'{after.mention}. [Joined: {join}]')
-                    local_embed.set_footer(f'{after}')
+                    local_embed.set_footer(text=f'{after}')
                     await mod_info.send(embed=local_embed)
                 elif role.name.lower() == 'member':
                     for role in before.roles:
@@ -94,7 +94,7 @@ class Logging():
                             title='Member',
                             description=f'**{time} **Successfully applied member to '
                                         f'{after.mention}. [Joined: {join}]')
-                    local_embed.set_footer(f'{after}')
+                    local_embed.set_footer(text=f'{after}')
                     await mod_info.send(embed=local_embed)
 
 def setup(bot):
