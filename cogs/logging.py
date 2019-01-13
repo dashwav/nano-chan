@@ -76,24 +76,26 @@ class Logging():
             for role in role_diff:
                 if role.name.lower() == 'clover':
                     await self.bot.postgres_controller.add_new_clover(after)
-                    await mod_info.send(embed=discord.Embed(
-                            color = 0x419400,
-                            title = 'Clover',
-                            description = f'**{time}: **Successfully applied clover to '
-                                        f'{after.mention}. [Joined: {join}]',
-                            set_footer = f'{after}'))
+                    local_embed = discord.Embed(
+                            color=0x419400,
+                            title='Clover',
+                            description=f'**{time}: **Successfully applied clover to '
+                                        f'{after.mention}. [Joined: {join}]')
+                    local_embed.set_footer(f'{after}')
+                    await mod_info.send(embed=local_embed)
                 elif role.name.lower() == 'member':
                     for role in before.roles:
                         if '🔑' in role.name.lower():
                             return
                         elif role.name.lower() == 'clover':
                             return
-                    await mod_info.send(embed = discord.Embed(
-                            color = 0x3498DB,
-                            title = 'Member',
-                            description = f'**{time} **Successfully applied member to '
-                                        f'{after.mention}. [Joined: {join}]',
-                            set_footer = f'{after}'))
+                    local_embed = discord.Embed(
+                            color=0x3498DB,
+                            title='Member',
+                            description=f'**{time} **Successfully applied member to '
+                                        f'{after.mention}. [Joined: {join}]')
+                    local_embed.set_footer(f'{after}')
+                    await mod_info.send(embed=local_embed)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
