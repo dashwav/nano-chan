@@ -2,6 +2,7 @@
 Cog for logging info to mod-info
 """
 import discord
+import random
 
 
 class Logging():
@@ -12,6 +13,31 @@ class Logging():
 
     async def on_message(self, message):
         if not isinstance(message.channel, discord.DMChannel):
+            if message.channel.id != 429536153251741706:
+                return
+            if len(message.attachments) > 0:
+                if random.randint(1, 10) > 8:
+                    return
+                await message.channel.send(
+                    random.choice([
+                        # doing it this way cause i don't want to actually implement probability
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Worst girl',
+                        'Best girl',
+                        'Ew.',
+                        'LMAO :joy: :joy:',
+                        'Why is this even in the show'
+                    ])
+                )
             return
         if message.author.bot:
             return
@@ -50,18 +76,26 @@ class Logging():
             for role in role_diff:
                 if role.name.lower() == 'clover':
                     await self.bot.postgres_controller.add_new_clover(after)
-                    await mod_info.send(
-                        f'**{time} | CLOVER: **Successfully applied clover to '
-                        f'{after.mention}. [Joined: {join}]')
+                    local_embed = discord.Embed(
+                            color=0x419400,
+                            title='Clover',
+                            description=f'**{time}: **Successfully applied clover to '
+                                        f'{after.mention}. [Joined: {join}]')
+                    local_embed.set_footer(text=f'{after}')
+                    await mod_info.send(embed=local_embed)
                 elif role.name.lower() == 'member':
                     for role in before.roles:
                         if '🔑' in role.name.lower():
                             return
                         elif role.name.lower() == 'clover':
                             return
-                    await mod_info.send(
-                        f'**{time} | MEMBER: **Successfully applied member to '
-                        f'{after.mention}. [Joined: {join}]')
+                    local_embed = discord.Embed(
+                            color=0x3498DB,
+                            title='Member',
+                            description=f'**{time} **Successfully applied member to '
+                                        f'{after.mention}. [Joined: {join}]')
+                    local_embed.set_footer(text=f'{after}')
+                    await mod_info.send(embed=local_embed)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
