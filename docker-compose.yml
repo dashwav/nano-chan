@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  postgres-db:
+    image: postgres:10-alpine
+    restart: always
+    environment: 
+      POSTGRES_USER: nanochanuser
+      POSTGRES_PASSWORD: nanochan-password
+      POSTGRES_DB: nanochandb
+    volumes:
+      - nanochan-db-volume:/var/lib/postgresql/data
+  yinbot:
+    build:
+      context: .
+      dockerfile: nano.dockerfile
+    depends_on: 
+      - postgres-db
+
+
+volumes:
+  nanochan-db-volume:

@@ -9,4 +9,6 @@ from cogs.moderation import Moderation
 from cogs.stats import Stats
 from cogs.channels import Channels
 from cogs.pingy import Pingy
-__all__ = ['Janitor', 'Fightclub', 'Channels', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats', 'Pingy']
+from cogs.tutoring import Tutoring
+
+__all__ = ['Janitor', 'Tutoring', 'Fightclub', 'Channels', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats', 'Pingy']

@@ -15,7 +15,7 @@ class Nanochan(Bot):
     """
     actual bot class
     """
-    def __init__(self, config, logger, test,
+    def __init__(self, config, misc_config, logger, test,
                  postgres_controller: PostgresController):
         """
         init for bot class
@@ -38,6 +38,7 @@ class Nanochan(Bot):
         self.wait_time = config['wait_time']
         self.clover_days = config['clover_days']
         self.dm_forward = config['dm_forward']
+        self.timeout_id = misc_config['timeout_id']
         self.logger = logger
         super().__init__('-')
 
@@ -48,6 +49,8 @@ class Nanochan(Bot):
         """
         with open("config/config.yml", 'r') as yml_config:
             config = yaml.load(yml_config)
+        with open("config/misc_config.yml", 'r') as yml_config:
+            misc_config = yaml.load(yml_config)
         logger = getLogger('nanochan')
         console_handler = StreamHandler()
         console_handler.setFormatter(Formatter(
@@ -58,7 +61,7 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        return cls(config, logger, False, postgres_controller)
+        return cls(config, misc_config, logger, False, postgres_controller)
 
     @classmethod
     async def get_test_instance(cls):
@@ -67,6 +70,8 @@ class Nanochan(Bot):
         """
         with open("config/config.yml", 'r') as yml_config:
             config = yaml.load(yml_config)
+        with open("config/misc_config.yml", 'r') as yml_config:
+            misc_config = yaml.load(yml_config)
         logger = getLogger('nanochan')
         console_handler = StreamHandler()
         console_handler.setFormatter(Formatter(
@@ -77,7 +82,7 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        return cls(config, logger, True, postgres_controller)
+        return cls(config, misc_config, logger, True, postgres_controller)
 
     def start_bot(self, cogs):
         """
