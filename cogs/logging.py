@@ -2,10 +2,11 @@
 Cog for logging info to mod-info
 """
 import discord
+from discord.ext import commands
 import random
 
 
-class Logging():
+class Logging(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -61,7 +62,7 @@ class Logging():
                 await mod_info.send(embed=local_embed)
                 await message.channel.send(':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.')
                 for user_id in self.bot.dm_forward:
-                    user = await self.bot.get_user_info(user_id)
+                    user = await self.bot.fetch_user_info(user_id)
                     await user.create_dm()
                     await user.dm_channel.send(embed=local_embed)
             except Exception as e:

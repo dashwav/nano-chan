@@ -14,7 +14,7 @@ ALLOWED_CHANNELS = [
     176429411443146752,
 ]
 
-class Stats:
+class Stats(commands.Cog):
     """
     Main stats class
     """
@@ -50,7 +50,7 @@ class Stats:
         """
         channel = self.bot.get_channel(payload.channel_id)
         user = self.bot.get_user(payload.user_id)
-        message = await channel.get_message(payload.message_id)
+        message = await channel.fetch_message(payload.message_id)
         for server_emoji in channel.guild.emojis:
             if payload.emoji.id == server_emoji.id:
                 await self.bot.postgres_controller.add_emoji(
@@ -219,7 +219,7 @@ class Stats:
             if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
                 return
             try:
-                message = await channel.get_message(record['id'])
+                message = await channel.fetch_message(record['id'])
                 if len(message.clean_content) > 600:
                     msg_content = f'{message.clean_content[:500]} ... `(message shortened)`'
                 else:
@@ -268,7 +268,7 @@ class Stats:
             if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
                 return
             try:
-                message = await channel.get_message(record['id'])
+                message = await channel.fetch_message(record['id'])
                 if len(message.clean_content) > 600:
                     msg_content = f'{message.clean_content[:500]} ... `(message shortened)`'
                 else:
@@ -317,7 +317,7 @@ class Stats:
             if channel.id in [259728514914189312, 220762067739738113, 230958006701916160, 304366022276939776]:
                 return
             try:
-                message = await channel.get_message(record['id'])
+                message = await channel.fetch_message(record['id'])
                 if len(message.clean_content) > 600:
                     msg_content = f'{message.clean_content[:500]} ... `(message shortened)`'
                 else:

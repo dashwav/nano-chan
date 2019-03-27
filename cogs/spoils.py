@@ -8,7 +8,7 @@ from discord.ext import commands
 from .utils import checks
 
 
-class Spoils():
+class Spoils(commands.Cog):
     """
     Class that creates a task to run every minute and check for
     time since last post

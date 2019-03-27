@@ -9,7 +9,7 @@ Don't talk about fight club
 """
 
 
-class Fightclub():
+class Fightclub(commands.Cog):
     """
     """
 

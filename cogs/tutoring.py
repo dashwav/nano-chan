@@ -3,7 +3,7 @@ from discord.utils import find
 from .utils import checks
 
 
-class Tutoring():
+class Tutoring(commands.Cog):
 
     def __init__(self, bot):
         """
@@ -28,7 +28,7 @@ class Tutoring():
             all_channels = self.bot.postgres_controller.get_all_channels()
             for row in all_channels:
                 channel = self.bot.get_channel(row['host_channel'])
-                message = channel.get_message(row['message_id'])
+                message = channel.fetch_message(row['message_id'])
                 reacted_users = await message.reactions[0].users().flatten()
                 if member in reacted_users:
                     try:
@@ -54,7 +54,7 @@ class Tutoring():
                 all_channels = self.bot.postgres_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
-                    message = channel.get_message(row['message_id'])
+                    message = channel.fetch_message(row['message_id'])
                     reacted_users = await message.reactions[0].users().flatten()
                     if member in reacted_users:
                         try:
@@ -77,7 +77,7 @@ class Tutoring():
             all_channels = self.bot.postgres_controller.get_all_channels()
             for row in all_channels:
                 channel = self.bot.get_channel(row['host_channel'])
-                message = channel.get_message(row['message_id'])
+                message = channel.fetch_message(row['message_id'])
                 reacted_users = await message.reactions[0].users().flatten()
                 if member in reacted_users:
                     try:
