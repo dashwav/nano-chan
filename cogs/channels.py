@@ -9,7 +9,7 @@ from .utils import helpers, checks
 from discord.ext import commands
 
 
-class Channels():
+class Channels(commands.Cog):
     """
     """
 

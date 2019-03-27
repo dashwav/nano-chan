@@ -2,9 +2,10 @@
 A cog that filters all but a specific few phrases. (ignores bots)
 """
 import discord
+from discord.ext import commands
 
 
-class Filter():
+class Filter(commands.Cog):
 
     def __init__(self, bot):
         super().__init__()

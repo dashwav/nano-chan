@@ -6,7 +6,7 @@ from discord.ext import commands
 from.utils import checks 
 
 
-class Owner():
+class Owner(commands.Cog):
     """
     Cog with misc owner commands
     """

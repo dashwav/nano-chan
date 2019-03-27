@@ -14,7 +14,7 @@ ALLOWED_CHANNELS = [
 ]
 
 
-class Reactions():
+class Reactions(commands.Cog):
     """
     """
 

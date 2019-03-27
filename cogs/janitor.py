@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import asyncio
 
 
-class Janitor():
+class Janitor(commands.Cog):
     """
     The main class wrapepr
     """

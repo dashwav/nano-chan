@@ -1,7 +1,7 @@
 from discord.ext import commands
 import random as rng
 
-class RNG:
+class RNG(commands.Cog):
 
     @commands.group(pass_context=True)
     async def random(self, ctx):

@@ -14,7 +14,7 @@ ALLOWED_CHANNELS = [
     176429411443146752,
 ]
 
-class Stats:
+class Stats(commands.Cog):
     """
     Main stats class
     """

@@ -2,10 +2,11 @@
 Cog for logging info to mod-info
 """
 import discord
+from discord.ext import commands
 import random
 
 
-class Logging():
+class Logging(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot

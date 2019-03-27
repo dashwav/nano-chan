@@ -3,7 +3,7 @@ from discord.utils import find
 from .utils import checks
 
 
-class Tutoring():
+class Tutoring(commands.Cog):
 
     def __init__(self, bot):
         """
