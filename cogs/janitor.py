@@ -31,7 +31,7 @@ class Janitor(commands.Cog):
             f'Setting up owner channel {self.bot.bot_owner_id}')
         try:
             self.server_logs = self.bot.get_channel(378684962934751239)
-            self.owner = await self.bot.get_user_info(self.bot.bot_owner_id)
+            self.owner = await self.bot.fetch_user_info(self.bot.bot_owner_id)
         except Exception as e:
             self.bot.logger.warning(f'Error getting owner: {e}')
         self.bot.logger.info(f'User retrieved: {self.owner.name}')
