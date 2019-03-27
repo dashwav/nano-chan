@@ -120,7 +120,7 @@ class Moderation(commands.Cog):
                 print(row)
                 try:
                     channel = self.bot.get_channel(row['host_channel'])
-                    message = await channel.get_message(row['message_id'])
+                    message = await channel.fetch_message(row['message_id'])
                 except:
                     continue
                 if not message:
@@ -177,7 +177,7 @@ class Moderation(commands.Cog):
                 print(row)
                 try:
                     channel = self.bot.get_channel(row['host_channel'])
-                    message = await channel.get_message(row['message_id'])
+                    message = await channel.fetch_message(row['message_id'])
                 except:
                     continue
                 if not message:

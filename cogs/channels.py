@@ -71,7 +71,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         for reaction in og_message.reactions:
             async for user in reaction.users():
                 if user.bot:
@@ -95,7 +95,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         og_embed.description = edit[:2046]
         await og_message.edit(embed=og_embed)
@@ -118,7 +118,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         og_embed.title = f'#{target_channel.name}'
         await og_message.edit(embed=og_embed)
@@ -141,7 +141,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         og_embed.color = discord.Color.from_rgb(int(red), int(green), int(blue))
         await og_message.edit(embed=og_embed)
@@ -164,7 +164,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_image(url=image_url)
@@ -192,7 +192,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_thumbnail(url=image_url)
@@ -221,7 +221,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.get_message(message_id)
+        og_message = await ctx.channel.fetch_message(message_id)
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_footer(text=footer)
