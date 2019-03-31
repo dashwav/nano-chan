@@ -103,7 +103,7 @@ class Democracy(commands.Cog):
                 votes['yes'] += reaction.count
             elif reaction.emoji == '\N{Cross Mark}':
                 votes['no'] += reaction.count
-        if votes['yes'] + votes['no'] <= 2:
+        if votes['yes'] + votes['no'] <= 6:
             # Not enough votes
             await self.close_vote(updatedBallot, votes)
             return
