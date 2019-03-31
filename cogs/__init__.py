@@ -10,5 +10,6 @@ from cogs.stats import Stats
 from cogs.channels import Channels
 from cogs.pingy import Pingy
 from cogs.tutoring import Tutoring
+from cogs.democracy import Democracy
 
-__all__ = ['Janitor', 'Tutoring', 'Fightclub', 'Channels', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats', 'Pingy']
+__all__ = ['Janitor', 'Tutoring', 'Fightclub', 'Channels', 'Reactions', 'Filter', 'Logging', 'Spoils', 'Moderation','Owner', 'Stats', 'Pingy', 'Democracy']

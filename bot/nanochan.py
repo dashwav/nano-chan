@@ -39,6 +39,9 @@ class Nanochan(Bot):
         self.clover_days = config['clover_days']
         self.dm_forward = config['dm_forward']
         self.timeout_id = misc_config['timeout_id']
+        self.democracy = misc_config['democracy']
+        self.purgatory = misc_config['purgatory']
+        self.shame_role = misc_config['shame_role']
         self.logger = logger
         super().__init__('-')
 
