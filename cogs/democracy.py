@@ -70,6 +70,9 @@ class Democracy(commands.Cog):
             return
         if member.id == ctx.author.id:
             return
+        has_role = discord.utils.find(lambda role: role.id == self.bot.shame_role, member.roles)
+        if has_role:
+            ctx.send(f'{member.display} is already removed!', delete_after=4)
         ballot = await self.enact_democracy(member, ctx.channel)
         self.bot.loop.create_task(
             self.collect_votes(ballot, member, ctx.author))
