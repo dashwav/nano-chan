@@ -43,7 +43,7 @@ class Nanochan(Bot):
         self.purgatory = misc_config['purgatory']
         self.shame_role = misc_config['shame_role']
         self.logger = logger
-        super().__init__('-')
+        super().__init__(';')
 
     @classmethod
     async def get_instance(cls):

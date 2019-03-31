@@ -66,7 +66,7 @@ class Democracy(commands.Cog):
         """
         Begins a vote on a user
         """
-        if ctx.channel.id not in [282640120388255744]:
+        if ctx.channel.id not in [282640120388255744, 148609211977302017, 562007838331895813]:
             return
         if member.id == ctx.author.id:
             return
