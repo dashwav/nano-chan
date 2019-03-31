@@ -70,6 +70,8 @@ class Democracy(commands.Cog):
             return
         if member.id == ctx.author.id:
             return
+        if member.bot:
+            return
         has_role = discord.utils.find(lambda role: role.id == self.bot.shame_role, member.roles)
         if has_role:
             ctx.send(f'{member.display} is already removed!', delete_after=4)
