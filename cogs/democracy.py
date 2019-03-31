@@ -66,8 +66,10 @@ class Democracy(commands.Cog):
         """
         Begins a vote on a user
         """
-        # if member.id == ctx.author.id:
-            # return
+        if ctx.channel.id not in [282640120388255744]:
+            return
+        if member.id == ctx.author.id:
+            return
         ballot = await self.enact_democracy(member, ctx.channel)
         self.bot.loop.create_task(
             self.collect_votes(ballot, member, ctx.author))
