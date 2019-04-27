@@ -53,7 +53,7 @@ class Logging(commands.Cog):
                     title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                     description=message.clean_content
                 )
-                local_embed.set_footer(text=report_id)
+                local_embed.set_footer(text=f'Report ID: {report_id}')
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:
@@ -64,7 +64,7 @@ class Logging(commands.Cog):
                         inline=True
                     )
                 report_message = await mod_info.send(embed=local_embed)
-                await message.channel.send(':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.')
+                await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
                 await self.bot.postgres_controller.set_report_message_id(
                     report_id, report_message.id
                 )
@@ -115,7 +115,7 @@ class Logging(commands.Cog):
             await ctx.send("Please add a message", delete_after=3)
 
         local_embed = discord.Embed(
-                    title=f'Response from the mod team:',
+                    title=f'Response from the mod team for report {report_id}:',
                     description=response
                 )
 
@@ -125,8 +125,7 @@ class Logging(commands.Cog):
         await user.dm_channel.send(embed=local_embed)
 
         await self.bot.postgres_controller.add_user_report_response(
-            ctx.author.id, report_id 
-        )
+            ctx.author.id, report_id)
         
 
 def setup(bot):
