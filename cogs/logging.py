@@ -44,37 +44,35 @@ class Logging(commands.Cog):
             return
         if message.author.bot:
             return
-        found_role = True
-        if found_role:
-            try:
-                report_id = await self.bot.postgres_controller.add_user_report(
-                    message.author.id)
-                mod_info = self.bot.get_channel(259728514914189312)
-                local_embed = discord.Embed(
-                    title=f'DM report from {message.author.name}#{message.author.discriminator}:',
-                    description=message.clean_content
+        try:
+            report_id = await self.bot.postgres_controller.add_user_report(
+                message.author.id)
+            mod_info = self.bot.get_channel(259728514914189312)
+            local_embed = discord.Embed(
+                title=f'DM report from {message.author.name}#{message.author.discriminator}:',
+                description=message.clean_content
+            )
+            local_embed.set_footer(text=f'Report ID: {report_id}')
+            if message.attachments:
+                desc = ''
+                for file in message.attachments:
+                    desc += f'{file.url}\n'
+                local_embed.add_field(
+                    name='Attachments',
+                    value=f'{desc}',
+                    inline=True
                 )
-                local_embed.set_footer(text=f'Report ID: {report_id}')
-                if message.attachments:
-                    desc = ''
-                    for file in message.attachments:
-                        desc += f'{file.url}\n'
-                    local_embed.add_field(
-                        name='Attachments',
-                        value=f'{desc}',
-                        inline=True
-                    )
-                report_message = await mod_info.send(embed=local_embed)
-                await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
-                await self.bot.postgres_controller.set_report_message_id(
-                    report_id, report_message.id
-                )
-                for user_id in self.bot.dm_forward:
-                    user = await self.bot.fetch_user(user_id)
-                    await user.create_dm()
-                    await user.dm_channel.send(embed=local_embed)
-            except Exception as e:
-                self.bot.logger.warning(f'Issue forwarding dm: {e}')
+            report_message = await mod_info.send(embed=local_embed)
+            await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
+            await self.bot.postgres_controller.set_report_message_id(
+                report_id, report_message.id
+            )
+            for user_id in self.bot.dm_forward:
+                user = await self.bot.fetch_user(user_id)
+                await user.create_dm()
+                await user.dm_channel.send(embed=local_embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Issue forwarding dm: {e}')
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
