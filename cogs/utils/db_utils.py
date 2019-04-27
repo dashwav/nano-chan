@@ -137,7 +137,7 @@ async def make_tables(pool: Pool, schema: str):
         responder_id BIGINT DEFAULT null,
         logtime TIMESTAMP DEFAULT current_timestamp,
         response_time TIMESTAMP DEFAULT null,
-        PRIMARY KEY (message_id)
+        PRIMARY KEY (report_id)
     );
     """.format(schema)
 
