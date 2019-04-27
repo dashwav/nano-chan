@@ -729,8 +729,8 @@ class PostgresController():
         """
 
         sql = """
-        INSERT INTO {}.user_reports (id, user_id) VALUES (DEFAULT, $1)
-        RETURNING id;
+        INSERT INTO {}.user_reports (report_id, user_id) VALUES (DEFAULT, $1)
+        RETURNING report_id;
         """.format(self.schema)
 
         return await self.pool.fetchval(sql, user_id)
