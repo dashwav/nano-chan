@@ -755,7 +755,7 @@ class PostgresController():
 
         sql = """
         UPDATE {}.user_reports 
-        SET response_time = current_timestamp, response_id = $1
+        SET response_time = current_timestamp, responder_id = $1
         WHERE report_id = $2;
         """.format(self.schema)
         
