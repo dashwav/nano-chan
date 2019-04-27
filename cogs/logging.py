@@ -106,7 +106,7 @@ class Logging(commands.Cog):
                     local_embed.set_footer(text=f'{after}')
                     await mod_info.send(embed=local_embed)
 
-    @commands.command
+    @commands.command()
     async def respond(self, ctx, report_id: int, *, response):
         """
         Respond back 
