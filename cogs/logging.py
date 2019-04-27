@@ -45,11 +45,14 @@ class Logging(commands.Cog):
         found_role = True
         if found_role:
             try:
+                report_id = await self.bot.postgres_controller.add_user_report(
+                    message.author.id)
                 mod_info = self.bot.get_channel(259728514914189312)
                 local_embed = discord.Embed(
                     title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                     description=message.clean_content
                 )
+                local_embed.set_footer(text=report_id)
                 if message.attachments:
                     desc = ''
                     for file in message.attachments:
@@ -59,8 +62,11 @@ class Logging(commands.Cog):
                         value=f'{desc}',
                         inline=True
                     )
-                await mod_info.send(embed=local_embed)
+                report_message = await mod_info.send(embed=local_embed)
                 await message.channel.send(':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.')
+                await self.bot.postgres_controller.set_report_message_id(
+                    report_id, report_message.id
+                )
                 for user_id in self.bot.dm_forward:
                     user = await self.bot.fetch_user_info(user_id)
                     await user.create_dm()
@@ -97,6 +103,29 @@ class Logging(commands.Cog):
                                         f'{after.mention}. [Joined: {join}]')
                     local_embed.set_footer(text=f'{after}')
                     await mod_info.send(embed=local_embed)
+
+    @commands.command
+    async def respond(self, ctx, report_id: int, *, response):
+        """
+        Respond back 
+        """
+        if not response:
+            await ctx.send("Please add a message", delete_after=3)
+
+        local_embed = discord.Embed(
+                    title=f'Response from the mod team:',
+                    description=response
+                )
+
+        report = await self.bot.postgres_controller.get_user_report(report_id)
+        user = await self.bot.fetch_user_info(report["user_id"])
+        await user.create_dm()
+        await user.dm_channel.send(embed=local_embed)
+
+        await self.bot.postgres_controller.add_user_report_response(
+            ctx.author.id, report_id 
+        )
+        
 
 def setup(bot):
     bot.add_cog(Logging(bot))

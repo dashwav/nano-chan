@@ -129,6 +129,18 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    reports = """
+    CREATE TABLE IF NOT EXISTS {}.user_reports (
+        report_id SERIAL,
+        user_id BIGINT,
+        message_id BIGINT,
+        responder_id BIGINT DEFAULT null,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        response_time TIMESTAMP DEFAULT null,
+        PRIMARY KEY (message_id)
+    );
+    """.format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -138,6 +150,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(servers)
     await pool.execute(channel_index)
     await pool.execute(reaction_spam)
+    await pool.execute(reports)
 
 
 class PostgresController():
@@ -709,3 +722,54 @@ class PostgresController():
         DELETE FROM {}.reaction_spam;
         """.format(self.schema)
         await self.pool.execute(sql)
+
+    async def add_user_report(self, user_id):
+        """
+        Adds a user report
+        """
+
+        sql = """
+        INSERT INTO {}.user_reports (id, user_id) VALUES (DEFAULT, $1)
+        RETURNING id;
+        """.format(self.schema)
+
+        return await self.pool.fetchval(sql, user_id)
+
+    async def set_report_message_id(self, report_id, message_id):
+        """
+        Sets the message_id of the report
+        """
+
+        sql = """
+        UPDATE {}.user_reports 
+        SET message_id = $1
+        WHERE report_id = $2;
+        """.format(self.schema)
+        
+        await self.pool.execute(sql, message_id, report_id)
+
+    async def add_user_report_response(self, report_id, responder_id):
+        """
+        Adds a response to a message
+        """
+
+        sql = """
+        UPDATE {}.user_reports 
+        SET response_time = current_timestamp, response_id = $1
+        WHERE report_id = $2;
+        """.format(self.schema)
+        
+        await self.pool.execute(sql, responder_id, report_id)
+        
+
+    async def get_user_report(self, report_id):
+        """
+        Returns a user_report
+        """
+
+        sql = """
+        SELECT * FROM {}.user_reports
+        WHERE report_id = $1;
+        """.format(self.schema)
+
+        return await self.pool.fetch(sql, report_id)
