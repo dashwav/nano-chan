@@ -120,7 +120,7 @@ class Logging(commands.Cog):
                 )
 
         report = await self.bot.postgres_controller.get_user_report(report_id)
-        user = await self.bot.fetch_user(report["user_id"])
+        user = await self.bot.fetch_user(report[0]["user_id"])
         await user.create_dm()
         await user.dm_channel.send(embed=local_embed)
 
