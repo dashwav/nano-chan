@@ -4,6 +4,7 @@ Cog for logging info to mod-info
 import discord
 from discord.ext import commands
 import random
+import datetime
 
 
 class Logging(commands.Cog):
@@ -118,15 +119,23 @@ class Logging(commands.Cog):
                     title=f'Response from the mod team for report {report_id}:',
                     description=response
                 )
+        try:
+            report = await self.bot.postgres_controller.get_user_report(report_id)
+            user = await self.bot.fetch_user(report[0]["user_id"])
+            await user.create_dm()
+            await user.dm_channel.send(embed=local_embed)
 
-        report = await self.bot.postgres_controller.get_user_report(report_id)
-        user = await self.bot.fetch_user(report[0]["user_id"])
-        await user.create_dm()
-        await user.dm_channel.send(embed=local_embed)
+            await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
-        await self.bot.postgres_controller.add_user_report_response(
-            ctx.author.id, report_id)
-        
+            await self.bot.postgres_controller.add_user_report_response(
+                ctx.author.id, report_id)
+
+            report_message = await ctx.channel.fetch_message(report[0]['message_id'])
+            report_embed = report_message.embeds[0]
+            report_embed.set_footer(text=f'Report ID: {report_id}. Response {ctx.message.jump_url}')
+            await report_message.edit(embed=report_embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Error in responding to report: {e}')  
 
 def setup(bot):
     bot.add_cog(Logging(bot))
