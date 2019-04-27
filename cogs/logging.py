@@ -119,7 +119,7 @@ class Logging(commands.Cog):
                 )
         if ctx.message.attachments:
             desc = ''
-            for file in message.attachments:
+            for file in ctx.message.attachments:
                 desc += f'{file.url}\n'
             local_embed.add_field(
                 name='Attachments',
