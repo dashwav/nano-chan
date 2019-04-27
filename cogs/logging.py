@@ -117,6 +117,15 @@ class Logging(commands.Cog):
                     title=f'Response from the mod team for report {report_id}:',
                     description=response
                 )
+        if ctx.message.attachments:
+            desc = ''
+            for file in message.attachments:
+                desc += f'{file.url}\n'
+            local_embed.add_field(
+                name='Attachments',
+                value=f'{desc}',
+                inline=True
+            )
         try:
             report = await self.bot.postgres_controller.get_user_report(report_id)
             user = await self.bot.fetch_user(report[0]["user_id"])
