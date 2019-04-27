@@ -69,7 +69,7 @@ class Logging(commands.Cog):
                     report_id, report_message.id
                 )
                 for user_id in self.bot.dm_forward:
-                    user = await self.bot.fetch_user_info(user_id)
+                    user = await self.bot.fetch_user(user_id)
                     await user.create_dm()
                     await user.dm_channel.send(embed=local_embed)
             except Exception as e:
