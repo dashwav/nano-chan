@@ -23,6 +23,7 @@ class Stats(commands.Cog):
         self.bot = bot
         self.editible_posts = []
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         if not isinstance(message.channel, discord.TextChannel):
             return
@@ -44,6 +45,7 @@ class Stats(commands.Cog):
         except Exception as e:
             self.bot.logger.warning(f'Error adding emoji to db: {e}')
 
+    @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         """
         Called when an emoji is added

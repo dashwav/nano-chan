@@ -13,6 +13,7 @@ class Filter(commands.Cog):
         self.channels = bot.filter_channels
         self.filter_allowed = bot.filter_allowed
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         if isinstance(message.channel, discord.DMChannel):
             return

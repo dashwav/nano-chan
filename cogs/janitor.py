@@ -56,6 +56,7 @@ class Janitor(commands.Cog):
             member_roles.remove(role)
         return member_roles
 
+    @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return

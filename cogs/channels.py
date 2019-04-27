@@ -233,7 +233,7 @@ class Channels(commands.Cog):
         await ctx.send(":ok_hand:", delete_after=3)
         await ctx.message.delete()
 
-
+    @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         """
         Called when an emoji is added
@@ -253,6 +253,7 @@ class Channels(commands.Cog):
                 )
         await self.add_perms(user, channel)
 
+    @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         """
         Called when an emoji is removed
