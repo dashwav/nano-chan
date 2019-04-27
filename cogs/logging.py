@@ -3,6 +3,7 @@ Cog for logging info to mod-info
 """
 import discord
 from discord.ext import commands
+from discord import client
 import random
 
 
@@ -12,6 +13,7 @@ class Logging(commands.Cog):
         self.bot = bot
         super().__init__()
 
+    @client.event
     async def on_message(self, message):
         if not isinstance(message.channel, discord.DMChannel):
             if message.channel.id != 429536153251741706:
