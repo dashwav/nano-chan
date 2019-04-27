@@ -126,11 +126,11 @@ class Logging(commands.Cog):
             await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
             await self.bot.postgres_controller.add_user_report_response(
-                ctx.author.id, report_id)
+                report_id, ctx.author.id)
 
             report_message = await ctx.channel.fetch_message(report[0]['message_id'])
             report_embed = report_message.embeds[0]
-            report_embed.set_footer(text=f'Report ID: {report_id}. Response {ctx.message.jump_url}')
+            report_embed.add_field(name="Response", value=f"[Link to response]({ctx.message.jump_url})")
             await report_message.edit(embed=report_embed)
         except Exception as e:
             self.bot.logger.warning(f'Error in responding to report: {e}')  
