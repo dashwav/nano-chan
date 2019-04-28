@@ -63,7 +63,7 @@ class Logging(commands.Cog):
                     inline=True
                 )
             report_message = await mod_info.send(embed=local_embed)
-            await mod_info.send(f'You can respond to this report by typing:\n\n`-respond {report_id}` with your message at the end.')
+            await mod_info.send(f'You can respond to this report by typing:\n\n```\n-respond {report_id}\n`` with your message at the end.')
             await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
             await self.bot.postgres_controller.set_report_message_id(
                 report_id, report_message.id
