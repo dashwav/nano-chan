@@ -37,7 +37,7 @@ class Filter(commands.Cog):
                 mod_info = self.bot.get_channel(259728514914189312)
                 await mod_info.send(
                     f'**{time} | SPAM:** {message.author} has had {user_deleted} '\
-                    f'messages deleted in #join-logs'
+                    f'messages deleted in {message.channel.name}'
                 )
             self.bot.logger.info(
                 'Successfully deleted message from: '
