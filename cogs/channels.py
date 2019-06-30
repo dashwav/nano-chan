@@ -34,8 +34,39 @@ class Channels(commands.Cog):
          if ctx.invoked_subcommand is None:
             await ctx.send(':thinking:')
     
+    @channel_message.command(name='fixdb', aliases=['correctdb'])
+    @commands.is_owner()
+    async def _channel_message_fix(self, ctx):
+        """
+        This will fix the channel_message db by manually looping through all channel_message entries and then adding every user manually.
+        """
+        confirm = await helpers.custom_confirm(ctx, 'Want to forcibly fix the react db based on reactions? This can use up a lot of resources.')
+        if not confirm:
+            await ctx.send("Cancelled Fix", delete_after=3)
+            return
+        await self.bot.postgres_controller.fix_channel_message()  # add a column
+        for row in self.bot.chanreact:
+            target = await self.bot.postgres_controller.get_target_channel(*row)
+            message_id = await self.bot.postgres_controller.get_message_info(row[0], target)
+            if not message_id:
+                continue
+            channel = self.bot.get_channel(int(row[0]))
+            if not channel:
+                continue
+            og_message = await channel.fetch_message(int(message_id))
+            if not og_message:
+                continue
+            reaction = og_message.reactions[0]
+            users = await reaction.users().flatten()
+            users = ','.join([str(x.id) for x in users if not x.bot])
+            await self.bot.postgres_controller.add_user_chanreact(users, ctx.channel.id, target)
+
+
     @channel_message.command(aliases=['add'])
     async def create(self, ctx, target_channel: discord.TextChannel, *, description: str):
+        """
+        Creates a channel_message message in the current channel with the target of the designated channel.
+        """
         if not isinstance(target_channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
@@ -49,6 +80,7 @@ class Channels(commands.Cog):
         try:
             await self.bot.postgres_controller.add_channel_message(
                 message.id, target_channel.id, ctx.channel.id)
+            self.bot.chanreact.append((ctx.channel.id, message.id))
         except UniqueViolationError:
             await message.delete()
             await ctx.send(
@@ -58,7 +90,7 @@ class Channels(commands.Cog):
     @channel_message.command(aliases=['rem'])
     async def remove(self, ctx, target_channel: discord.TextChannel):
         """
-        uhhh it removes the thing
+        Removes the channel_message. Must be invoked within the channel the message is found.
         """
         if not isinstance(target_channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam", delete_after=4)
@@ -71,15 +103,19 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
-        for reaction in og_message.reactions:
-            async for user in reaction.users():
+        og_message = await ctx.channel.fetch_message(int(message_id))
+        users_to_remove = await self.bot.postgres_controller.get_chanreacts(ctx.channel.id, target_channel.id)
+        for user_id in users_to_remove:
+            try:
+                user = self.bot.get_user(user_id)
                 if user.bot:
                     continue
-                await og_message.remove_reaction(reaction.emoji, user)
                 await self.remove_perms(user, target_channel)
+            except:
+                pass
         await og_message.delete()
         await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id)
+        del self.bot.chanreact[self.bot.chanreact.index((ctx.channel.id, message_id))]
         await ctx.message.delete()
 
     @channel_message.command()
@@ -95,7 +131,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         og_embed.description = edit[:2046]
         await og_message.edit(embed=og_embed)
@@ -118,7 +154,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         og_embed.title = f'#{target_channel.name}'
         await og_message.edit(embed=og_embed)
@@ -141,7 +177,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         og_embed.color = discord.Color.from_rgb(int(red), int(green), int(blue))
         await og_message.edit(embed=og_embed)
@@ -164,7 +200,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_image(url=image_url)
@@ -192,7 +228,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_thumbnail(url=image_url)
@@ -221,7 +257,7 @@ class Channels(commands.Cog):
             return
         if not message_id:
             return
-        og_message = await ctx.channel.fetch_message(message_id)
+        og_message = await ctx.channel.fetch_message(int(message_id))
         og_embed = og_message.embeds[0]
         try:
             og_embed.set_footer(text=footer)
@@ -238,32 +274,38 @@ class Channels(commands.Cog):
         """
         Called when an emoji is added
         """
+        if (payload.channel_id, payload.message_id) not in self.bot.chanreact:
+            return
         target_channel = await self.bot.postgres_controller.get_target_channel(payload.channel_id, payload.message_id)
         if not target_channel:
-                return 
+            return 
         user = self.bot.get_user(payload.user_id)
         channel = self.bot.get_channel(target_channel)
         reacts = await self.bot.postgres_controller.add_user_reaction(payload.user_id, payload.message_id)
         if int(reacts) in [10,20,100]:
-                time = self.bot.timestamp()
-                mod_info = self.bot.get_channel(259728514914189312)
-                await mod_info.send(
-                    f'**{time} | REACTION SPAM:** {user} has reacted {reacts} '\
-                    f'times today on the permission message for #{channel}'
-                )
+            time = self.bot.timestamp()
+            mod_info = self.bot.get_channel(259728514914189312)
+            await mod_info.send(
+                f'**{time} | REACTION SPAM:** {user} has reacted {reacts} '\
+                f'times today on the permission message for #{channel}'
+            )
         await self.add_perms(user, channel)
+        await self.bot.postgres_controller.add_user_chanreact(payload.user_id, payload.channel_id, target_channel)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         """
         Called when an emoji is removed
         """
+        if (payload.channel_id, payload.message_id) not in self.bot.chanreact:
+            return
         target_channel = await self.bot.postgres_controller.get_target_channel(payload.channel_id, payload.message_id)
         if not target_channel:
             return
         channel = self.bot.get_channel(target_channel)
         user = self.bot.get_user(payload.user_id)
         await self.remove_perms(user, channel)
+        await self.bot.postgres_controller.rm_user_chanreact(payload.user_id, payload.channel_id, target_channel)
     
     async def add_perms(self, user, channel):
         """

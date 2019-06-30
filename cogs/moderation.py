@@ -115,30 +115,21 @@ class Moderation(commands.Cog):
             except (HTTPException, AttributeError) as e:
                 reply += f'Error adding user to TO role: <@&{self.bot.timeout_id}>!: {str(e)}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
-            all_channels = await self.bot.postgres_controller.get_all_channels()
+            r = await self.bot.postgres_controller.get_all_chanreacts()
+            all_channels = []
+            for x in r:
+                if not isinstance(x['user_id'], type(None)):
+                    if member.id in x['user_id']:
+                        all_channels.append(x)
             for row in all_channels:
-                print(row)
-                try:
-                    channel = self.bot.get_channel(row['host_channel'])
-                    message = await channel.fetch_message(row['message_id'])
-                except:
-                    continue
-                if not message:
-                    continue
-                reaction = message.reactions[0]
-                users = await reaction.users().flatten()
-                to_member = find(lambda m: m.id == member.id, users)
-                if to_member == None:
-                    continue
-                self.bot.logger.info(f'{row}, {to_member.id}')
+                self.bot.logger.info(f'{row}, {member.id}')
                 try:
                     target_channel = self.bot.get_channel(
                         row['target_channel'])
-                    await self.remove_perms(to_member, target_channel)
+                    await self.remove_perms(member, target_channel)
                     removed_from_channels.append(target_channel.name)
                 except (HTTPException, AttributeError) as e:
                     self.bot.logger.warning(f'Error removing user from channel!: {row["target_channel"]}{e}')  # noqa
-                self.bot.logger.warning(f'{row["target_channel"]}') # noqa
         except Exception as e:
             self.bot.logger.warning(f'Error timing out user!: {e}')
             await ctx.send('❌', delete_after=3)
@@ -156,7 +147,6 @@ class Moderation(commands.Cog):
         guild_roles = ctx.guild.roles
         timeout_role = ctx.guild.get_role(self.bot.timeout_id)
         confirm = await helpers.confirm(ctx, member, '')
-        member_roles = member.roles
         removed_from_channels = []
         reply = ''
         if not confirm:
@@ -164,30 +154,19 @@ class Moderation(commands.Cog):
             return
         try:
             try:
-                if timeout_role in member_roles:
-                    await member.remove_roles(timeout_role)
-                    reply += 'Successfully removed TO role\n'
-                else:
-                    raise AttributeError
+                await member.add_roles(timeout_role)
+                reply += 'Successfully added TO role\n'
             except (HTTPException, AttributeError) as e:
                 reply += f'Error removing user from TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
-            all_channels = await self.bot.postgres_controller.get_all_channels()
+            r = await self.bot.postgres_controller.get_all_chanreacts()
+            all_channels = []
+            for x in r:
+                if not isinstance(x['user_id'], type(None)):
+                    if member.id in x['user_id']:
+                        all_channels.append(x)
             for row in all_channels:
-                print(row)
-                try:
-                    channel = self.bot.get_channel(row['host_channel'])
-                    message = await channel.fetch_message(row['message_id'])
-                except:
-                    continue
-                if not message:
-                    continue
-                reaction = message.reactions[0]
-                users = await reaction.users().flatten()
-                to_member = find(lambda m: m.id == member.id, users)
-                if to_member == None:
-                    continue
-                self.bot.logger.info(f'{row}, {to_member.id}')
+                self.bot.logger.info(f'{row}, {member.id}')
                 try:
                     target_channel = self.bot.get_channel(
                         row['target_channel'])
@@ -195,9 +174,8 @@ class Moderation(commands.Cog):
                     removed_from_channels.append(target_channel.name)
                 except (HTTPException, AttributeError) as e:
                     self.bot.logger.warning(f'Error adding user to channel!: {row["target_channel"]}{e}')  # noqa
-                self.bot.logger.warning(f'{row["target_channel"]}') # noqa
         except Exception as e:
-            self.bot.logger.warning(f'Error timing out user!: {e}')
+            self.bot.logger.warning(f'Error untiming out user!: {e}')
             await ctx.send('❌', delete_after=3)
             return
         # send output to log channel
@@ -205,7 +183,6 @@ class Moderation(commands.Cog):
         ret = ', '.join(removed_from_channels)
         reply += f'**User: {member.name}#{member.discriminator}: **Successfully added to channels: ``` {ret}```'  # noqa
         await ctx.send(f'**{time}** | {reply}')
-        pass
 
     async def add_perms(self, user, channel):
         """
