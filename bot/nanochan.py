@@ -63,7 +63,7 @@ class Nanochan(Bot):
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
         chanreact = await postgres_controller.get_all_channels()
-        chanreact = [(x[2], x[1]) for x in chanreact]  # cache the react channel_message as host_channel, message_id
+        chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
         return cls(config, misc_config, logger, False, postgres_controller, chanreact)
 
     @classmethod

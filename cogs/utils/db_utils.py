@@ -113,11 +113,21 @@ async def make_tables(pool: Pool, schema: str):
 
     channel_index = """
     CREATE TABLE IF NOT EXISTS {}.channel_index (
-        user_id BIGINT ARRAY,
         message_id BIGINT,
         host_channel BIGINT,
         target_channel BIGINT,
         PRIMARY KEY (host_channel, target_channel)
+    );
+    """.format(schema)
+
+    channel_react = """
+    CREATE TABLE IF NOT EXISTS {0}.channel_react (
+        user_id BIGINT,
+        host_channel BIGINT,
+        message_id BIGINT,
+        target_channel BIGINT,
+        PRIMARY KEY (user_id, host_channel, target_channel),
+        FOREIGN KEY (host_channel, target_channel, message_id) REFERENCES {0}.channel_index (host_channel, target_channel, message_id) ON DELETE CASCADE
     );
     """.format(schema)
 
@@ -142,7 +152,7 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
-    db_entries = (reacts, fightclub, spam, roles, clovers, emojis, servers, channel_index, reaction_spam, reports)
+    db_entries = (reacts, fightclub, spam, roles, clovers, emojis, servers, channel_index, reaction_spam, reports, channel_react)
     for db_entry in db_entries:
         await pool.execute(db_entry)
 
@@ -632,28 +642,15 @@ class PostgresController():
     """
     Channel Message React Stuff
     """
-    async def fix_channel_message(self):
-        """
-        Manually adds a new column to the db
-        """
-        sql = """ALTER TABLE {}.channel_index DROP COLUMN IF EXISTS user_id;""".format(self.schema)
-        
-        await self.pool.execute(sql)
-        sql = """ALTER TABLE {}.channel_index ADD COLUMN IF NOT EXISTS user_id BIGINT ARRAY;""".format(self.schema)
-        
-        await self.pool.execute(sql)
-
-
-
     async def add_channel_message(self, message_id, target_channel, host_channel):
         """
         Adds a link in the database
         """
         sql = """
-        INSERT INTO {}.channel_index (message_id, host_channel, target_channel, user_id) VALUES ($1, $2, $3, $4);
+        INSERT INTO {}.channel_index (message_id, host_channel, target_channel) VALUES ($1, $2, $3);
         """.format(self.schema)
         
-        await self.pool.execute(sql, message_id, host_channel, target_channel, [])
+        await self.pool.execute(sql, message_id, host_channel, target_channel)
 
     async def get_message_info(self, host_channel, target_channel):
         """
@@ -707,25 +704,25 @@ class PostgresController():
 
         await self.pool.execute(sql, host_channel, target_channel)
 
-    async def get_all_chanreacts(self):
+    async def get_chanreacts_fromuser(self, user_id):
         """
         Returns all of the reaction channels id from new db
         """
         sql = """
-            SELECT * FROM {}.channel_index;
+            SELECT target_channel FROM {}.channel_react WHERE user_id = $1;
         """.format(self.schema)
 
         try:
-            return await self.pool.fetch(sql)
+            return await self.pool.fetch(sql, user_id)
         except:
             return None
 
-    async def get_chanreacts(self, host_channel, target_channel):
+    async def get_chanreacts_fromchan(self, host_channel, target_channel):
         """
         Returns all of the reaction channels id from new db
         """
         sql = """
-            SELECT user_id FROM {}.channel_index WHERE host_channel = $1 AND target_channel = $2;
+            SELECT user_id FROM {}.channel_react WHERE host_channel = $1 AND target_channel = $2;
         """.format(self.schema)
 
         try:
@@ -733,54 +730,30 @@ class PostgresController():
         except:
             return None
 
-    async def add_user_chanreact(self, user_ids, host_channel, target_channel):
+    async def add_user_chanreact(self, user_ids, host_channel, message_id, target_channel):
         """
         Returns all of the reaction channels
-        working on this!!!
         """
-        r = await self.get_chanreacts(host_channel, target_channel)
-        if len(r) > 0:
-            result = r[0]['user_id']
-        else:
-            result = None
-        if not result:
-            result = []
-        length = len(result)
-        for user_id in str(user_ids).split(','):
-            if int(user_id) in result:
-                continue
-            result.append(int(user_id))
-        if length == len(result):
-            return
         sql = """
-            UPDATE {}.channel_index SET user_id=$1 WHERE host_channel = $2 AND target_channel = $3;
+            INSERT INTO {}.channel_react (user_id, host_channel, message_id, target_channel)  VALUES ($1, $2, $3, $4);
             """.format(self.schema)
-        try:
-            return await self.pool.execute(sql, result, host_channel, target_channel)
-        except:
-            return None
 
-    async def rm_user_chanreact(self, user_id, host_channel, target_channel):
+        for user_id in str(user_ids).split(','):
+            try:
+                await self.pool.execute(sql, int(user_id), host_channel, message_id, target_channel)
+            except:
+                continue
+        return True
+
+    async def rm_user_chanreact(self, user_id, target_channel, host_channel):
         """
         Returns all of the reaction channels
         """
-        r = await self.get_chanreacts(host_channel, target_channel)
-        if len(r) > 0:
-            result = r[0]['user_id']
-        else:
-            result = None
-        if not result:
-            return
-        if int(user_id) not in result:
-            return
-        del result[result.index(int(user_id))]
         sql = """
-            UPDATE {}.channel_index SET user_id=$1 WHERE host_channel = $2 AND target_channel = $3;
+            DELETE FROM {}.channel_react WHERE user_id = $1 AND target_channel = $2 AND host_channel = $3;
             """.format(self.schema)
-        try:
-            return await self.pool.execute(sql, result, host_channel, target_channel)
-        except:
-            return None
+
+        return await self.pool.execute(sql, user_id, target_channel, host_channel)
 
     """
     User Reaction Spam Stuff
@@ -811,7 +784,6 @@ class PostgresController():
         DELETE FROM {}.reaction_spam;
         """.format(self.schema)
         await self.pool.execute(sql)
-
 
     """
     Report Stuff
