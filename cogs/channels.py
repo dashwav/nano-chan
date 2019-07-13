@@ -106,7 +106,7 @@ class Channels(commands.Cog):
         except:
             pass
         try:
-            await target_channel.sync_permissions(True)
+            await target_channel.edit(sync_permissions=True)
         except:
             pass
         await og_message.delete()
