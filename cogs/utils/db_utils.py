@@ -17,7 +17,7 @@ except ImportError:
 def parse_record(record: Record) -> Optional[tuple]:
     """
     Parse a asyncpg Record object to a tuple of values
-    :param record: the asyncpg Record object
+    :param record: theasyncpg Record object
     :return: the tuple of values if it's not None, else None
     """
     try:
@@ -754,6 +754,16 @@ class PostgresController():
             """.format(self.schema)
 
         return await self.pool.execute(sql, user_id, target_channel, host_channel)
+
+    async def rm_channel_chanreact(self, target_channel, host_channel):
+        """
+        Returns all of the reaction channels
+        """
+        sql = """
+            DELETE FROM {}.channel_react WHERE target_channel = $1 AND host_channel = $2;
+            """.format(self.schema)
+
+        return await self.pool.execute(sql, target_channel, host_channel)
 
     """
     User Reaction Spam Stuff

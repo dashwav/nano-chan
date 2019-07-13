@@ -100,15 +100,15 @@ class Channels(commands.Cog):
         if not message_id:
             return
         og_message = await ctx.channel.fetch_message(int(message_id))
-        users_to_remove = await self.bot.postgres_controller.get_chanreacts_fromchan(ctx.channel.id, target_channel.id)
-        for user_id in users_to_remove:
-            try:
-                user = self.bot.get_user(user_id)
-                if user.bot:
-                    continue
-                await self.remove_perms(user, target_channel)
-            except:
-                pass
+
+        try:
+            await self.rm_channel_chanreact(target_channel, ctx.channel.id)
+        except:
+            pass
+        try:
+            await target_channel.sync_permissions(True)
+        except:
+            pass
         await og_message.delete()
         await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id)
         del self.bot.chanreact[self.bot.chanreact.index((target_channel.id, og_message.id, ctx.channel.id))]
