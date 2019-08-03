@@ -16,7 +16,7 @@ class Nanochan(Bot):
     actual bot class
     """
     def __init__(self, config, misc_config, logger, test,
-                 postgres_controller: PostgresController):
+                 postgres_controller: PostgresController, chanreact):
         """
         init for bot class
         """
@@ -40,6 +40,7 @@ class Nanochan(Bot):
         self.dm_forward = config['dm_forward']
         self.timeout_id = misc_config['timeout_id']
         self.logger = logger
+        self.chanreact = chanreact
         super().__init__('-')
 
     @classmethod
@@ -61,7 +62,9 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        return cls(config, misc_config, logger, False, postgres_controller)
+        chanreact = await postgres_controller.get_all_channels()
+        chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
+        return cls(config, misc_config, logger, False, postgres_controller, chanreact)
 
     @classmethod
     async def get_test_instance(cls):
