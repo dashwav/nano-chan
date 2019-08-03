@@ -116,7 +116,7 @@ async def make_tables(pool: Pool, schema: str):
         message_id BIGINT,
         host_channel BIGINT,
         target_channel BIGINT,
-        PRIMARY KEY (host_channel, target_channel)
+        PRIMARY KEY (host_channel, target_channel, message_id)
     );
     """.format(schema)
 
