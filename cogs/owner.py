@@ -137,7 +137,7 @@ class Owner(commands.Cog):
             await ctx.send(embed=embed)
 
     @blacklistglobaluser.command(name='add', pass_context=True)
-    async def _blgua(self, ctx: commands.Context, uids: str=None):
+    async def _blgua(self, ctx: commands.Context, *, uids: str=None):
         """Add user to global blacklist.
 
         Parameters
@@ -179,7 +179,7 @@ class Owner(commands.Cog):
             self.bot.logger.info(f'Error adding users to global blacklist {e}')
 
     @blacklistglobaluser.command(name='remove', aliases=['rem', 'del', 'rm'])
-    async def _blgur(self, ctx: commands.Context, uids: str=None):
+    async def _blgur(self, ctx: commands.Context, *, uids: str=None):
         """Removes a user from the blacklist.
 
         Parameters
