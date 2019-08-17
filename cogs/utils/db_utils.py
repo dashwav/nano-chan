@@ -145,6 +145,7 @@ async def make_tables(pool: Pool, schema: str):
         report_id SERIAL,
         user_id BIGINT,
         message_id BIGINT,
+        message TEXT,
         responder_id BIGINT DEFAULT null,
         logtime TIMESTAMP DEFAULT current_timestamp,
         response_time TIMESTAMP DEFAULT null,
@@ -799,17 +800,28 @@ class PostgresController():
     Report Stuff
     """
 
-    async def add_user_report(self, user_id):
+    async def get_all_user_reports(self):
+        """
+        Grab all user reports
+        """
+
+        sql = """
+        SELECT * FROM {}.user_reports;
+        """.format(self.schema)
+
+        return await self.pool.fetch(sql)
+
+    async def add_user_report(self, user_id, message):
         """
         Adds a user report
         """
 
         sql = """
-        INSERT INTO {}.user_reports (report_id, user_id) VALUES (DEFAULT, $1)
+        INSERT INTO {}.user_reports (report_id, user_id, message) VALUES (DEFAULT, $1, $2)
         RETURNING report_id;
         """.format(self.schema)
 
-        return await self.pool.fetchval(sql, user_id)
+        return await self.pool.fetchval(sql, user_id, message)
 
     async def set_report_message_id(self, report_id, message_id):
         """
@@ -821,8 +833,20 @@ class PostgresController():
         SET message_id = $1
         WHERE report_id = $2;
         """.format(self.schema)
-        
+
         await self.pool.execute(sql, message_id, report_id)
+
+    async def set_report_message_content(self, report_id, content):
+        """
+        Sets the content of a report
+        """
+        sql = """
+        UPDATE {}.user_reports
+        SET message = $1
+        WHERE report_id = $2
+        """.format(self.schema)
+
+        await self.pool.execute(sql, content, report_id)
 
     async def add_user_report_response(self, report_id, responder_id):
         """
