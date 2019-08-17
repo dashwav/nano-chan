@@ -167,16 +167,21 @@ class Logging(commands.Cog):
         except:
             await ctx.send('Couldn\'t find this report :(', delete_after=10)
             return
+        report = report[0]
         content, attachments, responces = '', [], []
         if ':=:' in report['message']:
             content = report['message'].split(':=:')[0]
             attachments = report['message'].split(':=:')[1:]
             attachments[-1] = attachments[-1].split(';=;')[0]
+        elif ';=;' in report['message']:
+            content = report['message'].split(';=;')[0]
+        else:
+            content = report['message']
         if ';=;' in report['message']:
-            responces = report['message'].split(':=:')[-1].split(';=;')[1:]
+            responces = report['message'].split(';=;')[1:]
 
         local_embed = discord.Embed(
-            title=f'DM report from {report["user_id"]}:',
+            title=f'DM report from <@{report["user_id"]}>:',
             description=content
         )
         if len(attachments) > 0:
