@@ -100,5 +100,6 @@ class Owner(commands.Cog):
                         await self.bot.postgres_controller.set_report_message_content(report['report_id'], report_message)
                     except Exception as err:
                         pass # self.bot.logger.warning('Failed: {}'.format(err))
+            await ctx.send('Fixed the db')
 
         return
