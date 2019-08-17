@@ -16,7 +16,7 @@ class Nanochan(Bot):
     actual bot class
     """
     def __init__(self, config, misc_config, logger, test,
-                 postgres_controller: PostgresController, chanreact):
+                 postgres_controller: PostgresController, chanreact, blacklist):
         """
         init for bot class
         """
@@ -41,6 +41,7 @@ class Nanochan(Bot):
         self.timeout_id = misc_config['timeout_id']
         self.logger = logger
         self.chanreact = chanreact
+        self.blglobal = blacklist
         super().__init__('-')
 
     @classmethod
@@ -62,9 +63,10 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
+        blgu = await postgres_controller.get_all_blacklist_users_global()
         chanreact = await postgres_controller.get_all_channels()
         chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
-        return cls(config, misc_config, logger, False, postgres_controller, chanreact)
+        return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
 
     @classmethod
     async def get_test_instance(cls):
@@ -86,8 +88,9 @@ class Nanochan(Bot):
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
         chanreact = await postgres_controller.get_all_channels()
+        blgu = await postgres_controller.get_all_blacklist_users_global()
         chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
-        return cls(config, misc_config, logger, False, postgres_controller, chanreact)
+        return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
 
     def start_bot(self, cogs):
         """
@@ -109,3 +112,10 @@ class Nanochan(Bot):
         self.logger.info(f'\nLogged in as\n{self.user.name}'
                          f'\nVersion:\n {self.version}'
                          f'\n{self.user.id}\n------')
+
+    async def on_message(self, ctx):
+        # specifically handle blacklisted users
+        if ctx.author.id not in self.blglobal:
+            await self.process_commands(ctx)
+        else:
+            return

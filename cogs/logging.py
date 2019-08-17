@@ -16,6 +16,8 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author.id in self.bot.blglobal:
+            return
         if not isinstance(message.channel, discord.DMChannel):
             if message.channel.id != 429536153251741706:
                 return
