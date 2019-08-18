@@ -85,7 +85,9 @@ class Nanochan(Bot):
         postgres_cred = config['postgres_credentials']
         postgres_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        return cls(config, misc_config, logger, True, postgres_controller)
+        chanreact = await postgres_controller.get_all_channels()
+        chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
+        return cls(config, misc_config, logger, False, postgres_controller, chanreact)
 
     def start_bot(self, cogs):
         """
