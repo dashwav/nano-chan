@@ -129,7 +129,6 @@ class Logging(commands.Cog):
                     title=f'Response from the mod team for report {report_id}:',
                     description=response
                 )
-        local_embed.set_footer(text=f'Report ID: {report_id}')
         if ctx.message.attachments:
             desc = ''
             for file in ctx.message.attachments:
