@@ -90,15 +90,25 @@ class Owner(commands.Cog):
                 report_message = ''
                 try:
                     report_message = await ctx.channel.fetch_message(int(report['message_id']))
-                    # self.bot.logger.info(f'Message {report_message}')
-                    report_message = report_message.embeds[0].description
+                    # self.bomessage_idmessage_idmessage_idt.logger.info(f'Message {report_message}')
+                    report_content = report_message.embeds[0].description
+                    self.bot.logger.info('fields: {}'.format(report_message.embeds[0].fields))
+                    tmp1 = []
+                    tmp2 = []
+                    for row in report_message.embeds[0].fields:
+                        if row.name == 'Attachments':
+                            tmp1.append(':=:' + row.value)
+                        if row.name == 'Response':
+                            tmp2.append(';=;' + row.value.split('(')[-1].split(')')[0])
+                    report_content += ''.join(tmp1)
+                    report_content += ''.join(tmp2)
                 except Exception as err:
-                    # await ctx.send(err, delete_after=15)
+                    self.bot.logger.info(err)
                     pass
-                # self.bot.logger.info(report_message)
-                if report_message != '':
+                # self.bot.logger.info(report_content)
+                if report_content != '':
                     try:
-                        await self.bot.postgres_controller.set_report_message_content(report['report_id'], report_message)
+                        await self.bot.postgres_controller.set_report_message_content(report['report_id'], report_content)
                     except Exception as err:
                         pass # self.bot.logger.warning('Failed: {}'.format(err))
             await ctx.send('Fixed the db')

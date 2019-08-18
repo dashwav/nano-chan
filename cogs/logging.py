@@ -57,7 +57,7 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.postgres_controller.add_user_report(
                 message.author.id, content)
-            mod_info = self.bot.get_channel(480178049334378507)  # airl 259728514914189312)
+            mod_info = self.bot.get_channel(480178049334378507) # airl 259728514914189312)
             local_embed = discord.Embed(
                 title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                 description=message.clean_content
@@ -129,6 +129,7 @@ class Logging(commands.Cog):
                     title=f'Response from the mod team for report {report_id}:',
                     description=response
                 )
+        local_embed.set_footer(text=f'Report ID: {report_id}')
         if ctx.message.attachments:
             desc = ''
             for file in ctx.message.attachments:
@@ -186,6 +187,7 @@ class Logging(commands.Cog):
             title=f'DM report from <@{report["user_id"]}>:',
             description=content
         )
+        local_embed.set_footer(text=f'Report ID: {report_id}')
         if len(attachments) > 0:
             desc = ''
             for f in attachments:
@@ -199,7 +201,7 @@ class Logging(commands.Cog):
             for f in responces:
                 desc = f'[Link to responce]({f})'
                 local_embed.add_field(
-                    name='Responce',
+                    name='Response',
                     value=f'{desc}',
                     inline=True
                 )
