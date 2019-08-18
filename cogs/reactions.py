@@ -79,6 +79,8 @@ class Reactions(commands.Cog):
         """
         Actually responds with the reaction
         """
+        if message.author.id in self.bot.blglobal:
+            return
         if not message.channel.id in ALLOWED_CHANNELS:
             return
         if self.triggers is None:

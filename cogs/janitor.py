@@ -58,6 +58,8 @@ class Janitor(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author.id in self.bot.blglobal:
+            return
         if isinstance(message.channel, discord.DMChannel):
             return
         if message.author.bot:
