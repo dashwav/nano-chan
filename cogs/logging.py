@@ -57,7 +57,7 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.postgres_controller.add_user_report(
                 message.author.id, content)
-            mod_info = self.bot.get_channel(480178049334378507) # airl 259728514914189312)
+            mod_info = self.bot.get_channel(259728514914189312)
             local_embed = discord.Embed(
                 title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                 description=message.clean_content
