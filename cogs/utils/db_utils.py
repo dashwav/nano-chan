@@ -145,6 +145,7 @@ async def make_tables(pool: Pool, schema: str):
         report_id SERIAL,
         user_id BIGINT,
         message_id BIGINT,
+        message TEXT,
         responder_id BIGINT DEFAULT null,
         logtime TIMESTAMP DEFAULT current_timestamp,
         response_time TIMESTAMP DEFAULT null,
@@ -152,7 +153,16 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
-    db_entries = (reacts, fightclub, spam, roles, clovers, emojis, servers, channel_index, reaction_spam, reports, channel_react)
+
+    globul = """
+    CREATE TABLE IF NOT EXISTS {}.globaluserbl (
+        user_id BIGINT,
+        currtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY(user_id)
+    );
+    """.format(schema)
+
+    db_entries = (reacts, fightclub, spam, roles, clovers, emojis, servers, channel_index, reaction_spam, reports, channel_react, globul)
     for db_entry in db_entries:
         await pool.execute(db_entry)
 
@@ -799,17 +809,28 @@ class PostgresController():
     Report Stuff
     """
 
-    async def add_user_report(self, user_id):
+    async def get_all_user_reports(self):
+        """
+        Grab all user reports
+        """
+
+        sql = """
+        SELECT * FROM {}.user_reports;
+        """.format(self.schema)
+
+        return await self.pool.fetch(sql)
+
+    async def add_user_report(self, user_id, message):
         """
         Adds a user report
         """
 
         sql = """
-        INSERT INTO {}.user_reports (report_id, user_id) VALUES (DEFAULT, $1)
+        INSERT INTO {}.user_reports (report_id, user_id, message) VALUES (DEFAULT, $1, $2)
         RETURNING report_id;
         """.format(self.schema)
 
-        return await self.pool.fetchval(sql, user_id)
+        return await self.pool.fetchval(sql, user_id, message)
 
     async def set_report_message_id(self, report_id, message_id):
         """
@@ -821,8 +842,20 @@ class PostgresController():
         SET message_id = $1
         WHERE report_id = $2;
         """.format(self.schema)
-        
+
         await self.pool.execute(sql, message_id, report_id)
+
+    async def set_report_message_content(self, report_id, content):
+        """
+        Sets the content of a report
+        """
+        sql = """
+        UPDATE {}.user_reports
+        SET message = $1
+        WHERE report_id = $2
+        """.format(self.schema)
+
+        await self.pool.execute(sql, content, report_id)
 
     async def add_user_report_response(self, report_id, responder_id):
         """
@@ -849,3 +882,92 @@ class PostgresController():
         """.format(self.schema)
 
         return await self.pool.fetch(sql, report_id)
+
+
+    """
+    BLACKLIST
+    """
+    async def add_blacklist_user_global(self, user_id: int): # noqa
+        """Add blacklisted user.
+
+        Parameters
+        ----------
+        user_id: int
+            id for the user
+
+        Returns
+        ----------
+        boolean
+            success true or false
+        """
+        sql = f"""
+            INSERT INTO {self.schema}.globaluserbl
+                (user_id, currtime) VALUES ($1, DEFAULT)
+                ON CONFLICT (user_id) DO NOTHING;
+        """
+        try:
+            await self.pool.execute(sql,  int(user_id))
+            return True
+        except Exception as e:
+            self.logger.warning(f'Error adding user to blacklist {user_id}: {e}')
+            return False
+
+    async def rem_blacklist_user_global(self, user_id: int): # noqa
+        """Remove blacklisted user.
+
+        Parameters
+        ----------
+        user_id: int
+            id for the user
+
+        Returns
+        ----------
+        boolean
+            success true or false
+        """
+        sql = f"""
+            DELETE FROM {self.schema}.globaluserbl WHERE user_id = $1
+        """
+        try:
+            return await self.pool.execute(sql, int(user_id))
+        except Exception as e:
+            self.logger.warning(f'Error removing blacklist user: {e}')
+            return False
+        return False
+
+    async def get_all_blacklist_users_global(self): # noqa
+        """Get all blacklisted channels.
+
+        Parameters
+        ----------
+
+        Returns
+        ----------
+        list
+            list all of the blacklisted users
+        """
+        sql = f"""
+            SELECT user_id FROM {self.schema}.globaluserbl;
+        """
+        user_list = await self.pool.fetch(sql)
+        user_list = [x['user_id'] for x in user_list]
+        return user_list
+
+    async def is_blacklist_user_global(self, user_id: int):
+        """Check if user is a blacklisted.
+
+        Parameters
+        ----------
+        cmd: str
+            cmd to check
+
+        Returns
+        ----------
+        boolean
+            return status true or false
+        """
+        sql = f"""
+            SELECT * FROM {self.schema}.globaluserbl WHERE user_id = $1;
+        """
+        row = await self.pool.fetchrow(sql, int(user_id))
+        return True if row else False
