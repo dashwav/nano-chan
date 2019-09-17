@@ -3,7 +3,6 @@ Database utility functions.
 """
 from datetime import datetime, timedelta
 from typing import Optional
-import random
 from .enums import Change
 try:
     from asyncpg import Record, InterfaceError, UniqueViolationError, create_pool
@@ -141,6 +140,16 @@ async def make_tables(pool: Pool, schema: str):
     );
     """.format(schema)
 
+    removals = """
+    CREATE TABLE IF NOT EXISTS {}.removals (
+        target_id BIGINT,
+        actor_id BIGINT,
+        channel_id BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (logtime)
+    );
+    """.format(schema)
+
     await pool.execute(reacts)
     await pool.execute(fightclub)
     await pool.execute(spam)
@@ -151,6 +160,7 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(channel_index)
     await pool.execute(reaction_spam)
     await pool.execute(reports)
+    await pool.execute(removals)
 
 
 class PostgresController():
@@ -773,3 +783,17 @@ class PostgresController():
         """.format(self.schema)
 
         return await self.pool.fetch(sql, report_id)
+    async def add_user_removal(self, target_id, actor_id, channel_id):
+        """
+        Logs a removal
+        """
+        sql = """
+        INSERT INTO {}.removals VALUES ($1, $2, $3);
+        """.format(self.schema)
+
+        sql2 = """
+        SELECT COUNT(*) FROM {}.removals
+        WHERE target_id = $1
+        """.format(self.schema)
+        await self.pool.execute(sql, target_id, actor_id, channel_id)
+        return await self.pool.fetchval(sql2, target_id)
