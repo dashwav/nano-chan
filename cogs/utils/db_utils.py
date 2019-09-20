@@ -141,10 +141,28 @@ async def make_tables(pool: Pool, schema: str):
     """.format(schema)
 
     removals = """
-    CREATE TABLE IF NOT EXISTS {}.removals (
-        target_id BIGINT,
-        actor_id BIGINT,
-        channel_id BIGINT,
+    CREATE TABLE IF NOT EXISTS {}.meme_removals (
+        author_id BIGINT,
+        message_id BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (message_id)
+    );
+    """.format(schema)
+
+    meme_ballots = """
+    CREATE TABLE IF NOT EXISTS {}.meme_ballots (
+        initiator_id BIGINT,
+        message_id BIGINT,
+        logtime TIMESTAMP DEFAULT current_timestamp,
+        PRIMARY KEY (message_id)
+    );
+    """.format(schema)
+
+    meme_votes = """
+    CREATE TABLE IF NOT EXISTS {}.meme_votes (
+        votee_id BIGINT,
+        message_id BIGINT,
+        vote SMALLINT,
         logtime TIMESTAMP DEFAULT current_timestamp,
         PRIMARY KEY (logtime)
     );
@@ -161,6 +179,8 @@ async def make_tables(pool: Pool, schema: str):
     await pool.execute(reaction_spam)
     await pool.execute(reports)
     await pool.execute(removals)
+    await pool.execute(meme_votes)
+    await pool.execute(meme_ballots)
 
 
 class PostgresController():
@@ -783,17 +803,50 @@ class PostgresController():
         """.format(self.schema)
 
         return await self.pool.fetch(sql, report_id)
-    async def add_user_removal(self, target_id, actor_id, channel_id):
+
+    async def add_meme_removal(self, target_id, message_id):
         """
         Logs a removal
         """
         sql = """
-        INSERT INTO {}.removals VALUES ($1, $2, $3);
+        INSERT INTO {}.meme_removals VALUES ($1, $2);
         """.format(self.schema)
 
         sql2 = """
-        SELECT COUNT(*) FROM {}.removals
-        WHERE target_id = $1
+        SELECT COUNT(*) FROM {}.meme_removals
+        WHERE author_id = $1
         """.format(self.schema)
-        await self.pool.execute(sql, target_id, actor_id, channel_id)
+        await self.pool.execute(sql, target_id, message_id)
         return await self.pool.fetchval(sql2, target_id)
+
+    async def add_meme_ballot(self, initiator_id, message_id):
+        """
+        Logs a ballot add
+        """
+        sql = """
+        INSERT INTO {}.meme_ballots VALUES ($1, $2);
+        """.format(self.schema)
+
+        sql2 = """
+        SELECT COUNT(*) FROM {}.meme_ballots
+        WHERE initiator_id = $1
+        """.format(self.schema)
+        await self.pool.execute(sql, initiator_id, message_id)
+        return await self.pool.fetchval(sql2, initiator_id)
+
+    async def add_meme_vote(self, votee_id, message_id, vote):
+        """
+        Logs a ballot vote
+        """
+        # TODO: check for duplicate votes
+        sql = """
+        INSERT INTO {}.meme_votes VALUES ($1, $2, $3);
+        """.format(self.schema)
+
+        sql2 = """
+        SELECT COUNT(*), vote FROM {}.meme_votes
+        WHERE message_id = $1
+        GROUP BY vote
+        """.format(self.schema)
+        await self.pool.execute(sql, votee_id, message_id, vote)
+        return await self.pool.fetch(sql2, message_id)

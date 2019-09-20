@@ -61,6 +61,53 @@ class Democracy(commands.Cog):
 
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        """
+        Called when an emoji is added
+        """
+        if payload.user_id in [333344884696285184]:
+            return
+        SHRUG = 623740401764794391
+        UPARROW = 624465937164140564
+        DOWNARROW = 624465662995202052
+        if payload.channel_id not in [366641788292956161]:
+            return
+        if payload.emoji.id == 234444145555406858:
+            channel = self.bot.get_channel(payload.channel_id)
+            user = self.bot.get_user(payload.user_id)
+            message = await channel.fetch_message(payload.message_id)
+            guild = await self.bot.fetch_guild(333342931601588253)
+            shrug = await guild.fetch_emoji(SHRUG)
+            up = await guild.fetch_emoji(UPARROW)
+            down = await guild.fetch_emoji(DOWNARROW)
+
+            #Set up Ballot voting
+            await message.clear_reactions()
+            await message.add_reaction(up)
+            await message.add_reaction(shrug)
+            await message.add_reaction(down)
+
+            await self.bot.postgres_controller.add_meme_ballot(user.id, message.id)
+        elif payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
+            # Down arrow
+            if payload.emoji.id == DOWNARROW:
+                vote = 2
+            # Up arrow
+            if payload.emoji.id == UPARROW:
+                vote = 1
+            # Shrug
+            if payload.emoji.id == SHRUG:
+                vote = 0
+            vote_count = await self.bot.postgres_controller.add_meme_vote(
+                payload.user_id,
+                payload.message_id,
+                vote
+            )
+            # TODO: Delete on certain ratio
+            # TODO: Message on deletion
+            # TODO: Emoji vote removal
+
     @commands.command()
     async def vote(self, ctx, member: GeneralMember):
         """
