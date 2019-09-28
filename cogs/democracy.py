@@ -142,7 +142,6 @@ class Democracy(commands.Cog):
             except Exception as e:
                 self.bot.logger.error(f"Issue deleting bad meme: {e}")
 
-    # TODO: Emoji vote removal
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
         """
@@ -209,82 +208,3 @@ class Democracy(commands.Cog):
         await ballot.add_reaction('\N{WHITE HEAVY CHECK MARK}')
         await ballot.add_reaction('\N{Cross Mark}')
         return ballot
-
-    async def collect_votes(self, ballot: discord.Message, target: discord.Member,
-                            actor: discord.Member):
-        """
-        Collects all votes for a message after 30 seconds
-        """
-        await asyncio.sleep(30)
-        updatedBallot = await ballot.channel.fetch_message(ballot.id)
-        allReactions = updatedBallot.reactions
-        votes = {
-            'yes': 0,
-            'no': 0
-        }
-        for reaction in allReactions:
-            if reaction.emoji == '\N{WHITE HEAVY CHECK MARK}':
-                votes['yes'] += reaction.count
-            elif reaction.emoji == '\N{Cross Mark}':
-                votes['no'] += reaction.count
-        if votes['yes'] + votes['no'] <= 6:
-            # Not enough votes
-            await self.close_vote(updatedBallot, votes)
-            return
-        elif votes['yes'] > votes['no']:
-            # Target gets removed
-            infractions = await self.bot.postgres_controller.add_user_removal(target.id, actor.id, updatedBallot.channel.id)
-            await updatedBallot.delete()
-            return await self.punish(target, ballot.channel, votes, infractions, None)
-        elif votes['yes'] < votes['no']:
-            # Actor is removed
-            infractions = await self.bot.postgres_controller.add_user_removal(actor.id, actor.id, updatedBallot.channel.id)
-            await updatedBallot.delete()
-            return await self.punish(target, ballot.channel, votes, infractions, actor)
-
-    async def close_vote(self, ballot: discord.Message, votes):
-        """
-        Clean up the embed, state the outcome
-        """
-        local_embed = discord.Embed(
-            title=f'⛔ Vote Closed ⛔',
-            colour=0x651111,
-            type='rich')
-        local_embed.description = f'There were not enough reactions to'\
-                                  f' decide an outcome!\n\nYes votes: {votes["yes"]}\nNo votes: {votes["no"]}'
-        await ballot.edit(embed=local_embed)
-
-    async def punish(self, target: discord.Member, channel: discord.TextChannel, votes, infractions, reflection):
-        """
-        Gives the user the purgatory role for x amount of time
-        """
-        if infractions < 5:
-            infractions = 5
-        if reflection:
-            local_embed = discord.Embed(
-                title=f'✅ Vote Closed ✅',
-                colour=0x419400,
-                type='rich')
-            local_embed.description = f'**{reflection.mention} has been removed for trying to remove {target} and failing!**\n\n'\
-                                      f'Yes votes: {votes["yes"]}\nNo votes: {votes["no"]}'
-            shame_role = channel.guild.get_role(self.bot.shame_role)
-            await reflection.add_roles(shame_role)
-            await channel.send(embed=local_embed)
-            purgatory = channel.guild.get_channel(self.bot.purgatory)
-            await purgatory.send(f'Welcome to purgatory {reflection.mention}! You will be let out in {infractions} minutes!')
-            await asyncio.sleep(60 * infractions)
-            await reflection.remove_roles(shame_role)
-        else:
-            local_embed = discord.Embed(
-                title=f'✅ Vote Closed ✅',
-                colour=0x419400,
-                type='rich')
-            local_embed.description = f'**{target.mention} has been removed!**\n\n'\
-                                      f'Yes votes: {votes["yes"]}\nNo votes: {votes["no"]}'
-            shame_role = channel.guild.get_role(self.bot.shame_role)
-            await target.add_roles(shame_role)
-            await channel.send(embed=local_embed)
-            purgatory = channel.guild.get_channel(self.bot.purgatory)
-            await purgatory.send(f'Welcome to purgatory {target.mention}! You will be let out in {infractions} minutes!')
-            await asyncio.sleep(60 * infractions)
-            await target.remove_roles(shame_role)
