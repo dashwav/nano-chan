@@ -905,6 +905,9 @@ class PostgresController():
                 (user_id, currtime) VALUES ($1, DEFAULT)
                 ON CONFLICT (user_id) DO NOTHING;
         """
+        inbl = await self.is_blacklist_user_global(user_id)
+        if inbl:
+            return False
         try:
             await self.pool.execute(sql,  int(user_id))
             return True

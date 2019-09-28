@@ -8,6 +8,7 @@ from discord.ext import commands
 from discord.utils import find
 from .utils import helpers, checks
 from .utils.enums import Action
+from .utils.functions import extract_id
 
 
 class MemberID(commands.Converter):
@@ -189,3 +190,158 @@ class Moderation(commands.Cog):
             await channel.set_permissions(user, read_messages=False)
         except Exception as e:
             self.bot.logger.warning(f'{e}')
+
+    """
+    BLACKLIST
+    """
+    @commands.group(aliases=['blgu'], pass_context=True)
+    @checks.has_permissions(manage_roles=True)
+    async def blacklistglobaluser(self, ctx):
+        """Add or remove a user to blacklist global list.
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        """
+        if ctx.invoked_subcommand is None:
+            users = await self.bot.postgres_controller.get_all_blacklist_users_global()
+            if isinstance(users, type(None)):
+                users = []
+            if len(users) > 0:
+                title = 'Users in global blacklist'
+                desc = '<@'
+                desc += '>, <@'.join(map(str, users))
+                desc += '>'
+            else:
+                desc = ''
+                title = 'No users in global blacklist'
+            embed = discord.Embed(
+                title=title,
+                description=desc
+            )
+            await ctx.send(embed=embed)
+
+    @blacklistglobaluser.command(name='add', pass_context=True)
+    async def _blgua(self, ctx: commands.Context, *, uids: str=None):
+        """Add user to global blacklist.
+
+        Parameters
+        ----------
+        uids: str
+            List of id, comma separated
+
+        Returns
+        -------
+        """
+        added_users = []
+        msg = uids.replace(' ', '')
+        if ',' in msg:
+            users = [extract_id(x, 'member') for x in msg.split(',')]
+        else:
+            users = [extract_id(msg, 'member')]
+        users = [x for x in users if x != '']
+
+        try:
+            for user in users:
+                if int(user) in self.bot.dm_forward:
+                    continue
+                success = await self.bot.postgres_controller.add_blacklist_user_global(user)
+                if success:
+                    added_users.append(user)
+            if added_users:
+                self.bot.blglobal += list(map(int, added_users))
+                title = 'Users added into global blacklist'
+                desc = '<@'
+                desc += '>, <@'.join(map(str, added_users))
+                desc += '>'
+                embed = discord.Embed(
+                    title=title,
+                    description=desc + '\nBy mod:' + str(ctx.author.mention),
+                )
+            else:
+                self.bot.logger.info(f'Error adding users to global blacklist')
+                return
+        except Exception as e:
+            self.bot.logger.info(f'Error adding users to global blacklist {e}')
+        try:
+            await ctx.send(embed=embed)
+        except Exception as e:
+            self.bot.logger.info(f'Error sending embed to modlog {e}')
+        try:
+            if added_users:
+                for user_id in self.bot.dm_forward:
+                    user = await self.bot.fetch_user(user_id)
+                    await user.create_dm()
+                    await user.dm_channel.send(embed=embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Issue forwarding dm: {e}')
+
+    @blacklistglobaluser.command(name='remove', aliases=['rem', 'del', 'rm'])
+    async def _blgur(self, ctx: commands.Context, *, uids: str=None):
+        """Removes a user from the blacklist.
+
+        Parameters
+        ----------
+        uids: str
+            List of id, comma separated
+
+        Returns
+        -------
+        """
+        removed_users = []
+        user_notfound = []
+        msg = uids.replace(' ', '')
+        if ',' in msg:
+            users = [extract_id(x, 'member') for x in msg.split(',')]
+        else:
+            users = [extract_id(msg, 'member')]
+        print(users)
+
+        try:
+            for user in users:
+                success = False
+                try:
+                    success = await self.bot.postgres_controller.rem_blacklist_user_global(user)
+                    if success:
+                        self.bot.blglobal.remove(int(user))
+                        removed_users.append(user)
+                    else:
+                        user_notfound.append(user)
+                except:
+                    user_notfound.append(user)
+
+            fields = []
+            if removed_users:
+                fields.append(['PASS', ', '.join([f'<@{x}>' for x in removed_users])])
+            if user_notfound:
+                fields.append(['FAIL', ', '.join([f'<@{x}>' for x in user_notfound])])
+            title = 'Users blacklisting'
+            desc = ''
+            embeds = discord.Embed(
+                title=title,
+                description=desc + '\nBy mod:' + str(ctx.author.mention)
+            )
+            for field in fields:
+                embeds.add_field(
+                    name = field[0],
+                    value = field[1],
+                    inline = True
+                )
+        except Exception as e:
+            self.bot.logger.warning(f'Issue removing users from ' +
+                                    f'global blacklist: {e}')
+        try:
+            await ctx.send(embed=embeds)
+        except Exception as e:
+            self.bot.logger.info(f'Error sending embed to modlog {e}')
+        try:
+            if removed_users:
+                for user_id in self.bot.dm_forward:
+                    user = await self.bot.fetch_user(user_id)
+                    await user.create_dm()
+                    await user.dm_channel.send(embed=embeds)
+        except Exception as e:
+            self.bot.logger.warning(f'Issue forwarding dm: {e}')
+
