@@ -40,8 +40,9 @@ class Nanochan(Bot):
         self.dm_forward = config['dm_forward']
         self.timeout_id = misc_config['timeout_id']
         self.democracy = misc_config['democracy']
-        self.purgatory = misc_config['purgatory']
-        self.shame_role = misc_config['shame_role']
+        self.good_meme_channel = misc_config['good_memes_only']
+        self.vote_ratio = misc_config['meme_goodness_ratio']
+        self.vote_total = misc_config['meme_participation_points']
         self.logger = logger
         super().__init__('-')
 

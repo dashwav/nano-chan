@@ -3,8 +3,8 @@ timeout_id: 335854217300541440
 # Guild ID
 democracy: 148606162810568704
 
-# Channel_id
-purgatory: 562029985402191872
+good_memes_only: 1234567
 
-# Role_id
-shame_role: 562030119741423627
+meme_goodness_ratio: .5
+
+meme_participation_points: 10

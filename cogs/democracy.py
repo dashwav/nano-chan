@@ -62,6 +62,30 @@ class Democracy(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        #TODO: abstract to config file
+        if message.channel.id != self.bot.good_meme_channel:
+            return
+        SHRUG = 623740401764794391
+        UPARROW = 624465937164140564
+        DOWNARROW = 624465662995202052
+        guild = await self.bot.fetch_guild(333342931601588253)
+        shrug = await guild.fetch_emoji(SHRUG)
+        up = await guild.fetch_emoji(UPARROW)
+        down = await guild.fetch_emoji(DOWNARROW)
+
+        #Set up Ballot voting
+        await message.clear_reactions()
+        await message.add_reaction(up)
+        await message.add_reaction(shrug)
+        await message.add_reaction(down)
+
+        await self.bot.postgres_controller.add_meme_ballot(
+            message.author.id, message.id)
+
+    @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         """
         Called when an emoji is added
@@ -75,23 +99,9 @@ class Democracy(commands.Cog):
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
         #TODO: abstract to config file
-        if payload.channel_id not in [366641788292956161]:
+        if payload.channel_id not in [self.bot.good_meme_channel]:
             return
-        #TODO: abstract to config file
-        if payload.emoji.id == 234444145555406858:
-            guild = await self.bot.fetch_guild(333342931601588253)
-            shrug = await guild.fetch_emoji(SHRUG)
-            up = await guild.fetch_emoji(UPARROW)
-            down = await guild.fetch_emoji(DOWNARROW)
-
-            #Set up Ballot voting
-            await message.clear_reactions()
-            await message.add_reaction(up)
-            await message.add_reaction(shrug)
-            await message.add_reaction(down)
-
-            await self.bot.postgres_controller.add_meme_ballot(user.id, message.id)
-        elif payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
+        if payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
             # Down arrow
             if payload.emoji.id == DOWNARROW:
                 vote = 2
@@ -123,12 +133,12 @@ class Democracy(commands.Cog):
 
             # There needs to be at least this many votes
             #TODO: abstract to config file
-            if total_votes < 8:
+            if total_votes < self.bot.vote_total:
                 return
 
             # NO votes ratio for removal
             #TODO: abstract to config file
-            if no_ratio < .5:
+            if no_ratio < self.bot.vote_ratio:
                 return
             try:
                 self.bot.logger.debug(f"Okay hit it lmao \nyes votes: {keep_votes} no votes: {no_count}")
@@ -156,7 +166,7 @@ class Democracy(commands.Cog):
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
         #TODO: abstract to config file
-        if payload.channel_id not in [366641788292956161]:
+        if payload.channel_id not in [self.bot.good_meme_channel]:
             return
         #TODO: abstract to config file
         if payload.emoji.id not in [SHRUG, UPARROW, DOWNARROW]:
@@ -178,33 +188,3 @@ class Democracy(commands.Cog):
             )
         except Exception as e:
             self.bot.logger.error(f"Error removing vote: {e}")
-
-    @commands.command()
-    async def vote(self, ctx, member: GeneralMember):
-        """
-        Begins a vote on a user
-        """
-        if ctx.channel.id not in [282640120388255744, 148609211977302017, 562007838331895813]:
-            return
-        if member.id == ctx.author.id:
-            return
-        if member.bot:
-            return
-        has_role = discord.utils.find(lambda role: role.id == self.bot.shame_role, member.roles)
-        if has_role:
-            ctx.send(f'{member.display} is already removed!', delete_after=4)
-        ballot = await self.enact_democracy(member, ctx.channel)
-        self.bot.loop.create_task(
-            self.collect_votes(ballot, member, ctx.author))
-
-    async def enact_democracy(self, user: discord.Member, channel):
-        local_embed = discord.Embed(
-            title=f'❗ Vote Started ❗',
-            colour=0xF26E00,
-            type='rich')
-        local_embed.description = f' {user.mention} is being voted into purgatory, react to this message to cast your vote\n'\
-            '\n\n*Vote closing in 30 seconds...*'
-        ballot = await channel.send(embed=local_embed)
-        await ballot.add_reaction('\N{WHITE HEAVY CHECK MARK}')
-        await ballot.add_reaction('\N{Cross Mark}')
-        return ballot
