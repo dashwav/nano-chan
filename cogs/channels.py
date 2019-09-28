@@ -46,17 +46,16 @@ class Channels(commands.Cog):
             return
         await self.bot.postgres_controller.fix_channel_message()  # add a column
         for row in self.bot.chanreact:
-            target, message_id, host_channel = row
-            channel = self.bot.get_channel(int(host_channel))
+            channel = self.bot.get_channel(int(row['host_channel']))
             if not channel:
                 continue
-            og_message = await channel.fetch_message(int(message_id))
+            og_message = await channel.fetch_message(int(row['message_id']))
             if not og_message:
                 continue
             reaction = og_message.reactions[0]
             users = await reaction.users().flatten()
             users = ','.join([str(x.id) for x in users if not x.bot])
-            await self.bot.postgres_controller.add_user_chanreact(users, ctx.channel.id, target)
+            await self.bot.postgres_controller.add_user_chanreact(users, ctx.channel.id, row['target_channel'])
 
 
     @channel_message.command(aliases=['add'])
@@ -76,7 +75,7 @@ class Channels(commands.Cog):
         await message.add_reaction(self.reaction_emojis[0])
         try:
             await self.bot.postgres_controller.add_channel_message(message.id, target_channel.id, ctx.channel.id)
-            self.bot.chanreact.append((target_channel.id, message.id, ctx.channel.id))
+            self.bot.chanreact.append({'target_channel': target_channel.id, 'message_id': message.id, 'host_channel': ctx.channel.id})
         except UniqueViolationError:
             await message.delete()
             await ctx.send(
@@ -102,25 +101,38 @@ class Channels(commands.Cog):
         og_message = await ctx.channel.fetch_message(int(message_id))
 
         try:
-            await self.rm_channel_chanreact(target_channel, ctx.channel.id)
+            # removes the channel watching from the db
+            await self.bot.postgres_controller.rm_channel_chanreact(target_channel, ctx.channel.id)
         except:
             pass
         try:
+            # resets the perms
             await target_channel.edit(sync_permissions=True)
         except:
             pass
+
+        for i in range(len(self.bot.chanreact)):
+            # removes the channel from the bot cacheing
+            if self.bot.chanreact[i]['message_id'] == message_id and \
+               self.bot.chanreact[i]['host_channel'] == ctx.channel.id and \
+               self.bot.chanreact[i]['target_channel'] == target_channel.id:
+                del self.bot.chanreact[i]
+                break
+
         await og_message.delete()
-        await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id)
-        del self.bot.chanreact[self.bot.chanreact.index((target_channel.id, og_message.id, ctx.channel.id))]
+        await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id) # removes the channel for user watching
         await ctx.message.delete()
 
     @channel_message.command()
     async def edit(self, ctx, target_channel: discord.TextChannel, *, edit: str):
+        """
+        Edits the channel description.
+        """
         if not isinstance(target_channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -136,13 +148,13 @@ class Channels(commands.Cog):
     @channel_message.command(aliases=['fix'])
     async def update(self, ctx, target_channel: discord.TextChannel):
         """
-        This will update the title of the embed to the currrent title of the channel
+        This will update the title of the embed to the current title of the channel
         """
         if not isinstance(target_channel, discord.TextChannel):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -164,7 +176,7 @@ class Channels(commands.Cog):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -186,7 +198,7 @@ class Channels(commands.Cog):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -213,7 +225,7 @@ class Channels(commands.Cog):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -241,7 +253,7 @@ class Channels(commands.Cog):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = ([x for x in self.bot.chanreact if (x[0], x[-1]) == (ctx.channel.id, target_channel.id)])[0][1]
+            message_id = ([x for x in self.bot.chanreact if (x['host_channel'], x['target_channel']) == (ctx.channel.id, target_channel.id)])[0]['message_id']
         except:
             await ctx.send("something broke", delete_after=3)
             return
@@ -264,9 +276,9 @@ class Channels(commands.Cog):
         """
         Called when an emoji is added
         """
-        if not any([True if (payload.channel_id, payload.message_id) == (x[-1], x[1]) else False for x in self.bot.chanreact]):
+        if not any([True if (payload.channel_id, payload.message_id) == (x['host_channel'], x['message_id']) else False for x in self.bot.chanreact]):
             return
-        target_channel = ([x for x in self.bot.chanreact if (x[-1], x[1]) == (payload.channel_id, payload.message_id)])[0][0]
+        target_channel = ([x for x in self.bot.chanreact if (x['host_channel'], x['message_id']) == (payload.channel_id, payload.message_id)])[0]['target_channel']
         if not target_channel:
             return
         user = self.bot.get_user(payload.user_id)
@@ -289,9 +301,9 @@ class Channels(commands.Cog):
         """
         Called when an emoji is removed
         """
-        if not any([True if (payload.channel_id, payload.message_id) == (x[-1], x[1]) else False for x in self.bot.chanreact]):
+        if not any([True if (payload.channel_id, payload.message_id) == (x['host_channel'], x['message_id']) else False for x in self.bot.chanreact]):
             return
-        target_channel = ([x for x in self.bot.chanreact if (x[-1], x[1]) == (payload.channel_id, payload.message_id)])[0][0]
+        target_channel = ([x for x in self.bot.chanreact if (x['host_channel'], x['message_id']) == (payload.channel_id, payload.message_id)])[0]['target_channel']
         if not target_channel:
             return
         channel = self.bot.get_channel(target_channel)

@@ -44,6 +44,13 @@ class Nanochan(Bot):
         self.blglobal = blacklist
         super().__init__('-')
 
+    @staticmethod
+    def _record_to_dict(rec) -> dict:
+        ret = {}
+        for key, val in rec.items():
+            ret[key] = int(val)
+        return ret
+
     @classmethod
     async def get_instance(cls):
         """
@@ -65,7 +72,7 @@ class Nanochan(Bot):
             logger=logger, connect_kwargs=postgres_cred)
         blgu = await postgres_controller.get_all_blacklist_users_global()
         chanreact = await postgres_controller.get_all_channels()
-        chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
+        chanreact = [cls._record_to_dict(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
         return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
 
     @classmethod
@@ -89,7 +96,7 @@ class Nanochan(Bot):
             logger=logger, connect_kwargs=postgres_cred)
         chanreact = await postgres_controller.get_all_channels()
         blgu = await postgres_controller.get_all_blacklist_users_global()
-        chanreact = [tuple(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
+        chanreact = [cls._record_to_dict(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
         return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
 
     def start_bot(self, cogs):
