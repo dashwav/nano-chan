@@ -66,17 +66,19 @@ class Democracy(commands.Cog):
         """
         Called when an emoji is added
         """
-        if payload.user_id in [333344884696285184]:
+        if payload.user_id in [333344884696285184, 333803905337262080]:
             return
+        channel = self.bot.get_channel(payload.channel_id)
+        user = self.bot.get_user(payload.user_id)
+        message = await channel.fetch_message(payload.message_id)
         SHRUG = 623740401764794391
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
+        #TODO: abstract to config file
         if payload.channel_id not in [366641788292956161]:
             return
+        #TODO: abstract to config file
         if payload.emoji.id == 234444145555406858:
-            channel = self.bot.get_channel(payload.channel_id)
-            user = self.bot.get_user(payload.user_id)
-            message = await channel.fetch_message(payload.message_id)
             guild = await self.bot.fetch_guild(333342931601588253)
             shrug = await guild.fetch_emoji(SHRUG)
             up = await guild.fetch_emoji(UPARROW)
@@ -104,9 +106,43 @@ class Democracy(commands.Cog):
                 payload.message_id,
                 vote
             )
-            # TODO: Delete on certain ratio
-            # TODO: Message on deletion
-            # TODO: Emoji vote removal
+            yes_count = 0
+            no_count = 0
+            shrug_count = 0
+            print(f"voteCOunt: {vote_count}")
+            for votes in vote_count:
+                if votes["vote"] == 0:
+                    shrug_count = votes["count"]
+                elif votes["vote"] == 1:
+                    yes_count = votes["count"]
+                elif votes["vote"] == 2:
+                    no_count = votes["count"]
+            keep_votes = shrug_count + yes_count
+            total_votes = keep_votes + no_count
+            no_ratio = no_count / total_votes
+
+            # There needs to be at least this many votes
+            #TODO: abstract to config file
+            if total_votes < 8:
+                return
+
+            # NO votes ratio for removal
+            #TODO: abstract to config file
+            if no_ratio < .5:
+                return
+            try:
+                self.bot.logger.debug(f"Okay hit it lmao \nyes votes: {keep_votes} no votes: {no_count}")
+                author = message.author
+                await message.delete()
+                await channel.send(f"{author.mention}, your message has been deemed unworthy")
+                await self.bot.postgres_controller.add_meme_removal(
+                    author.id,
+                    message.id
+                )
+            except Exception as e:
+                self.bot.logger.error(f"Issue deleting bad meme: {e}")
+
+    # TODO: Emoji vote removal
 
     @commands.command()
     async def vote(self, ctx, member: GeneralMember):
