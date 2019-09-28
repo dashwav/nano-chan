@@ -143,6 +143,42 @@ class Democracy(commands.Cog):
                 self.bot.logger.error(f"Issue deleting bad meme: {e}")
 
     # TODO: Emoji vote removal
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        """
+        Called when an emoji is removed
+        """
+        if payload.user_id in [333344884696285184, 333803905337262080]:
+            return
+        channel = self.bot.get_channel(payload.channel_id)
+        user = self.bot.get_user(payload.user_id)
+        message = await channel.fetch_message(payload.message_id)
+        SHRUG = 623740401764794391
+        UPARROW = 624465937164140564
+        DOWNARROW = 624465662995202052
+        #TODO: abstract to config file
+        if payload.channel_id not in [366641788292956161]:
+            return
+        #TODO: abstract to config file
+        if payload.emoji.id not in [SHRUG, UPARROW, DOWNARROW]:
+            return
+        # Down arrow
+        if payload.emoji.id == DOWNARROW:
+            vote = 2
+        # Up arrow
+        if payload.emoji.id == UPARROW:
+            vote = 1
+        # Shrug
+        if payload.emoji.id == SHRUG:
+            vote = 0
+        try:
+            await self.bot.postgres_controller.rem_meme_vote(
+                user.id,
+                message.id,
+                vote
+            )
+        except Exception as e:
+            self.bot.logger.error(f"Error removing vote: {e}")
 
     @commands.command()
     async def vote(self, ctx, member: GeneralMember):

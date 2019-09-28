@@ -850,3 +850,14 @@ class PostgresController():
         """.format(self.schema)
         await self.pool.execute(sql, votee_id, message_id, vote)
         return await self.pool.fetch(sql2, message_id)
+
+    async def rem_meme_vote(self, votee_id, message_id, vote):
+        """
+        Logs a ballot vote
+        """
+        # TODO: check for duplicate votes
+        sql = """
+        DELETE FROM {}.meme_votes 
+        WHERE votee_id = $1 AND message_id = $2 AND vote = $3;
+        """.format(self.schema)
+        return await self.pool.execute(sql, votee_id, message_id, vote)
