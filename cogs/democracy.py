@@ -76,7 +76,10 @@ class Democracy(commands.Cog):
         if message.channel.id != self.bot.good_meme_channel:
             return
         if not message.attachments:
-            return
+            if "http" in message.content:
+                pass
+            else:
+                return
         SHRUG = 623740401764794391
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
@@ -181,7 +184,10 @@ class Democracy(commands.Cog):
         if payload.channel_id not in [self.bot.good_meme_channel]:
             return
         if not message.attachments:
-            return
+            if "http" in message.content:
+                pass
+            else:
+                return
         if payload.emoji.id not in [SHRUG, UPARROW, DOWNARROW]:
             return
         # Down arrow
