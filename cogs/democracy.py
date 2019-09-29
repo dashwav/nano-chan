@@ -65,8 +65,15 @@ class Democracy(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-        #TODO: abstract to config file
+        if isinstance(message.channel, discord.DMChannel):
+            message_content = message.content
+            if message_content.split(' ')[0].lower() == "remove":
+                #TODO: add remove vote
+            elif message_content.split(' ')[0].lower() == "keep":
+                #TODO: add keep vote
         if message.channel.id != self.bot.good_meme_channel:
+            return
+        if not message.attachments:
             return
         SHRUG = 623740401764794391
         UPARROW = 624465937164140564
