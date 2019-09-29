@@ -5,6 +5,7 @@ I love democracy
 import discord
 import asyncio
 import re
+import io
 from discord.ext import commands
 from .utils import checks
 
@@ -218,10 +219,11 @@ class Democracy(commands.Cog):
             if not message.attachments:
                 return
             for bad_meme in message.attachments:
-                file_meme = await bad_meme.read()
+                buff = io.bytesio()
+                bad_meme.save(buff)
                 return await misc.send(
                     f'A meme has been voted out of the `good` meme channel',
-                    file=discord.File(file_meme)
+                    file=discord.File(buff)
                 )
         except Exception as e:
             self.bot.logger.error(f"Holy fuck something broke: {e}")
