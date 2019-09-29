@@ -218,13 +218,10 @@ class Democracy(commands.Cog):
             if not message.attachments:
                 return
             for bad_meme in message.attachments:
+                file_meme = await bad_meme.read()
                 return await misc.send(
                     f'A meme has been voted out of the `good` meme channel',
-                    file=bad_meme
-                )
-                return await misc.send(
-                    f'A meme has been voted out of the `good` meme channel',
-                    file=bad_meme
+                    file=discord.File(file_meme)
                 )
         except Exception as e:
             self.bot.logger.error(f"Holy fuck something broke: {e}")
