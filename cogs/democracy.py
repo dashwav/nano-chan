@@ -69,8 +69,10 @@ class Democracy(commands.Cog):
             message_content = message.content
             if message_content.split(' ')[0].lower() == "remove":
                 #TODO: add remove vote
+                pass
             elif message_content.split(' ')[0].lower() == "keep":
                 #TODO: add keep vote
+                pass
         if message.channel.id != self.bot.good_meme_channel:
             return
         if not message.attachments:
