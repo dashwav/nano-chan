@@ -109,7 +109,7 @@ class Democracy(commands.Cog):
         DOWNARROW = 624465662995202052
         if payload.channel_id not in [self.bot.good_meme_channel]:
             return
-        if not message.attachments:
+        if not message.attachments or not(".com" in message.content):
             return
         if payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
             # Down arrow
