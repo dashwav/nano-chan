@@ -159,6 +159,7 @@ class Democracy(commands.Cog):
             try:
                 self.bot.logger.debug(f"Okay hit it lmao \nyes votes: {keep_votes} no votes: {no_count}")
                 author = message.author
+                await self.reposty(message)
                 await message.delete()
                 await channel.send(f"{author.mention}, your message has been deemed unworthy")
                 await self.bot.postgres_controller.add_meme_removal(
@@ -207,3 +208,23 @@ class Democracy(commands.Cog):
             )
         except Exception as e:
             self.bot.logger.error(f"Error removing vote: {e}")
+
+    async def reposty(self, message):
+        try:
+            misc = self.bot.get_channel(self.bot.bad_meme_channel)
+            if not message.attachments:
+                return
+            for bad_meme in message.attachments:    misc = self.bot.get_channel(self.bot.bad_meme_channel)
+            if not message.attachments:
+                return
+            for bad_meme in message.attachments:
+                return await misc.send(
+                    f'A meme has been voted out of the `good` meme channel',
+                    file=bad_meme
+                )
+                return await misc.send(
+                    f'A meme has been voted out of the `good` meme channel',
+                    file=bad_meme
+                )
+        except Exception as e:
+            self.bot.logger.error(f"Holy fuck something broke: {e}")

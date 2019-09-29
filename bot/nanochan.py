@@ -41,6 +41,7 @@ class Nanochan(Bot):
         self.timeout_id = misc_config['timeout_id']
         self.democracy = misc_config['democracy']
         self.good_meme_channel = misc_config['good_memes_only']
+        self.bad_meme_channel = misc_config['bad_memes_only']
         self.vote_ratio = misc_config['meme_goodness_ratio']
         self.vote_total = misc_config['meme_participation_points']
         self.logger = logger
