@@ -90,9 +90,9 @@ class Democracy(commands.Cog):
 
         #Set up Ballot voting
         await message.clear_reactions()
-        await message.add_reaction(up)
-        await message.add_reaction(shrug)
-        await message.add_reaction(down)
+        # await message.add_reaction(up)
+        # await message.add_reaction(shrug)
+        # await message.add_reaction(down)
 
         await self.bot.postgres_controller.add_meme_ballot(
             message.author.id, message.id)
