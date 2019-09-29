@@ -220,7 +220,7 @@ class Democracy(commands.Cog):
                 return
             for bad_meme in message.attachments:
                 buff = io.BytesIO()
-                bad_meme.save(buff)
+                await bad_meme.save(buff)
                 return await misc.send(
                     f'A meme has been voted out of the `good` meme channel',
                     file=discord.File(buff)
