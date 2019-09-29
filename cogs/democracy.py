@@ -111,7 +111,7 @@ class Democracy(commands.Cog):
             return
         if not message.attachments:
             if "http" in message.content:
-                continue
+                pass
             else:
                 return
         if payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
