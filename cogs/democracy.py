@@ -107,8 +107,9 @@ class Democracy(commands.Cog):
         SHRUG = 623740401764794391
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
-        #TODO: abstract to config file
         if payload.channel_id not in [self.bot.good_meme_channel]:
+            return
+        if not message.attachments:
             return
         if payload.emoji.id in [DOWNARROW, UPARROW, SHRUG]:
             # Down arrow
@@ -174,10 +175,10 @@ class Democracy(commands.Cog):
         SHRUG = 623740401764794391
         UPARROW = 624465937164140564
         DOWNARROW = 624465662995202052
-        #TODO: abstract to config file
         if payload.channel_id not in [self.bot.good_meme_channel]:
             return
-        #TODO: abstract to config file
+        if not message.attachments:
+            return
         if payload.emoji.id not in [SHRUG, UPARROW, DOWNARROW]:
             return
         # Down arrow
