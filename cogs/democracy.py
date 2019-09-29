@@ -160,7 +160,7 @@ class Democracy(commands.Cog):
             try:
                 self.bot.logger.debug(f"Okay hit it lmao \nyes votes: {keep_votes} no votes: {no_count}")
                 author = message.author
-                await self.reposty(message)
+                await self.reposty(message, no_count)
                 await message.delete()
                 await channel.send(f"{author.mention}, your message has been deemed unworthy")
                 await self.bot.postgres_controller.add_meme_removal(
