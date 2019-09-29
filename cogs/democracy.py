@@ -210,7 +210,7 @@ class Democracy(commands.Cog):
         except Exception as e:
             self.bot.logger.error(f"Error removing vote: {e}")
 
-    async def reposty(self, message):
+    async def reposty(self, message, votes):
         try:
             misc = self.bot.get_channel(self.bot.bad_meme_channel)
             if not message.attachments:
@@ -222,8 +222,8 @@ class Democracy(commands.Cog):
                 buff = io.BytesIO()
                 await bad_meme.save(buff)
                 return await misc.send(
-                    f'A meme has been voted out of the `good` meme channel',
-                    file=discord.File(buff)
+                    f'{votes} people voted this meme off the island, it washed up here',
+                    file=discord.File(buff, filename=bad_meme.filename)
                 )
         except Exception as e:
             self.bot.logger.error(f"Holy fuck something broke: {e}")
