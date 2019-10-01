@@ -127,7 +127,7 @@ class Democracy(commands.Cog):
                 vote = 1
             # Shrug
             if payload.emoji.id == SHRUG:
-                vote = 0
+                return
             vote_count = await self.bot.postgres_controller.add_meme_vote(
                 payload.user_id,
                 payload.message_id,
@@ -150,7 +150,7 @@ class Democracy(commands.Cog):
 
             # There needs to be at least this many votes
             #TODO: abstract to config file
-            if total_votes < self.bot.vote_total:
+            if no_count < self.bot.vote_total:
                 return
 
             # NO votes ratio for removal
