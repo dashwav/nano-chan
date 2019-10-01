@@ -186,6 +186,7 @@ class Democracy(commands.Cog):
         if payload.channel_id not in [self.bot.good_meme_channel]:
             return
         if not message.attachments:
+Writing objects: 100% (4/4), 380 bytes | 380.0
             if "http" in message.content:
                 pass
             else:
@@ -212,17 +213,16 @@ class Democracy(commands.Cog):
 
     async def reposty(self, message, votes):
         try:
-            misc = self.bot.get_channel(self.bot.bad_meme_channel)
-            if not message.attachments:
-                return
-            for bad_meme in message.attachments:    misc = self.bot.get_channel(self.bot.bad_meme_channel)
+            dms = message.author.dm_channel
+            if not dms:
+                dms = await message.author.create_dm()
             if not message.attachments:
                 return
             for bad_meme in message.attachments:
                 buff = io.BytesIO()
                 await bad_meme.save(buff)
-                return await misc.send(
-                    f'{votes} people voted this meme off the island, it washed up here',
+                return await dms.send(
+                    f'{votes} people voted this meme off the island, sorry buddy',
                     file=discord.File(buff, filename=bad_meme.filename)
                 )
         except Exception as e:
