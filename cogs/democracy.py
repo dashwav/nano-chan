@@ -162,7 +162,7 @@ class Democracy(commands.Cog):
                 author = message.author
                 await self.reposty(message, no_count)
                 await message.delete()
-                await channel.send(f"{author.mention}, your message has been deemed unworthy")
+                # await channel.send(f"{author.mention}, your message has been deemed unworthy")
                 await self.bot.postgres_controller.add_meme_removal(
                     author.id,
                     message.id
