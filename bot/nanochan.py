@@ -45,7 +45,7 @@ class Nanochan(Bot):
         self.vote_ratio = misc_config['meme_goodness_ratio']
         self.vote_total = misc_config['meme_participation_points']
         self.logger = logger
-        super().__init__('-')
+        super().__init__('?!')
 
     @classmethod
     async def get_instance(cls):
