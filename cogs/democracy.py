@@ -186,7 +186,6 @@ class Democracy(commands.Cog):
         if payload.channel_id not in [self.bot.good_meme_channel]:
             return
         if not message.attachments:
-Writing objects: 100% (4/4), 380 bytes | 380.0
             if "http" in message.content:
                 pass
             else:
