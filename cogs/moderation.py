@@ -2,6 +2,8 @@
 This cog is the moderation toolkit this is for tasks such as
 kicking/banning users.
 """
+import logging
+
 import discord
 from discord import HTTPException
 from discord.ext import commands
@@ -297,7 +299,7 @@ class Moderation(commands.Cog):
             users = [extract_id(x, 'member') for x in msg.split(',')]
         else:
             users = [extract_id(msg, 'member')]
-        print(users)
+        logging.info(users)
 
         try:
             for user in users:

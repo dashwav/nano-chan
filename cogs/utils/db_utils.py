@@ -1,6 +1,8 @@
 """
 Database utility functions.
 """
+import logging
+
 from datetime import datetime, timedelta
 from typing import Optional
 import random
@@ -11,7 +13,7 @@ try:
 except ImportError:
     Record = None
     Pool = None
-    print('asyncpg not installed, PostgresSQL function not available.')
+    logging.error('asyncpg not installed, PostgresSQL function not available.')
 
 
 def parse_record(record: Record) -> Optional[tuple]:
