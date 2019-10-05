@@ -1,8 +1,8 @@
-""" 
-Misc commands that I want to run 
-""" 
-import discord 
-from discord.ext import commands 
+"""
+Misc commands that I want to run
+"""
+import discord
+from discord.ext import commands
 from .utils import checks
 
 
@@ -24,12 +24,11 @@ class Owner(commands.Cog):
             await self.bot.change_presence(game=discord.Game(name=game))
         ctx.delete()
 
-
     @commands.command(hidden=True)
     async def echo(self, ctx, channel, *, message):
         """
         Echoes a string into a different channel
-        :params channel: channel to echo into params message: message to 
+        :params channel: channel to echo into params message: message to
         :echo
         """
         is_owner = await ctx.bot.is_owner(ctx.author)
@@ -42,7 +41,8 @@ class Owner(commands.Cog):
             for channel in ctx.message.channel_mentions:
                 await channel.send(f'{message}')
         except Exception as e:
-            ctx.send('Error when trying to send fam')
+            self.logger.warning(f"Error while echoing: {e}")
+            await ctx.send('Error when trying to send fam')
 
     @commands.command(hidden=True)
     @commands.is_owner()
@@ -62,7 +62,8 @@ class Owner(commands.Cog):
         """
         actions = ('rebuildReport',)
         if correction not in actions:
-            await ctx.send('Your action {} was not found in the actionable list: {}'.format(correction, actions))
+            await ctx.send('Your action {} was not found in the actionable \
+                list: {}'.format(correction, actions))
             return
         if correction == 'rebuildReport':
             # Add column to table
@@ -72,14 +73,16 @@ class Owner(commands.Cog):
             """.format(self.bot.postgres_controller.schema)
             try:
                 await self.bot.postgres_controller.pool.execute(sql)
-            except Exception as err:
-                # await ctx.send('Couldn\'t add column to db: {}'.format(err), delete_after=15)
+            except Exception:
+                # await ctx.send('Couldn\'t add column to db: {}'.format(err),\
+                #  delete_after=15)
                 pass
             # gather all user reports
             user_reports = []
             try:
-                user_reports = await self.bot.postgres_controller.get_all_user_reports()
-            except Exception as err:
+                user_reports = await \
+                    self.bot.postgres_controller.get_all_user_reports()
+            except Exception:
                 # await ctx.send(err, delete_after=15)
                 pass
             # Now go through and grab message contents
@@ -88,17 +91,19 @@ class Owner(commands.Cog):
                 # self.bot.logger.info(f'Report {report}')
                 report_message = ''
                 try:
-                    report_message = await ctx.channel.fetch_message(int(report['message_id']))
-                    # self.bomessage_idmessage_idmessage_idt.logger.info(f'Message {report_message}')
+                    report_message = await \
+                        ctx.channel.fetch_message(int(report['message_id']))
                     report_content = report_message.embeds[0].description
-                    self.bot.logger.info('fields: {}'.format(report_message.embeds[0].fields))
+                    self.bot.logger.info('fields: \
+                        {}'.format(report_message.embeds[0].fields))
                     tmp1 = []
                     tmp2 = []
                     for row in report_message.embeds[0].fields:
                         if row.name == 'Attachments':
                             tmp1.append(':=:' + row.value)
                         if row.name == 'Response':
-                            tmp2.append(';=;' + row.value.split('(')[-1].split(')')[0])
+                            tmp2.append(
+                                ';=;' + row.value.split('(')[-1].split(')')[0])
                     report_content += ''.join(tmp1)
                     report_content += ''.join(tmp2)
                 except Exception as err:
@@ -107,8 +112,11 @@ class Owner(commands.Cog):
                 # self.bot.logger.info(report_content)
                 if report_content != '':
                     try:
-                        await self.bot.postgres_controller.set_report_message_content(report['report_id'], report_content)
-                    except Exception as err:
-                        pass # self.bot.logger.warning('Failed: {}'.format(err))
+                        await self.bot.postgres_controller.\
+                            set_report_message_content(
+                                report['report_id'], report_content)
+                    except Exception:
+                        # self.bot.logger.warning('Failed: {}'.format(err))
+                        pass
             await ctx.send('Fixed the db')
         return
