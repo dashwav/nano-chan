@@ -28,7 +28,7 @@ async def confirm(ctx: commands.Context, member_to_kick, reason):
         await confirmation_message.delete()
         await message.delete()
     except Exception as e:
-        print(f'Error in deleting message: {e}')
+        ctx.bot.logger.warning(f'Error in deleting message: {e}')
     return True
 
 
@@ -53,7 +53,7 @@ async def custom_confirm(ctx: commands.Context, custom_message):
         await confirmation_message.delete()
         await message.delete()
     except Exception as e:
-        print(f'Error in deleting message: {e}')
+        ctx.bot.logger.warning(f'Error in deleting message: {e}')
     return True
 
 

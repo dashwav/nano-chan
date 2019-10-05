@@ -297,7 +297,7 @@ class Moderation(commands.Cog):
             users = [extract_id(x, 'member') for x in msg.split(',')]
         else:
             users = [extract_id(msg, 'member')]
-        print(users)
+        self.bot.logger.info(users)
 
         try:
             for user in users:
