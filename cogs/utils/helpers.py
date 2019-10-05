@@ -2,8 +2,6 @@
 Helper functions for nano-chan.
 Did take a few from kitsu-chan and modify them tbh
 """
-import logging
-
 import asyncio
 import discord
 from discord.ext import commands
@@ -29,8 +27,8 @@ async def confirm(ctx: commands.Context, member_to_kick, reason):
     try:
         await confirmation_message.delete()
         await message.delete()
-    except Exception:
-        logging.exception(f'Error in deleting message:')
+    except Exception as e:
+        print(f'Error in deleting message: {e}')
     return True
 
 
@@ -54,8 +52,8 @@ async def custom_confirm(ctx: commands.Context, custom_message):
     try:
         await confirmation_message.delete()
         await message.delete()
-    except Exception:
-        logging.exception(f'Error in deleting message:')
+    except Exception as e:
+        print(f'Error in deleting message: {e}')
     return True
 
 

@@ -1,5 +1,3 @@
-import logging
-
 import discord
 import random as rng
 import asyncio
@@ -136,8 +134,8 @@ class Fightclub(commands.Cog):
                 ctx.message.author)
             if aggressor is None:
                 raise ValueError('aggressor doesnt exist yet')
-        except Exception:
-            logging.exception(f'An error occured getting stats:')
+        except Exception as e:
+            print(f'An error occured getting stats: {e}')
             aggressor = await self.bot.postgres_controller.add_fightclub_member(
                 ctx.message.author, 0)
         try:
@@ -145,8 +143,8 @@ class Fightclub(commands.Cog):
                 target)
             if defender is None:
                 raise ValueError('defender doesnt exist yet')
-        except Exception:
-            logging.exception(f'An error occured getting stats:')
+        except Exception as e:
+            print(f'An error occured getting stats: {e}')
             defender = await self.bot.postgres_controller.add_fightclub_member(
                 target, 0)
         aggro_elo = self.expected(aggressor['elo'], defender['elo'])
