@@ -62,7 +62,7 @@ class Logging(commands.Cog):
                 title=f'DM report from {message.author.name}#{message.author.discriminator}:',
                 description=message.clean_content
             )
-            local_embed.set_footer(text=f'Report ID: {report_id}')
+            local_embed.set_footer(text=f'Report ID: {report_id} | User ID: {message.author.id}')
             if message.attachments:
                 local_embed.add_field(
                     name='Attachments',
