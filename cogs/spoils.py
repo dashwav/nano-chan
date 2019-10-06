@@ -48,10 +48,13 @@ class Spoils(commands.Cog):
                         if channel:
                             async for message in channel.history(limit=1):
                                 if not message.author.bot:
-                                    last_post = datetime.utcnow() - message.created_at
-                                    if last_post > timedelta(seconds=self.wait_time):
+                                    last_post = datetime.utcnow() - \
+                                        message.created_at
+                                    if last_post > \
+                                            timedelta(seconds=self.wait_time):
                                         try:
-                                            await channel.send(embed=local_embed)
+                                            await channel.send(
+                                                embed=local_embed)
                                         except Exception as e:
                                             self.bot.logger.warning(
                                                 f'Error posting to channel'
@@ -63,12 +66,12 @@ class Spoils(commands.Cog):
 
     def create_wall_embed(self, reason=None):
         local_embed = discord.Embed(title='Clear Spoilers', type='rich')
-        temp_description = '\_\_\_'
+        temp_description = '\\_\\_\\_'
         for i in range(60):
             temp_description += ' \n'
         if reason:
-            temp_description += f'\_\_\_\nSpoilers for {reason} above'
+            temp_description += f'\\_\\_\\_\nSpoilers for {reason} above'
         else:
-            temp_description += '\_\_\_\nSpoilers above'
+            temp_description += '\\_\\_\\_\nSpoilers above'
         local_embed.description = temp_description
         return local_embed
