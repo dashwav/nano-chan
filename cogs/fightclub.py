@@ -74,7 +74,7 @@ class Fightclub(commands.Cog):
             for role in ctx.channel.guild.roles:
                 if role.id in [375012340401176586]:
                     for member in role.members:
-                        if member.id % 10 in [1,2,3,4,5]:
+                        if member.id % 10 in [ 1, 2, 3, 4, 5]:
                             team = team_1
                         else:
                             team = team_2
@@ -88,7 +88,7 @@ class Fightclub(commands.Cog):
             await ctx.send('aight nigga we done')
         except Exception as e:
             self.bot.logger.warning(f'fucked up the team shit {e}')
-    
+
     @commands.command()
     @commands.is_owner()
     async def assign(self, ctx):
@@ -110,7 +110,7 @@ class Fightclub(commands.Cog):
         if not team_2:
             await ctx.send('no stealies :sad:')
             return
-        if ctx.author.id % 10 in [1,2,3,4,5]:
+        if ctx.author.id % 10 in [1, 2, 3, 4, 5]:
             team = team_1
         else:
             team = team_2
@@ -210,16 +210,16 @@ class Fightclub(commands.Cog):
                     team_2_elo += entry['elo']
                     team_2_users += 1
                 if entry['userid'] == 164546159140929538:
-                    god_emperor = entry['elo']
+                    # never used; god_emperor = entry['elo']
             total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
             total_def_r = self.ratio(total_def_w, total_def_l)
-            top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
-            top_5_def = sorted(full_list, key=lambda user: user['defwins'], reverse=True)[:5]
+            #never used; top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
+            #never used; top_5_def = sorted(full_list, key=lambda user: user['defwins'], reverse=True)[:5]
             local_embed = discord.Embed(title='Overall Stats', description=f'Offensive Ratio: {total_aggro_r}\nDefensive Ratio: {total_def_r}')
             local_embed.add_field(name='Top 10 (by score)', value=(
                 await self.get_member_string(ctx.guild, 'elo', full_elo[:10])))
             local_embed.add_field(name='Team Scores',
-                value=f'Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}')
+                value=f('Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}')
             await ctx.send(embed=local_embed)
             return
         else:
@@ -245,7 +245,7 @@ class Fightclub(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def full_leaderboard(self, ctx, *, amt: int=80):
+    async def full_leaderboard(self, ctx, *, amt: int = 80):
         if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
         full_list = await self.bot.postgres_controller.get_fightclub_stats()
@@ -257,7 +257,7 @@ class Fightclub(commands.Cog):
                     ctx.guild, 'elo', full_elo))))
             return
         local_embed = discord.Embed(
-            title=f'Top {amt} by elo:',description='')
+            title=f'Top {amt} by elo:', description='')
         count = 1
         while amt/20 > 0:
             local_embed.add_field(name=f'{((count * 20) - 20)} - {((count * 20) - 1)}', value=(await self.get_member_string(
@@ -297,7 +297,7 @@ class Fightclub(commands.Cog):
                 team_2_elo += entry['elo']
                 team_2_users += 1
             if entry['userid'] == 164546159140929538:
-                god_emperor = entry['elo']
+                #never used; god_emperor = entry['elo']
         total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
@@ -337,17 +337,17 @@ class Fightclub(commands.Cog):
         leaderboard_list = all_member_elo.split('\n')
         leaderboard_s = ''
         count = 0
-        board = 1
+        #never used; board = 1
         for user in leaderboard_list:
             if len(leaderboard_s) > 980:
                 count += 1
                 if count > 11:
                     full_leaderboard_embed3.add_field(
-                    name='----', value=leaderboard_s, inline=True)
+                        name='----', value=leaderboard_s, inline=True)
                     leaderboard_s = ''
                 elif count > 5:
                     full_leaderboard_embed2.add_field(
-                    name='----', value=leaderboard_s, inline=True)
+                        name='----', value=leaderboard_s, inline=True)
                     leaderboard_s = ''
                 else:
                     full_leaderboard_embed1.add_field(
@@ -397,7 +397,6 @@ class Fightclub(commands.Cog):
                 continue
             string += (f'**{count}.**  {member["username"]}  ({member[attribute]})\n')
         return string
-
 
     def expected(self, A, B):
         """
