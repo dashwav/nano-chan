@@ -25,14 +25,18 @@ class Pingy(commands.Cog):
         guild_roles = ctx.guild.roles
         found_roles = []
         for role in roles:
-            if role.lower() not in ['dedicated', 'updated', 'moderator', 'admin', 'representative']:
+            if role.lower() not in \
+                    ['dedicated', 'updated', 'moderator',
+                     'admin', 'representative']:
                 continue
-            guild_role = find(lambda m: m.name.lower() == role.lower(), guild_roles)
+            guild_role = find(
+                lambda m: m.name.lower() == role.lower(), guild_roles)
             if not guild_role:
                 continue
             found_roles.append(guild_role)
         if not found_roles:
-            await ctx.send(":joy: lmao no roles there bud :100:", delete_after=3)
+            await ctx.send(
+                ":joy: lmao no roles there bud :100:", delete_after=3)
             await ctx.message.delete()
             return
         mention_str = ""
