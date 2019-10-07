@@ -16,7 +16,8 @@ __all__ = ('extract_id',
 __filename__ = __file__.split('/')[-1].strip('.py')
 __path__ = __file__.strip('.py').strip(__filename__)
 
-def clean_str(argument: str, dtype: str='role'):
+
+def clean_str(argument: str, dtype: str = 'role'):
     argument = str(argument)
     general = argument.replace('<', '').replace('>', '')\
                       .replace('@', '')
@@ -41,12 +42,12 @@ def is_id(argument: str):
     str
         the bare id
     """
-    status = True
+    # status = True
     for x in argument:
         try:
             _ = int(x)
-        except:
-            status = False
+        except Exception:
+            # status = False
             return False
     return True
 
@@ -74,7 +75,7 @@ def get_channel(ctx, argument: str):
             return ctx.guild.get_channel(int(ret))
         if ret:
             return ret
-    except:
+    except Exception:
         return False
 
 
@@ -95,13 +96,13 @@ def get_role(ctx, argument: str):
     try:
         ret = extract_id(argument, 'role')
         if not ret:
-            ret = discord.utils.find(lambda m:
-                (m.name.lower() == cleaned), ctx.guild.roles)
+            ret = discord.utils.find(
+                lambda m: (m.name.lower() == cleaned), ctx.guild.roles)
         else:
             return ctx.guild.get_role(int(ret))
         if ret:
             return ret
-    except:
+    except Exception:
         return False
 
 
@@ -121,7 +122,9 @@ def get_member(ctx, argument: str):
     ret = extract_id(argument, 'member')
     t_st = clean_str(argument, 'member').lower()
     if not ret:
-        ret = discord.utils.find(lambda m: (m.id == ret) or (m.name.lower() == t_st), ctx.guild.members)
+        ret = discord.utils.find(
+            lambda m: (m.id == ret) or (m.name.lower() == t_st),
+            ctx.guild.members)
     else:
         ret = ctx.guild.get_member(int(ret))
     if not ret:
@@ -131,7 +134,8 @@ def get_member(ctx, argument: str):
     else:
         return None
 
-def extract_id(argument: str, dtype: str='member'):
+
+def extract_id(argument: str, dtype: str = 'member'):
     """Check if argument is # or <@#>.
 
     Parameters
@@ -181,7 +185,7 @@ def extract_id(argument: str, dtype: str='member'):
         regex = regexes[i]
         try:
             match = re.finditer(regex, argument, re.MULTILINE)
-        except:
+        except Exception:
             match = None
         i += 1
         if match is None:
