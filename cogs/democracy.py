@@ -149,14 +149,15 @@ class Democracy(commands.Cog):
             no_ratio = no_count / total_votes
 
             # There needs to be at least this many votes
-            #TODO: abstract to config file
             if no_count < self.bot.vote_total:
                 return
 
             # NO votes ratio for removal
-            #TODO: abstract to config file
             if no_ratio < self.bot.vote_ratio:
                 return
+            if no_count < self.bot.vote_total + 5:
+                if no_ratio < .75:
+                    return
             try:
                 self.bot.logger.debug(f"Okay hit it lmao \nyes votes: {keep_votes} no votes: {no_count}")
                 author = message.author
