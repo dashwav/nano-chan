@@ -40,7 +40,7 @@ class Stats(commands.Cog):
                     confirmed_emojis.append(emoji)
         try:
             for emoji in confirmed_emojis:
-                await self.bot.postgres_controller.add_emoji(
+                await self.bot.pg_controller.add_emoji(
                     emoji, message.id, message.author, message.author, message.channel, False, emoji.animated)
         except Exception as e:
             self.bot.logger.warning(f'Error adding emoji to db: {e}')
@@ -55,7 +55,7 @@ class Stats(commands.Cog):
         message = await channel.fetch_message(payload.message_id)
         for server_emoji in channel.guild.emojis:
             if payload.emoji.id == server_emoji.id:
-                await self.bot.postgres_controller.add_emoji(
+                await self.bot.pg_controller.add_emoji(
                     payload.emoji, payload.message_id, user, message.author, channel, True, payload.emoji.animated)
 
     @commands.group(aliases=['s'])
@@ -79,7 +79,7 @@ class Stats(commands.Cog):
         user = ctx.message.author
         user_count = defaultdict(int)
         target_count = defaultdict(int)
-        stats = await self.bot.postgres_controller.get_user_emojis(user, days)
+        stats = await self.bot.pg_controller.get_user_emojis(user, days)
         for record in stats['user']:
             if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
@@ -117,7 +117,7 @@ class Stats(commands.Cog):
         """
         user_count = defaultdict(int)
         target_count = defaultdict(int)
-        stats = await self.bot.postgres_controller.get_user_emojis(user, days)
+        stats = await self.bot.pg_controller.get_user_emojis(user, days)
         for record in stats['user']:
             if record['channel_id'] in [297834395945926667, 329500167118258176, 294248007422181376, 148606162810568704, 227385793637777408, 264704915845283840, 191102386633179136, 378684962934751239, 232371423069339648, 343953048940314625]: #nsfw-roleplay, meta, brainpower
                 continue
@@ -153,7 +153,7 @@ class Stats(commands.Cog):
         """
         Returns stats on an Emoji
         """
-        emoji_stats = await self.bot.postgres_controller.get_emoji_stats(emoji, days)
+        emoji_stats = await self.bot.pg_controller.get_emoji_stats(emoji, days)
         user_count = defaultdict(int)
         target_count = defaultdict(int)
         total_count = 0
@@ -206,7 +206,7 @@ class Stats(commands.Cog):
         Returns top post in timespan with reacts
         """
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
-        all_records = await self.bot.postgres_controller.get_top_post_by_emoji(
+        all_records = await self.bot.pg_controller.get_top_post_by_emoji(
             emoji, days, channel
         )
         l_embed = discord.Embed(
@@ -255,7 +255,7 @@ class Stats(commands.Cog):
         """
         channel_id = channel.id if channel else None
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
-        all_records = await self.bot.postgres_controller.get_top_post_by_emoji_and_user(
+        all_records = await self.bot.pg_controller.get_top_post_by_emoji_and_user(
              user.id, emoji, days, channel_id
         )
         l_embed = discord.Embed(
@@ -304,7 +304,7 @@ class Stats(commands.Cog):
         """
         channel_id = channel.id if channel else None
         day_str = f'in the last {days} days' if days != -1 else f'since forever'
-        all_records = await self.bot.postgres_controller.get_top_post_by_reacts(
+        all_records = await self.bot.pg_controller.get_top_post_by_reacts(
             days, channel_id
         )
         l_embed = discord.Embed(
@@ -354,7 +354,7 @@ class Stats(commands.Cog):
         for emoji in ctx.guild.emojis:
             try:
                 count_dict[emoji] = await \
-                    self.bot.postgres_controller.get_emoji_count(
+                    self.bot.pg_controller.get_emoji_count(
                         emoji, days, self.bot.logger
                     )
             except Exception as e:
@@ -465,7 +465,7 @@ class Stats(commands.Cog):
                     if message.author.bot:
                         continue
                     try:
-                        await self.bot.postgres_controller.add_message(
+                        await self.bot.pg_controller.add_message(
                             message
                         )
                     except Exception as e:

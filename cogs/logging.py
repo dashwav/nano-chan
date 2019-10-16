@@ -55,7 +55,7 @@ class Logging(commands.Cog):
                     desc += f'{file.url}\n'
                     content += f':=:{file.url}'
 
-            report_id = await self.bot.postgres_controller.add_user_report(
+            report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
             mod_info = self.bot.get_channel(259728514914189312)
             local_embed = discord.Embed(
@@ -72,7 +72,7 @@ class Logging(commands.Cog):
             report_message = await mod_info.send(embed=local_embed)
             await mod_info.send(f'You can respond to this report by typing:\n```\n-respond {report_id} <message here>```')
             await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
-            await self.bot.postgres_controller.set_report_message_id(
+            await self.bot.pg_controller.set_report_message_id(
                 report_id, report_message.id
             )
         except Exception as e:
@@ -94,7 +94,7 @@ class Logging(commands.Cog):
             role_diff = set(after.roles) - (set(before.roles))
             for role in role_diff:
                 if role.name.lower() == 'clover':
-                    await self.bot.postgres_controller.add_new_clover(after)
+                    await self.bot.pg_controller.add_new_clover(after)
                     local_embed = discord.Embed(
                             color=0x419400,
                             title='Clover',
@@ -139,20 +139,20 @@ class Logging(commands.Cog):
                 inline=True
             )
         try:
-            report = await self.bot.postgres_controller.get_user_report(report_id)
+            report = await self.bot.pg_controller.get_user_report(report_id)
             user = await self.bot.fetch_user(report[0]["user_id"])
             await user.create_dm()
             await user.dm_channel.send(embed=local_embed)
 
             await ctx.message.add_reaction('\N{WHITE HEAVY CHECK MARK}')
 
-            await self.bot.postgres_controller.add_user_report_response(
+            await self.bot.pg_controller.add_user_report_response(
                 report_id, ctx.author.id)
 
             report_message = await ctx.channel.fetch_message(report[0]['message_id'])
             report_embed = report_message.embeds[0]
             report_embed.add_field(name="Response", value=f"[Link to response]({ctx.message.jump_url})")
-            await self.bot.postgres_controller.set_report_message_content(
+            await self.bot.pg_controller.set_report_message_content(
                 report_id, report[0]['message'] + f';=;{ctx.message.jump_url}')
             await report_message.edit(embed=report_embed)
         except Exception as e:
@@ -165,7 +165,7 @@ class Logging(commands.Cog):
         Rebuild a collapsed report
         """
         try:
-            report = await self.bot.postgres_controller.get_user_report(report_id)
+            report = await self.bot.pg_controller.get_user_report(report_id)
         except:
             await ctx.send('Couldn\'t find this report :(', delete_after=10)
             return
@@ -206,7 +206,7 @@ class Logging(commands.Cog):
                 )
         try:
             message = await ctx.send(embed=local_embed)
-            await self.bot.postgres_controller.set_report_message_id(
+            await self.bot.pg_controller.set_report_message_id(
                 report_id, message.id
             )
         except Exception as e:
