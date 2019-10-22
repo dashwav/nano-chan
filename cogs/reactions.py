@@ -23,13 +23,13 @@ class Reactions(commands.Cog):
         self.triggers = []
         loop = get_event_loop()
         self.triggers = loop.run_until_complete(
-            self.bot.postgres_controller.get_all_triggers())
+            self.bot.pg_controller.get_all_triggers())
         super().__init__()
 
     @commands.group(aliases=['reacts'])
     @checks.is_admin()
     async def reactions(self, ctx):
-        self.triggers = await self.bot.postgres_controller.get_all_triggers()
+        self.triggers = await self.bot.pg_controller.get_all_triggers()
         if ctx.invoked_subcommand is None:
             desc = ''
             for trigger in self.triggers:
@@ -50,9 +50,9 @@ class Reactions(commands.Cog):
             await ctx.send('No reaction given please use `reacts add <trigger> <reaction>')
             return
         try:
-            await self.bot.postgres_controller.add_reaction(trigger, reaction.strip())
+            await self.bot.pg_controller.add_reaction(trigger, reaction.strip())
             await ctx.send('\N{OK HAND SIGN}', delete_after=3)
-            self.triggers = await self.bot.postgres_controller.get_all_triggers()
+            self.triggers = await self.bot.pg_controller.get_all_triggers()
         except Exception as e:
             await ctx.send('❌', delete_after=3)
             self.bot.logger.warning(f'Error adding reaction: {e}')
@@ -67,9 +67,9 @@ class Reactions(commands.Cog):
             await ctx.send('No trigger given please use `reacts rem <trigger>')
             return
         try:
-            await self.bot.postgres_controller.rem_reaction(trigger)
+            await self.bot.pg_controller.rem_reaction(trigger)
             await ctx.send('\N{OK HAND SIGN}', delete_after=3)
-            self.triggers = await self.bot.postgres_controller.get_all_triggers()
+            self.triggers = await self.bot.pg_controller.get_all_triggers()
         except Exception as e:
             await ctx.send('❌', delete_after=3)
             self.bot.logger.warning(f'Error adding reaction: {e}')
@@ -87,7 +87,7 @@ class Reactions(commands.Cog):
             return
         if message.clean_content in self.triggers:
             await message.channel.send(
-                await self.bot.postgres_controller.get_reaction(message.clean_content)
+                await self.bot.pg_controller.get_reaction(message.clean_content)
             )
 
 

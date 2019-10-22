@@ -97,7 +97,7 @@ class Janitor(commands.Cog):
                     f'{message.author.display_name}'
                     ' was just promoted to member!')
                 try:
-                    await self.bot.postgres_controller.insert_rolechange(
+                    await self.bot.pg_controller.insert_rolechange(
                         message.guild.id, message.author.id, Change.PROMOTION
                     )
                 except Exception as e:
@@ -128,7 +128,7 @@ class Janitor(commands.Cog):
                     f'{message.author.display_name}'
                     ' was just promoted to member!')
                 try:
-                    await self.bot.postgres_controller.insert_rolechange(
+                    await self.bot.pg_controller.insert_rolechange(
                         message.guild.id, message.author.id, Change.PROMOTION
                     )
                 except Exception as e:
@@ -199,7 +199,7 @@ class Janitor(commands.Cog):
             return
         clovers = clover_role.members
         try:
-            members_prunable = await self.bot.postgres_controller.get_all_prunable()
+            members_prunable = await self.bot.pg_controller.get_all_prunable()
         except Exception as e:
             self.bot.logger.warning(f'{e}')
         prune_info = {'pruned': False, 'amount': 0}
@@ -220,8 +220,8 @@ class Janitor(commands.Cog):
                     )
         self.bot.logger.info(f'Prune info: {prune_info}')
         try:
-            await self.bot.postgres_controller.reset_message_deleted()
-            await self.bot.postgres_controller.reset_user_reactions()
+            await self.bot.pg_controller.reset_message_deleted()
+            await self.bot.pg_controller.reset_user_reactions()
         except Exception as e:
             self.bot.logger.warning(f'Issue resetting spam db: {e}')
         if prune_info['pruned']:
@@ -256,7 +256,7 @@ class Janitor(commands.Cog):
         clovers = clover_role.members
         self.bot.logger.info(f'Can i get uhhh')
         try:
-            members_safe = await self.bot.postgres_controller.get_all_clovers()
+            members_safe = await self.bot.pg_controller.get_all_clovers()
         except Exception as e:
             self.bot.logger.warning(f'shiiiiittt:{e}')
         self.bot.logger.info(f'uhhh {members_safe}')
@@ -277,8 +277,8 @@ class Janitor(commands.Cog):
                     )
         self.bot.logger.info(f'Prune info: {prune_info}')
         try:
-            await self.bot.postgres_controller.reset_message_deleted()
-            await self.bot.postgres_controller.reset_user_reactions()
+            await self.bot.pg_controller.reset_message_deleted()
+            await self.bot.pg_controller.reset_user_reactions()
         except Exception as e:
             self.bot.logger.warning(f'Issue resetting spam db: {e}')
         if prune_info['pruned']:

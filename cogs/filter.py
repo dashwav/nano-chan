@@ -28,10 +28,10 @@ class Filter(commands.Cog):
             return
         try:
             await message.delete()
-            await self.bot.postgres_controller.add_message_delete(
+            await self.bot.pg_controller.add_message_delete(
                 message.author.id
             )
-            user_deleted = await self.bot.postgres_controller.get_message_deleted(
+            user_deleted = await self.bot.pg_controller.get_message_deleted(
                 message.author.id
             )
             if int(user_deleted) in [5,10,20,100]:

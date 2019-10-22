@@ -16,11 +16,11 @@ class Nanochan(Bot):
     actual bot class
     """
     def __init__(self, config, misc_config, logger, test,
-                 postgres_controller: PostgresController, chanreact, blacklist):
+                 pg_controller: PostgresController, chanreact, blacklist):
         """
         init for bot class
         """
-        self.postgres_controller = postgres_controller
+        self.pg_controller = pg_controller
         self.start_time = int(time())
         self.version = discord.__version__
         if test:
@@ -54,7 +54,7 @@ class Nanochan(Bot):
     @classmethod
     async def get_instance(cls):
         """
-        async method to initialize the postgres_controller class
+        async method to initialize the pg_controller class
         """
         with open("config/config.yml", 'r') as yml_config:
             config = yaml.load(yml_config)
@@ -68,17 +68,17 @@ class Nanochan(Bot):
         logger.addHandler(console_handler)
         logger.setLevel(INFO)
         postgres_cred = config['postgres_credentials']
-        postgres_controller = await PostgresController.get_instance(
+        pg_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        blgu = await postgres_controller.get_all_blacklist_users_global()
-        chanreact = await postgres_controller.get_all_channels()
+        blgu = await pg_controller.get_all_blacklist_users_global()
+        chanreact = await pg_controller.get_all_channels()
         chanreact = [cls._record_to_dict(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
-        return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
+        return cls(config, misc_config, logger, False, pg_controller, chanreact, blgu)
 
     @classmethod
     async def get_test_instance(cls):
         """
-        async method to everything except the postgres_controller
+        async method to everything except the pg_controller
         """
         with open("config/config.yml", 'r') as yml_config:
             config = yaml.load(yml_config)
@@ -92,12 +92,12 @@ class Nanochan(Bot):
         logger.addHandler(console_handler)
         logger.setLevel(INFO)
         postgres_cred = config['postgres_credentials']
-        postgres_controller = await PostgresController.get_instance(
+        pg_controller = await PostgresController.get_instance(
             logger=logger, connect_kwargs=postgres_cred)
-        chanreact = await postgres_controller.get_all_channels()
-        blgu = await postgres_controller.get_all_blacklist_users_global()
+        chanreact = await pg_controller.get_all_channels()
+        blgu = await pg_controller.get_all_blacklist_users_global()
         chanreact = [cls._record_to_dict(x) for x in chanreact]  # cache the react channel_message as target_channel, message_id, host_channel
-        return cls(config, misc_config, logger, False, postgres_controller, chanreact, blgu)
+        return cls(config, misc_config, logger, False, pg_controller, chanreact, blgu)
 
     def start_bot(self, cogs):
         """

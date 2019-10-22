@@ -25,7 +25,7 @@ class Tutoring(commands.Cog):
         channel_backup = []
         try:
             await member.add_roles(studying_id)
-            all_channels = self.bot.postgres_controller.get_all_channels()
+            all_channels = self.bot.pg_controller.get_all_channels()
             for row in all_channels:
                 channel = self.bot.get_channel(row['host_channel'])
                 message = channel.fetch_message(row['message_id'])
@@ -51,7 +51,7 @@ class Tutoring(commands.Cog):
         if confirm:
             try:
                 await member.remove_roles(studying_id)
-                all_channels = self.bot.postgres_controller.get_all_channels()
+                all_channels = self.bot.pg_controller.get_all_channels()
                 for row in all_channels:
                     channel = self.bot.get_channel(row['host_channel'])
                     message = channel.fetch_message(row['message_id'])
@@ -74,7 +74,7 @@ class Tutoring(commands.Cog):
         studying_id = 526994881676181507
         try:
             await member.remove_roles(studying_id)
-            all_channels = self.bot.postgres_controller.get_all_channels()
+            all_channels = self.bot.pg_controller.get_all_channels()
             for row in all_channels:
                 channel = self.bot.get_channel(row['host_channel'])
                 message = channel.fetch_message(row['message_id'])
