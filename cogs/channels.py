@@ -44,7 +44,7 @@ class Channels(commands.Cog):
         if not confirm:
             await ctx.send("Cancelled Fix", delete_after=3)
             return
-        await self.bot.postgres_controller.fix_channel_message()  # add a column
+        await self.bot.pg_controller.fix_channel_message()  # add a column
         for row in self.bot.chanreact:
             channel = self.bot.get_channel(int(row['host_channel']))
             if not channel:
@@ -55,7 +55,7 @@ class Channels(commands.Cog):
             reaction = og_message.reactions[0]
             users = await reaction.users().flatten()
             users = ','.join([str(x.id) for x in users if not x.bot])
-            await self.bot.postgres_controller.add_user_chanreact(users, ctx.channel.id, row['target_channel'])
+            await self.bot.pg_controller.add_user_chanreact(users, ctx.channel.id, row['target_channel'])
 
 
     @channel_message.command(aliases=['add'])
@@ -74,7 +74,7 @@ class Channels(commands.Cog):
         message = await ctx.send(embed=local_embed)
         await message.add_reaction(self.reaction_emojis[0])
         try:
-            await self.bot.postgres_controller.add_channel_message(message.id, target_channel.id, ctx.channel.id)
+            await self.bot.pg_controller.add_channel_message(message.id, target_channel.id, ctx.channel.id)
             self.bot.chanreact.append({'target_channel': target_channel.id, 'message_id': message.id, 'host_channel': ctx.channel.id})
         except UniqueViolationError:
             await message.delete()
@@ -91,7 +91,7 @@ class Channels(commands.Cog):
             await ctx.send("that is not a valid channel fam", delete_after=4)
             return
         try:
-            message_id = await self.bot.postgres_controller.get_message_info(
+            message_id = await self.bot.pg_controller.get_message_info(
                 ctx.channel.id, target_channel.id)
         except Exception as e:
             await ctx.send("something broke", delete_after=3)
@@ -102,7 +102,7 @@ class Channels(commands.Cog):
 
         try:
             # removes the channel watching from the db
-            await self.bot.postgres_controller.rm_channel_chanreact(target_channel, ctx.channel.id)
+            await self.bot.pg_controller.rm_channel_chanreact(target_channel, ctx.channel.id)
         except:
             pass
         try:
@@ -120,7 +120,7 @@ class Channels(commands.Cog):
                 break
 
         await og_message.delete()
-        await self.bot.postgres_controller.rem_channel_message(target_channel.id, ctx.channel.id) # removes the channel for user watching
+        await self.bot.pg_controller.rem_channel_message(target_channel.id, ctx.channel.id) # removes the channel for user watching
         await ctx.message.delete()
 
     @channel_message.command()
@@ -285,7 +285,7 @@ class Channels(commands.Cog):
         if user.bot:
             return
         channel = self.bot.get_channel(target_channel)
-        reacts = await self.bot.postgres_controller.add_user_reaction(payload.user_id, payload.message_id)
+        reacts = await self.bot.pg_controller.add_user_reaction(payload.user_id, payload.message_id)
         if int(reacts) in [10, 20, 100]:
             time = self.bot.timestamp()
             mod_info = self.bot.get_channel(259728514914189312)
@@ -294,7 +294,7 @@ class Channels(commands.Cog):
                 f'times today on the permission message for #{channel}'
             )
         await self.add_perms(user, channel)
-        await self.bot.postgres_controller.add_user_chanreact(payload.user_id, payload.channel_id, payload.message_id, target_channel)
+        await self.bot.pg_controller.add_user_chanreact(payload.user_id, payload.channel_id, payload.message_id, target_channel)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -311,7 +311,7 @@ class Channels(commands.Cog):
         if user.bot:
             return
         await self.remove_perms(user, channel)
-        await self.bot.postgres_controller.rm_user_chanreact(payload.user_id, target_channel, payload.channel_id)
+        await self.bot.pg_controller.rm_user_chanreact(payload.user_id, target_channel, payload.channel_id)
 
     async def add_perms(self, user, channel):
         """

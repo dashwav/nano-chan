@@ -77,7 +77,7 @@ class Moderation(commands.Cog):
             except (HTTPException, AttributeError) as e:
                 reply += f'Error adding user to TO role: <@&{self.bot.timeout_id}>!: {str(e)}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
-            r = await self.bot.postgres_controller.get_chanreacts_fromuser(member.id)
+            r = await self.bot.pg_controller.get_chanreacts_fromuser(member.id)
             r = [x['target_channel'] for x in r]
             for target_channel in r:
                 try:
@@ -115,7 +115,7 @@ class Moderation(commands.Cog):
             except (HTTPException, AttributeError) as e:
                 reply += f'Error removing user from TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
-            r = await self.bot.postgres_controller.get_chanreacts_fromuser(member.id)
+            r = await self.bot.pg_controller.get_chanreacts_fromuser(member.id)
             r = [x['target_channel'] for x in r]
             for target_channel in r:
                 try:
@@ -167,7 +167,7 @@ class Moderation(commands.Cog):
         -------
         """
         if ctx.invoked_subcommand is None:
-            users = await self.bot.postgres_controller.get_all_blacklist_users_global()
+            users = await self.bot.pg_controller.get_all_blacklist_users_global()
             if isinstance(users, type(None)):
                 users = []
             if len(users) > 0:
@@ -208,7 +208,7 @@ class Moderation(commands.Cog):
             for user in users:
                 if int(user) in self.bot.dm_forward:
                     continue
-                success = await self.bot.postgres_controller.add_blacklist_user_global(user)
+                success = await self.bot.pg_controller.add_blacklist_user_global(user)
                 if success:
                     added_users.append(user)
             if added_users:
@@ -264,7 +264,7 @@ class Moderation(commands.Cog):
             for user in users:
                 success = False
                 try:
-                    success = await self.bot.postgres_controller.rem_blacklist_user_global(user)
+                    success = await self.bot.pg_controller.rem_blacklist_user_global(user)
                     if success:
                         self.bot.blglobal.remove(int(user))
                         removed_users.append(user)

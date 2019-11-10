@@ -27,7 +27,7 @@ class Fightclub(commands.Cog):
         while not self.bot.is_closed():
             try:
                 await asyncio.sleep(120)
-                full_list = await self.bot.postgres_controller.get_fightclub_stats()
+                full_list = await self.bot.pg_controller.get_fightclub_stats()
                 team_1_elo = 1000
                 team_1_users = 0
                 team_2_elo = 1000
@@ -130,22 +130,22 @@ class Fightclub(commands.Cog):
         if ctx.message.author == target:
             return
         try:
-            aggressor = await self.bot.postgres_controller.get_fightclub_member(
+            aggressor = await self.bot.pg_controller.get_fightclub_member(
                 ctx.message.author)
             if aggressor is None:
                 raise ValueError('aggressor doesnt exist yet')
         except Exception as e:
             self.bot.logger.warning(f'An error occured getting stats: {e}')
-            aggressor = await self.bot.postgres_controller.add_fightclub_member(
+            aggressor = await self.bot.pg_controller.add_fightclub_member(
                 ctx.message.author, 0)
         try:
-            defender = await self.bot.postgres_controller.get_fightclub_member(
+            defender = await self.bot.pg_controller.get_fightclub_member(
                 target)
             if defender is None:
                 raise ValueError('defender doesnt exist yet')
         except Exception as e:
             self.bot.logger.warning(f'An error occured getting stats: {e}')
-            defender = await self.bot.postgres_controller.add_fightclub_member(
+            defender = await self.bot.pg_controller.add_fightclub_member(
                 target, 0)
         aggro_elo = self.expected(aggressor['elo'], defender['elo'])
         def_elo = self.expected(defender['elo'], aggressor['elo'])
@@ -156,9 +156,9 @@ class Fightclub(commands.Cog):
         if roll > 499:
             winner = ctx.message.author
             loser = target
-            await self.bot.postgres_controller.add_fightclub_win(
+            await self.bot.pg_controller.add_fightclub_win(
                 True, winner, self.elo(aggro_elo, 1))
-            await self.bot.postgres_controller.add_fightclub_loss(
+            await self.bot.pg_controller.add_fightclub_loss(
                 False, loser, self.elo(def_elo, 0))
             await ctx.send(embed=discord.Embed(
                 title='Results',
@@ -170,9 +170,9 @@ class Fightclub(commands.Cog):
             winner = target
             loser = ctx.message.author
             roll = 1000 - roll
-            await self.bot.postgres_controller.add_fightclub_win(
+            await self.bot.pg_controller.add_fightclub_win(
                 False, winner, self.elo(def_elo, 1.05))
-            await self.bot.postgres_controller.add_fightclub_loss(
+            await self.bot.pg_controller.add_fightclub_loss(
                 True, loser, self.elo(aggro_elo, 0))
             await ctx.send(embed=discord.Embed(
                 title='Results',
@@ -186,7 +186,7 @@ class Fightclub(commands.Cog):
     async def fight_stats(self, ctx, *, member: discord.Member = None):
         if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
-        full_list = await self.bot.postgres_controller.get_fightclub_stats()
+        full_list = await self.bot.pg_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
         if member is None:
             team_1_elo = 1000
@@ -223,7 +223,7 @@ class Fightclub(commands.Cog):
             await ctx.send(embed=local_embed)
             return
         else:
-            user_stats = await self.bot.postgres_controller.get_fightclub_member(member)
+            user_stats = await self.bot.pg_controller.get_fightclub_member(member)
             aggrowr = self.ratio(user_stats['aggrowins'], user_stats['aggroloss'])
             defwr = self.ratio(user_stats['defwins'], user_stats['defloss'])
             await ctx.send(embed=discord.Embed(
@@ -240,7 +240,7 @@ class Fightclub(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def dock(self, ctx, member: discord.Member, amt=50):
-        await self.bot.postgres_controller.add_fightclub_loss(True, member, -amt)
+        await self.bot.pg_controller.add_fightclub_loss(True, member, -amt)
         await ctx.send(':okhand:')
 
     @commands.command()
@@ -248,7 +248,7 @@ class Fightclub(commands.Cog):
     async def full_leaderboard(self, ctx, *, amt: int = 80):
         if ctx.channel.id not in [367217621701099520, 403805028697243648, 176429411443146752]:
             return
-        full_list = await self.bot.postgres_controller.get_fightclub_stats()
+        full_list = await self.bot.pg_controller.get_fightclub_stats()
         full_elo = sorted(full_list, key=lambda user: user['elo'], reverse=True)
         if amt == -1:
             await ctx.send(embed=discord.Embed(
@@ -269,7 +269,7 @@ class Fightclub(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def final_stats(self, ctx):
-        full_list = await self.bot.postgres_controller.get_fightclub_stats()
+        full_list = await self.bot.pg_controller.get_fightclub_stats()
         total_aggro_w = 0
         total_aggro_l = 0
         total_def_w = 0

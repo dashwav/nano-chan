@@ -70,9 +70,9 @@ class Owner(commands.Cog):
             sql = """
                 ALTER TABLE {}.user_reports
                 ADD COLUMN message TEXT;
-            """.format(self.bot.postgres_controller.schema)
+            """.format(self.bot.pg_controller.schema)
             try:
-                await self.bot.postgres_controller.pool.execute(sql)
+                await self.bot.pg_controller.pool.execute(sql)
             except Exception:
                 # await ctx.send('Couldn\'t add column to db: {}'.format(err),\
                 #  delete_after=15)
@@ -81,7 +81,7 @@ class Owner(commands.Cog):
             user_reports = []
             try:
                 user_reports = await \
-                    self.bot.postgres_controller.get_all_user_reports()
+                    self.bot.pg_controller.get_all_user_reports()
             except Exception:
                 # await ctx.send(err, delete_after=15)
                 pass
@@ -112,7 +112,7 @@ class Owner(commands.Cog):
                 # self.bot.logger.info(report_content)
                 if report_content != '':
                     try:
-                        await self.bot.postgres_controller.\
+                        await self.bot.pg_controller.\
                             set_report_message_content(
                                 report['report_id'], report_content)
                     except Exception:
