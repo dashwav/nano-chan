@@ -57,7 +57,7 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
-            mod_info = self.bot.get_channel(self.bot.mod_info)
+            mod_info = self.bot.get_channel(259728514914189312)
             if content.startswith('!suggest'):
                 local_embed = discord.Embed(
                     title=f'Suggestion:',
@@ -95,7 +95,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if before.roles != after.roles:
-            mod_info = self.bot.get_channel(self.bot.mod_info)
+            mod_info = self.bot.get_channel(259728514914189312)
             time = self.bot.timestamp()
             join = after.joined_at.strftime('%b %d %Y %H:%M')
             role_diff = set(after.roles) - (set(before.roles))

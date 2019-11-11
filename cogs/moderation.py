@@ -161,9 +161,7 @@ class Moderation(commands.Cog):
         Examples
         --------
         blgu add 1298371,18972398,182739817
-        blgu add report 10
-        blgu rm 1298371,18972398,182739817
-        blgu rm report 10
+        blgu rm 11
 
         Parameters
         ----------
