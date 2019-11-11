@@ -75,7 +75,6 @@ class Moderation(commands.Cog):
                 await member.add_roles(timeout_role)
                 reply += 'Successfully added TO role\n'
             except (HTTPException, AttributeError) as e:
-                reply += f'Error adding user to TO role: <@&{self.bot.timeout_id}>!: {str(e)}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
             r = await self.bot.pg_controller.get_chanreacts_fromuser(member.id)
             r = [x['target_channel'] for x in r]
@@ -113,7 +112,6 @@ class Moderation(commands.Cog):
                 await member.add_roles(timeout_role)
                 reply += 'Successfully added TO role\n'
             except (HTTPException, AttributeError) as e:
-                reply += f'Error removing user from TO role: <@&{self.bot.timeout_id}>!: {e}\nContinuing with restoring permissions to self-assign channels.\n'
                 pass
             r = await self.bot.pg_controller.get_chanreacts_fromuser(member.id)
             r = [x['target_channel'] for x in r]
@@ -160,6 +158,13 @@ class Moderation(commands.Cog):
     async def blacklistglobaluser(self, ctx):
         """Add or remove a user to blacklist global list.
 
+        Examples
+        --------
+        blgu add 1298371,18972398,182739817
+        blgu add report 10
+        blgu rm 1298371,18972398,182739817
+        blgu rm report 10
+
         Parameters
         ----------
 
@@ -188,6 +193,13 @@ class Moderation(commands.Cog):
     async def _blgua(self, ctx: commands.Context, *, uids: str=None):
         """Add user to global blacklist.
 
+        This can be done as either a comma separated list of user ids or from the report numbers.
+
+        Examples
+        --------
+        blgu add 1298371,18972398,182739817
+        blgu add 10
+
         Parameters
         ----------
         uids: str
@@ -197,36 +209,52 @@ class Moderation(commands.Cog):
         -------
         """
         added_users = []
+        user_notfound = []
+        fields = []
         msg = uids.replace(' ', '')
         if ',' in msg:
-            users = [extract_id(x) for x in msg.split(',')]
+            users = [extract_id(x, False) for x in msg.split(',')]
         else:
-            users = [extract_id(msg)]
-        users = [x for x in users if x != '']
+            users = [extract_id(msg, False)]
+        users = [x for x in users if x]
+        for i, u in enumerate(users):
+            if int(u) < 1e15:
+                try:
+                    report = await self.bot.pg_controller.get_user_report(int(u))
+                    users[i] = report[0]['user_id']
+                except:
+                    await ctx.send('Couldn\'t find this report :(', delete_after=10)
 
-        try:
-            for user in users:
+        for user in users:
+            try:
                 if int(user) in self.bot.dm_forward:
                     continue
                 success = await self.bot.pg_controller.add_blacklist_user_global(user)
                 if success:
                     added_users.append(user)
-            if added_users:
-                self.bot.blglobal += list(map(int, added_users))
-                title = 'Users added into global blacklist'
-                desc = '<@'
-                desc += '>, <@'.join(map(str, added_users))
-                desc += '>'
-                embed = discord.Embed(
-                    title=title,
-                    description=desc + '\nBy mod:' + str(ctx.author.mention),
-                )
-            else:
+                else:
+                    user_notfound.append(user)
+            except:
+                user_notfound.append(user)
                 self.bot.logger.info(f'Error adding users to global blacklist')
-                return
-        except Exception as e:
-            self.bot.logger.info(f'Error adding users to global blacklist {e}')
+        if added_users:
+            fields.append(['PASS', ', '.join([f'<@{x}>' for x in added_users])])
+            self.bot.blglobal += list(map(int, added_users))
+        if user_notfound:
+            fields.append(['FAIL', ', '.join([f'<@{x}>' for x in user_notfound])])
         try:
+            title = 'Users added to the blacklist'
+            desc = ''
+            embed = discord.Embed(
+                title=title,
+                description=desc + '\nBy mod:' + str(ctx.author.mention)
+            )
+            for field in fields:
+                embed.add_field(
+                    name = field[0],
+                    value = field[1],
+                    inline = True
+                )
             await ctx.send(embed=embed)
         except Exception as e:
             self.bot.logger.info(f'Error sending embed to modlog {e}')
@@ -243,6 +271,12 @@ class Moderation(commands.Cog):
     async def _blgur(self, ctx: commands.Context, *, uids: str=None):
         """Removes a user from the blacklist.
 
+        This can be done as either a comma separated list of user ids or a list of the report numbers.
+
+        Examples
+        --------
+        blgu rm 1298371,18972398,182739817
+
         Parameters
         ----------
         uids: str
@@ -255,9 +289,17 @@ class Moderation(commands.Cog):
         user_notfound = []
         msg = uids.replace(' ', '')
         if ',' in msg:
-            users = [extract_id(x) for x in msg.split(',')]
+            users = [extract_id(x, False) for x in msg.split(',')]
         else:
-            users = [extract_id(msg)]
+            users = [extract_id(msg, False)]
+        users = [x for x in users if x]
+        for i, u in enumerate(users):
+            if int(u) < 1e15:
+                try:
+                    report = await self.bot.pg_controller.get_user_report(int(u))
+                    users[i] = report[0]['user_id']
+                except:
+                    await ctx.send('Couldn\'t find this report :(', delete_after=10)
         self.bot.logger.info(users)
 
         try:
@@ -278,14 +320,14 @@ class Moderation(commands.Cog):
                 fields.append(['PASS', ', '.join([f'<@{x}>' for x in removed_users])])
             if user_notfound:
                 fields.append(['FAIL', ', '.join([f'<@{x}>' for x in user_notfound])])
-            title = 'Users blacklisting'
+            title = 'Users Removed from the blacklist'
             desc = ''
-            embeds = discord.Embed(
+            embed = discord.Embed(
                 title=title,
                 description=desc + '\nBy mod:' + str(ctx.author.mention)
             )
             for field in fields:
-                embeds.add_field(
+                embed.add_field(
                     name = field[0],
                     value = field[1],
                     inline = True
@@ -294,7 +336,7 @@ class Moderation(commands.Cog):
             self.bot.logger.warning(f'Issue removing users from ' +
                                     f'global blacklist: {e}')
         try:
-            await ctx.send(embed=embeds)
+            await ctx.send(embed=embed)
         except Exception as e:
             self.bot.logger.info(f'Error sending embed to modlog {e}')
         try:
@@ -302,7 +344,7 @@ class Moderation(commands.Cog):
                 for user_id in self.bot.dm_forward:
                     user = await self.bot.fetch_user(user_id)
                     await user.create_dm()
-                    await user.dm_channel.send(embed=embeds)
+                    await user.dm_channel.send(embed=embed)
         except Exception as e:
             self.bot.logger.warning(f'Issue forwarding dm: {e}')
 

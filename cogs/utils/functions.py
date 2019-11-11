@@ -151,7 +151,7 @@ def get_member(ctx, argument: str):
         return None
 
 
-def extract_id(argument: str):
+def extract_id(argument: str, strict: bool=True):
     """Extract id from argument."""
     """
     Parameters
@@ -165,7 +165,7 @@ def extract_id(argument: str):
         the bare id
     """
     ex = ''.join(list(filter(str.isdigit, str(argument))))
-    if len(ex) < 15:
+    if len(ex) < 15 and strict:
         return None
     return ex
 

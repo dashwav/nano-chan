@@ -4,8 +4,8 @@ Cog for logging info to mod-info
 import discord
 from discord.ext import commands
 import random
-import datetime
 from .utils import checks
+from .utils.functions import get_member
 
 
 class Logging(commands.Cog):
@@ -57,12 +57,19 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
-            mod_info = self.bot.get_channel(259728514914189312)
-            local_embed = discord.Embed(
-                title=f'DM report from {message.author.name}#{message.author.discriminator}:',
-                description=message.clean_content
-            )
-            local_embed.set_footer(text=f'Report ID: {report_id} | User ID: {message.author.id}')
+            mod_info = self.bot.get_channel(self.bot.mod_info)
+            if content.startswith('!suggest'):
+                local_embed = discord.Embed(
+                    title=f'Suggestion:',
+                    description=message.clean_content
+                )
+                local_embed.set_footer(text=f'Suggestion ID: {report_id}')
+            else:
+                local_embed = discord.Embed(
+                    title=f'DM report:',
+                    description=message.clean_content
+                )
+                local_embed.set_footer(text=f'Report ID: {report_id}')
             if message.attachments:
                 local_embed.add_field(
                     name='Attachments',
@@ -71,7 +78,7 @@ class Logging(commands.Cog):
                 )
             report_message = await mod_info.send(embed=local_embed)
             await mod_info.send(f'You can respond to this report by typing:\n```\n-respond {report_id} <message here>```')
-            await message.channel.send(f':white_check_mark: You have submitted a report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
+            await message.channel.send(f':white_check_mark: You have submitted an anonymous report to the moderators. Abusing this function will get you kicked or banned. Thanks.\n\nThis report id is {report_id}')
             await self.bot.pg_controller.set_report_message_id(
                 report_id, report_message.id
             )
@@ -115,6 +122,31 @@ class Logging(commands.Cog):
                                         f'{after.mention}. [Joined: {join}]')
                     local_embed.set_footer(text=f'{after}')
                     await mod_info.send(embed=local_embed)
+
+    @commands.command()
+    @checks.has_permissions(manage_roles=True)
+    async def id(self, ctx, report_id: int):
+        """
+        Get the id from a report. Reports are supposed to be anon. so use sparingly. 
+        """
+        try:
+            report = await self.bot.pg_controller.get_user_report(report_id)
+        except Exception as e:
+            self.bot.logger.warning(f'Error in getting report {report_id}: {e}')
+            return
+        try:
+            user = get_member(ctx, str(report[0]["user_id"]))
+        except Exception as e:
+            self.bot.logger.warning(f'Error in getting user to report {report_id}: {e}')
+            return
+        try:
+            local_embed = discord.Embed(
+                    color=0x3498DB,
+                    title=f'Report ID: {report_id}',
+                    description=f'{user.mention}')
+            await ctx.send(embed=local_embed)
+        except Exception as e:
+            self.bot.logger.warning(f'Error in sending id to report: {e}')
 
     @commands.command()
     @checks.has_permissions(manage_roles=True)
@@ -183,7 +215,7 @@ class Logging(commands.Cog):
             responces = report['message'].split(';=;')[1:]
 
         local_embed = discord.Embed(
-            title=f'DM report from <@{report["user_id"]}>:',
+            title=f'DM report:',
             description=content
         )
         local_embed.set_footer(text=f'Report ID: {report_id}')
