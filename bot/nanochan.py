@@ -1,7 +1,7 @@
 """
 Discord bot that spaces out spoiler comments
 """
-import yaml
+import gila
 import os
 import discord
 from discord.ext.commands import Bot
@@ -56,10 +56,15 @@ class Nanochan(Bot):
         """
         async method to initialize the pg_controller class
         """
-        with open("config/config.yml", 'r') as yml_config:
-            config = yaml.load(yml_config)
-        with open("config/misc_config.yml", 'r') as yml_config:
-            misc_config = yaml.load(yml_config)
+        config = gila.Gila()
+        misc_config = gila.Gila()
+        config.set_config_file('config/config.yml')
+        misc_config.set_config_file('config/misc_config.yml')
+        config.read_config_file()
+        misc_config.read_config_file()
+        config = config.all_config()
+        misc_config = misc_config.all_config()
+
         logger = getLogger('nanochan')
         console_handler = StreamHandler()
         console_handler.setFormatter(Formatter(
@@ -80,10 +85,14 @@ class Nanochan(Bot):
         """
         async method to everything except the pg_controller
         """
-        with open("config/config.yml", 'r') as yml_config:
-            config = yaml.load(yml_config)
-        with open("config/misc_config.yml", 'r') as yml_config:
-            misc_config = yaml.load(yml_config)
+        config = gila.Gila()
+        misc_config = gila.Gila()
+        config.set_config_file('config/config.yml')
+        misc_config.set_config_file('config/misc_config.yml')
+        config.read_config_file()
+        misc_config.read_config_file()
+        config = config.all_config()
+        misc_config = misc_config.all_config()
         logger = getLogger('nanochan')
         console_handler = StreamHandler()
         console_handler.setFormatter(Formatter(
