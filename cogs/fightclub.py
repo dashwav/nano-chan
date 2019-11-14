@@ -211,6 +211,7 @@ class Fightclub(commands.Cog):
                     team_2_users += 1
                 if entry['userid'] == 164546159140929538:
                     # never used; god_emperor = entry['elo']
+                    pass
             total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
             total_def_r = self.ratio(total_def_w, total_def_l)
             #never used; top_5_aggro = sorted(full_list, key=lambda user: user['aggrowins'], reverse=True)[:5]
@@ -219,7 +220,7 @@ class Fightclub(commands.Cog):
             local_embed.add_field(name='Top 10 (by score)', value=(
                 await self.get_member_string(ctx.guild, 'elo', full_elo[:10])))
             local_embed.add_field(name='Team Scores',
-                value=f('Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}')
+                value=f('Mealies elo: {team_1_elo:.2f}\nStealies elo: {team_2_elo:.2f}'))
             await ctx.send(embed=local_embed)
             return
         else:
@@ -298,6 +299,7 @@ class Fightclub(commands.Cog):
                 team_2_users += 1
             if entry['userid'] == 164546159140929538:
                 #never used; god_emperor = entry['elo']
+                pass
         total_aggro_r = self.ratio(total_aggro_w, total_aggro_l)
         total_def_r = self.ratio(total_def_w, total_def_l)
         top_10_aggro = await self.get_member_string(
