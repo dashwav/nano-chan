@@ -6,6 +6,7 @@ from discord.ext import commands
 import random
 from .utils import checks
 from .utils.functions import get_member
+from datetime import datetime
 
 
 class Logging(commands.Cog):
@@ -57,16 +58,17 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
+            reporthash = (hash(f'{message.author.id}{datetime.now().timetuple().tm_yday}'))[:10]
             mod_info = self.bot.get_channel(259728514914189312)
             if content.startswith('!suggest'):
                 local_embed = discord.Embed(
-                    title=f'Suggestion:',
+                    title=f'Suggestion from {reporthash}:',
                     description=message.clean_content
                 )
                 local_embed.set_footer(text=f'Suggestion ID: {report_id}')
             else:
                 local_embed = discord.Embed(
-                    title=f'DM report:',
+                    title=f'DM report from {reporthash}:',
                     description=message.clean_content
                 )
                 local_embed.set_footer(text=f'Report ID: {report_id}')
@@ -124,10 +126,10 @@ class Logging(commands.Cog):
                     await mod_info.send(embed=local_embed)
 
     @commands.command()
-    @checks.has_permissions(manage_roles=True)
-    async def id(self, ctx, report_id: int):
+    @commands.is_owner()
+    async def id(self, ctx, report_id: str):
         """
-        Get the id from a report. Reports are supposed to be anon. so use sparingly. 
+        Get the id from a report. Reports are supposed to be anon. so use sparingly.
         """
         try:
             report = await self.bot.pg_controller.get_user_report(report_id)
@@ -141,9 +143,9 @@ class Logging(commands.Cog):
             return
         try:
             local_embed = discord.Embed(
-                    color=0x3498DB,
-                    title=f'Report ID: {report_id}',
-                    description=f'{user.mention}')
+                color=0x3498DB,
+                title=f'Report ID: {report_id}',
+                description=f'{user.mention}')
             await ctx.send(embed=local_embed)
         except Exception as e:
             self.bot.logger.warning(f'Error in sending id to report: {e}')
@@ -152,7 +154,7 @@ class Logging(commands.Cog):
     @checks.has_permissions(manage_roles=True)
     async def respond(self, ctx, report_id: int, *, response):
         """
-        Respond back 
+        Respond back
         """
         if not response:
             await ctx.send("Please add a message", delete_after=3)
