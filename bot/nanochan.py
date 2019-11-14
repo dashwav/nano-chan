@@ -60,7 +60,7 @@ class Nanochan(Bot):
         misc_config = gila.Gila()
         config.set_config_file('config/config.yml')
         misc_config.set_config_file('config/misc_config.yml')
-        config.read_config_file()
+        config.read_in_config()
         misc_config.read_in_config()
         config = config.all_config()
         misc_config = misc_config.all_config()
