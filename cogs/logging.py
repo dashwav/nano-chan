@@ -97,7 +97,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if before.roles != after.roles:
-            mod_info = self.bot.get_channel(259728514914189312)
+            mod_info = self.bot.get_channel(378684962934751239)
             time = self.bot.timestamp()
             join = after.joined_at.strftime('%b %d %Y %H:%M')
             role_diff = set(after.roles) - (set(before.roles))
