@@ -60,7 +60,7 @@ class Logging(commands.Cog):
                 message.author.id, content)
             reporthash = str(hash(f'{message.author.id}{datetime.now().timetuple().tm_yday}'))
             reporthash = reporthash[-10:]
-            mod_info = self.bot.get_channel(self.bot.mod_info)
+            mod_info = self.bot.get_channel(259728514914189312)
             if content.startswith('!suggest'):
                 local_embed = discord.Embed(
                     title=f'Suggestion from {reporthash}:',
