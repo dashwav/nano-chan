@@ -867,9 +867,9 @@ class PostgresController():
         SET response_time = current_timestamp, responder_id = $1
         WHERE report_id = $2;
         """.format(self.schema)
-        
+
         await self.pool.execute(sql, responder_id, report_id)
-        
+
 
     async def get_user_report(self, report_id):
         """

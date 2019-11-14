@@ -6,6 +6,7 @@ from discord.ext import commands
 import random
 from .utils import checks
 from .utils.functions import get_member
+from datetime import datetime
 
 
 class Logging(commands.Cog):
@@ -57,16 +58,18 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
+            reporthash = str(hash(f'{message.author.id}{datetime.now().timetuple().tm_yday}'))
+            reporthash = reporthash[-10:]
             mod_info = self.bot.get_channel(259728514914189312)
             if content.startswith('!suggest'):
                 local_embed = discord.Embed(
-                    title=f'Suggestion:',
+                    title=f'Suggestion from {reporthash}:',
                     description=message.clean_content
                 )
                 local_embed.set_footer(text=f'Suggestion ID: {report_id}')
             else:
                 local_embed = discord.Embed(
-                    title=f'DM report:',
+                    title=f'DM report from <{reporthash}>:',
                     description=message.clean_content
                 )
                 local_embed.set_footer(text=f'Report ID: {report_id}')
@@ -124,10 +127,10 @@ class Logging(commands.Cog):
                     await mod_info.send(embed=local_embed)
 
     @commands.command()
-    @checks.has_permissions(manage_roles=True)
+    @commands.is_owner()
     async def id(self, ctx, report_id: int):
         """
-        Get the id from a report. Reports are supposed to be anon. so use sparingly. 
+        Get the id from a report. Reports are supposed to be anon. so use sparingly.
         """
         try:
             report = await self.bot.pg_controller.get_user_report(report_id)
@@ -141,9 +144,9 @@ class Logging(commands.Cog):
             return
         try:
             local_embed = discord.Embed(
-                    color=0x3498DB,
-                    title=f'Report ID: {report_id}',
-                    description=f'{user.mention}')
+                color=0x3498DB,
+                title=f'Report ID: {report_id}',
+                description=f'{user.mention}')
             await ctx.send(embed=local_embed)
         except Exception as e:
             self.bot.logger.warning(f'Error in sending id to report: {e}')
@@ -152,7 +155,7 @@ class Logging(commands.Cog):
     @checks.has_permissions(manage_roles=True)
     async def respond(self, ctx, report_id: int, *, response):
         """
-        Respond back 
+        Respond back
         """
         if not response:
             await ctx.send("Please add a message", delete_after=3)
@@ -194,14 +197,17 @@ class Logging(commands.Cog):
     @checks.has_permissions(manage_roles=True)
     async def rebuild(self, ctx, report_id: int):
         """
-        Rebuild a collapsed report
+        Rebuild a collapsed report. If the bot went down since this report was made, the original hash won't be the same
         """
         try:
             report = await self.bot.pg_controller.get_user_report(report_id)
-        except:
+        except Exception:
             await ctx.send('Couldn\'t find this report :(', delete_after=10)
             return
         report = report[0]
+        yday = str(report['logtime'].timetuple().tm_yday)
+        reporthash = str(hash(f'{report["user_id"]}{yday}'))
+        reporthash = reporthash[-10:]
         content, attachments, responces = '', [], []
         if ':=:' in report['message']:
             content = report['message'].split(':=:')[0]
@@ -215,7 +221,7 @@ class Logging(commands.Cog):
             responces = report['message'].split(';=;')[1:]
 
         local_embed = discord.Embed(
-            title=f'DM report:',
+            title=f'DM report from <{reporthash}>:',
             description=content
         )
         local_embed.set_footer(text=f'Report ID: {report_id}')
@@ -230,7 +236,7 @@ class Logging(commands.Cog):
             )
         if len(responces) > 0:
             for f in responces:
-                desc = f'[Link to responce]({f})'
+                desc = f'[Link to response]({f})'
                 local_embed.add_field(
                     name='Response',
                     value=f'{desc}',
