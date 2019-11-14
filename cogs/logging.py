@@ -58,8 +58,9 @@ class Logging(commands.Cog):
 
             report_id = await self.bot.pg_controller.add_user_report(
                 message.author.id, content)
-            reporthash = (hash(f'{message.author.id}{datetime.now().timetuple().tm_yday}'))[:10]
-            mod_info = self.bot.get_channel(259728514914189312)
+            reporthash = str(hash(f'{message.author.id}{datetime.now().timetuple().tm_yday}'))
+            reporthash = reporthash[-10:]
+            mod_info = self.bot.get_channel(self.bot.mod_info)
             if content.startswith('!suggest'):
                 local_embed = discord.Embed(
                     title=f'Suggestion from {reporthash}:',
@@ -68,7 +69,7 @@ class Logging(commands.Cog):
                 local_embed.set_footer(text=f'Suggestion ID: {report_id}')
             else:
                 local_embed = discord.Embed(
-                    title=f'DM report from {reporthash}:',
+                    title=f'DM report from <{reporthash}>:',
                     description=message.clean_content
                 )
                 local_embed.set_footer(text=f'Report ID: {report_id}')
@@ -127,7 +128,7 @@ class Logging(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def id(self, ctx, report_id: str):
+    async def id(self, ctx, report_id: int):
         """
         Get the id from a report. Reports are supposed to be anon. so use sparingly.
         """
@@ -196,14 +197,17 @@ class Logging(commands.Cog):
     @checks.has_permissions(manage_roles=True)
     async def rebuild(self, ctx, report_id: int):
         """
-        Rebuild a collapsed report
+        Rebuild a collapsed report. If the bot went down since this report was made, the original hash won't be the same
         """
         try:
             report = await self.bot.pg_controller.get_user_report(report_id)
-        except:
+        except Exception:
             await ctx.send('Couldn\'t find this report :(', delete_after=10)
             return
         report = report[0]
+        yday = str(report['logtime'].timetuple().tm_yday)
+        reporthash = str(hash(f'{report["user_id"]}{yday}'))
+        reporthash = reporthash[-10:]
         content, attachments, responces = '', [], []
         if ':=:' in report['message']:
             content = report['message'].split(':=:')[0]
@@ -217,7 +221,7 @@ class Logging(commands.Cog):
             responces = report['message'].split(';=;')[1:]
 
         local_embed = discord.Embed(
-            title=f'DM report:',
+            title=f'DM report from <{reporthash}>:',
             description=content
         )
         local_embed.set_footer(text=f'Report ID: {report_id}')
@@ -232,7 +236,7 @@ class Logging(commands.Cog):
             )
         if len(responces) > 0:
             for f in responces:
-                desc = f'[Link to responce]({f})'
+                desc = f'[Link to response]({f})'
                 local_embed.add_field(
                     name='Response',
                     value=f'{desc}',
