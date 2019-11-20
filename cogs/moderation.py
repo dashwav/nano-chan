@@ -28,6 +28,42 @@ class Moderation(commands.Cog):
         super().__init__()
         self.bot = bot
 
+    @commands.command(aliases=['message', 'dm', 'pm'])
+    @checks.has_permissions(manage_roles=True)
+    @commands.guild_only()
+    async def privatemessage(self, ctx, member: GeneralMember, *, content: str):
+        """Respond to a user via yinbot.
+        """
+        try:
+            message = ctx.message
+            await member.create_dm()
+            channel = member.dm_channel
+        except Exception as e:
+            self.bot.logger.warn(f'Unable to PM user: {e}')
+            await ctx.message.add_reaction(r'❌')
+            return 
+        desc = ''
+        if message.attachments:
+            for f in message.attachments:
+                desc += f'{f.url}\n'
+
+        local_embed = discord.Embed(
+            title=f'Message to {member.mention} from the staff team',
+            description=content
+        )
+        if desc:
+            local_embed.add_field(
+                name='Attachments',
+                value=f'{desc}',
+                inline=True
+            )
+        try:
+            pm = await channel.send(embed=local_embed)
+            await ctx.message.add_reaction(r'✅')
+        except Exception:
+            await ctx.send(f'Unable to PM user: {e}', delete_after=5)
+            await ctx.message.add_reaction(r'❌')
+
     @commands.command()
     @checks.has_permissions(manage_messages=True)
     async def purge(self, ctx, *args, mentions=None):
