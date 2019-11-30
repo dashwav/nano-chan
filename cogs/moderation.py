@@ -28,6 +28,30 @@ class Moderation(commands.Cog):
         super().__init__()
         self.bot = bot
 
+    @commands.command(aliases=['pinclear', 'removepins'])
+    @checks.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    async def clearpins(self, ctx):
+        """Clear all the pins from the current channel."""
+        try:
+            confirm = await helpers.custom_confirm(
+                ctx,
+                f'```Clear all pins from current channel.```'
+            )
+            if not confirm:
+                return
+        except Exception:
+            return
+        try:
+            messages = await ctx.channel.pins()
+            for m in messages:
+                await m.unpin()
+            await ctx.message.add_reaction(r'✅')
+        except Exception as e:
+            self.bot.logger.warn(f'Unable to remove pins: {e}')
+            await ctx.message.add_reaction(r'❌')
+        
+
     @commands.command(aliases=['message', 'dm', 'pm'])
     @checks.has_permissions(manage_roles=True)
     @commands.guild_only()
