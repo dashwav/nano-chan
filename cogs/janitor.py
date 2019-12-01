@@ -325,10 +325,6 @@ class Janitor(commands.Cog):
             if role.name.lower() == '🔑':
                 key_role = role
 
-        clover_role = None
-        for role in all_roles:
-            if role.name.lower() == 'clover':
-                clover_role = role
         try:
             await self.rem_all_members(ctx, key_role)
             values[0] = f'Clearing :key: role :white_check_mark: \n'
@@ -338,18 +334,6 @@ class Janitor(commands.Cog):
         except Exception as e:
             self.bot.logger.warning(f'Error cleaning :key: {e}')
             values[0] = f'Clearing :key: role :x: \n'
-            l_embed = message.embeds[0]
-            l_embed.set_field_at(0, name="Progress:", value="".join(values))
-            await message.edit(embed = l_embed)
-        try:
-            await self.rem_all_members(ctx, clover_role)
-            values[0] = f'Clearing clover role :white_check_mark: \n'
-            l_embed = message.embeds[0]
-            l_embed.set_field_at(0 , name="Progress:", value="".join(values))
-            await message.edit(embed = l_embed)
-        except Exception as e:
-            self.bot.logger.warning(f'Error cleaning :key: {e}')
-            values[0] = f'Clearing clover role :x: \n'
             l_embed = message.embeds[0]
             l_embed.set_field_at(0, name="Progress:", value="".join(values))
             await message.edit(embed = l_embed)
