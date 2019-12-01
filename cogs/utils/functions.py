@@ -222,6 +222,34 @@ def get_role(ctx, argument: str):
     except Exception:
         return False
 
+async def add_perms(bot, user, channel):
+    """
+    Adds a user to channels perms
+    """
+    try:
+        await channel.set_permissions(user, read_messages=True)
+    except Exception as e:
+        bot.logger.warning(f'{e}')
+
+async def deny_perms(bot, user, channel):
+    """
+    Sets perm to deny a users perms on a channel
+    """
+    try:
+        await channel.set_permissions(user, read_messages=False)
+    except Exception as e:
+        bot.logger.warning(f'{e}')
+
+async def remove_perms(bot, user, channel):
+    """
+    removes a users perms on a channel
+    """
+    try:
+        await channel.set_permissions(user, read_messages=None)
+    except Exception as e:
+        bot.logger.warning(f'{e}')
+
+
 # end of code
 
 # end of file
