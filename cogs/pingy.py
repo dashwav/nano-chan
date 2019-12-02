@@ -26,7 +26,7 @@ class Pingy(commands.Cog):
         found_roles = []
         for role in roles:
             if role.lower() not in \
-                    ['dedicated', 'updated', 'moderator',
+                    ['dedicated', 'updated', 'events', 'moderator',
                      'admin', 'representative']:
                 continue
             guild_role = find(

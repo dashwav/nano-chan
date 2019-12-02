@@ -500,11 +500,11 @@ class PostgresController():
         """
         sql = """
         SELECT * from {}.clovers 
-        WHERE logtime::date <= (now() - '3 days'::interval);
+        WHERE logtime::date <= (now() - '30 days'::interval);
         """.format(self.schema)
         delete_sql = """
         DELETE from {}.clovers 
-        WHERE logtime::date <= (now() - '3 days'::interval);
+        WHERE logtime::date <= (now() - '30 days'::interval);
         """.format(self.schema)
         records = await self.pool.fetch(sql)
         await self.pool.execute(delete_sql)
