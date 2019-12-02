@@ -1,17 +1,19 @@
 """
 This cog will create messages that will manage channel perms with reacts.
 """
-import discord
-import datetime
-from asyncpg.exceptions import UniqueViolationError
 from collections import defaultdict
-from .utils import helpers, checks
+import datetime
+
+from asyncpg.exceptions import UniqueViolationError
+import discord
 from discord.ext import commands
+
+from .utils import helpers, checks
+from .utils.functions import add_perms, remove_perms
 
 
 class Channels(commands.Cog):
-    """
-    """
+    """Commands for the channel message functionality."""
 
     def __init__(self, bot):
         super().__init__()
@@ -293,7 +295,7 @@ class Channels(commands.Cog):
                 f'**{time} | REACTION SPAM:** {user} has reacted {reacts} '\
                 f'times today on the permission message for #{channel}'
             )
-        await self.add_perms(user, channel)
+        await add_perms(self.bot, user, channel)
         await self.bot.pg_controller.add_user_chanreact(payload.user_id, payload.channel_id, payload.message_id, target_channel)
 
     @commands.Cog.listener()
@@ -310,23 +312,6 @@ class Channels(commands.Cog):
         user = self.bot.get_user(payload.user_id)
         if user.bot:
             return
-        await self.remove_perms(user, channel)
+        await remove_perms(self.bot, user, channel)
         await self.bot.pg_controller.rm_user_chanreact(payload.user_id, target_channel, payload.channel_id)
 
-    async def add_perms(self, user, channel):
-        """
-        Adds a user to channels perms
-        """
-        try:
-            await channel.set_permissions(user, read_messages=True)
-        except Exception as e:
-            self.bot.logger.warning(f'{e}')
-
-    async def remove_perms(self, user, channel):
-        """
-        removes a users perms on a channel
-        """
-        try:
-            await channel.set_permissions(user, read_messages=False)
-        except Exception as e:
-            self.bot.logger.warning(f'{e}')

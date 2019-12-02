@@ -2,13 +2,18 @@
 This cog is to be used primarily for small janitorial tasks
 (removing clover once member is hit, pruning clovers)
 """
+import warnings
+warnings.filterwarnings("ignore")
+from datetime import datetime, timedelta
+
+import asyncio
 import discord
 from discord import AuditLogAction
 from discord.ext import commands
-from .utils import checks
+
+from .utils import checks, helpers
 from .utils.enums import Change
-from datetime import datetime, timedelta
-import asyncio
+from .utils.functions import plot_leaderboard
 
 
 class Janitor(commands.Cog):
@@ -23,6 +28,7 @@ class Janitor(commands.Cog):
         #     # self.bg_task = self.bot.loop.create_task(self.daily_prune())
         # except Exception as e:
         #     self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
+    # TODO: Pretty much all of these need to be abstracted
 
     def remove_clover(self, member) -> list:
         member_roles = member.roles.copy()
@@ -73,6 +79,7 @@ class Janitor(commands.Cog):
         has_permrole = False
         has_adv_role = False
         member_roles = message.author.roles
+        # TODO: This can be sped up
         for index, role in enumerate(member_roles):
             if role.name.lower() == 'clover':
                 has_clover = True
@@ -295,6 +302,33 @@ class Janitor(commands.Cog):
         """
         help? lmao bruh thats it. just run it at the end of the month and u good
         """
+        try:
+            confirm = await helpers.custom_confirm(
+                ctx,
+                f'```Begin the clearing of all exp roles. This may take a long time.```'
+            )
+            if not confirm:
+                return
+        except Exception:
+            return
+        plot = await plot_leaderboard(self.bot, ctx)
+        if not plot:
+            return
+        try:
+            fname = f'{plot}.pdf'
+            f = open(fname, 'rb')
+            await ctx.send(file=discord.File(f, filename=fname))
+            f.close()
+        except Exception:
+            try:
+                fname = f'{plot}.pickle'
+                f = open(fname, 'rb')
+                await ctx.send(file=discord.File(f, filename=fname))
+                f.close()
+            except Exception as e:
+                self.bot.logger.warn(e)
+                return
+        return
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
         color_roles = ['-2-', '-5-', '-10-', '-15-', '-20-', '-25-']
         all_roles = ctx.channel.guild.roles

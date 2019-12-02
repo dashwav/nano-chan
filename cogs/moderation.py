@@ -6,7 +6,7 @@ import discord
 from discord import HTTPException
 from discord.ext import commands
 from .utils import helpers, checks
-from .utils.functions import GeneralMember, extract_id
+from .utils.functions import GeneralMember, extract_id, remove_perms, add_perms
 
 
 class ActionReason(commands.Converter):
@@ -27,6 +27,66 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
+
+    @commands.command(aliases=['pinclear', 'removepins'])
+    @checks.has_permissions(manage_channels=True)
+    @commands.guild_only()
+    async def clearpins(self, ctx):
+        """Clear all the pins from the current channel."""
+        try:
+            confirm = await helpers.custom_confirm(
+                ctx,
+                f'```Clear all pins from current channel.```'
+            )
+            if not confirm:
+                return
+        except Exception:
+            return
+        try:
+            messages = await ctx.channel.pins()
+            for m in messages:
+                await m.unpin()
+            await ctx.message.add_reaction(r'✅')
+        except Exception as e:
+            self.bot.logger.warn(f'Unable to remove pins: {e}')
+            await ctx.message.add_reaction(r'❌')
+
+
+    @commands.command(aliases=['message', 'dm', 'pm'])
+    @checks.has_permissions(manage_roles=True)
+    @commands.guild_only()
+    async def privatemessage(self, ctx, member: GeneralMember, *, content: str):
+        """Respond to a user via yinbot.
+        """
+        try:
+            message = ctx.message
+            await member.create_dm()
+            channel = member.dm_channel
+        except Exception as e:
+            self.bot.logger.warn(f'Unable to PM user: {e}')
+            await ctx.message.add_reaction(r'❌')
+            return 
+        desc = ''
+        if message.attachments:
+            for f in message.attachments:
+                desc += f'{f.url}\n'
+
+        local_embed = discord.Embed(
+            title=f'Message to {member.mention} from the staff team',
+            description=content
+        )
+        if desc:
+            local_embed.add_field(
+                name='Attachments',
+                value=f'{desc}',
+                inline=True
+            )
+        try:
+            pm = await channel.send(embed=local_embed)
+            await ctx.message.add_reaction(r'✅')
+        except Exception:
+            await ctx.send(f'Unable to PM user: {e}', delete_after=5)
+            await ctx.message.add_reaction(r'❌')
 
     @commands.command()
     @checks.has_permissions(manage_messages=True)
@@ -81,7 +141,7 @@ class Moderation(commands.Cog):
             for target_channel in r:
                 try:
                     target_channel = self.bot.get_channel(target_channel)
-                    await self.remove_perms(member, target_channel)
+                    await remove_perms(self.bot, member, target_channel)
                     removed_from_channels.append(target_channel.name)
                 except (HTTPException, AttributeError) as e:
                     self.bot.logger.warning(f'Error removing user from channel!: {target_channel} {e}')  # noqa
@@ -118,7 +178,7 @@ class Moderation(commands.Cog):
             for target_channel in r:
                 try:
                     target_channel = self.bot.get_channel(target_channel)
-                    await self.add_perms(member, target_channel)
+                    await add_perms(self.bot, member, target_channel)
                     removed_from_channels.append(target_channel.name)
                 except (HTTPException, AttributeError) as e:
                     self.bot.logger.warning(f'Error adding user to channel!: {target_channel} {e}')  # noqa
@@ -131,24 +191,6 @@ class Moderation(commands.Cog):
         ret = ', '.join(removed_from_channels)
         reply += f'**User: {member.name}#{member.discriminator}: **Successfully added to channels: ``` {ret}```'  # noqa
         await ctx.send(f'**{time}** | {reply}')
-
-    async def add_perms(self, user, channel):
-        """
-        Adds a user to channels perms
-        """
-        try:
-            await channel.set_permissions(user, read_messages=True)
-        except Exception as e:
-            self.bot.logger.warning(f'{e}')
-
-    async def remove_perms(self, user, channel):
-        """
-        removes a users perms on a channel
-        """
-        try:
-            await channel.set_permissions(user, read_messages=False)
-        except Exception as e:
-            self.bot.logger.warning(f'{e}')
 
     """
     BLACKLIST
