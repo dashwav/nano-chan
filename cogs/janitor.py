@@ -295,6 +295,15 @@ class Janitor(commands.Cog):
         """
         help? lmao bruh thats it. just run it at the end of the month and u good
         """
+        try:
+            confirm = await helpers.custom_confirm(
+                ctx,
+                f'```Begin the clearing of all exp roles. This may take a long time.```'
+            )
+            if not confirm:
+                return
+        except Exception:
+            return
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
         color_roles = ['-2-', '-5-', '-10-', '-15-', '-20-', '-25-']
         all_roles = ctx.channel.guild.roles
