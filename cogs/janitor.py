@@ -19,10 +19,10 @@ class Janitor(commands.Cog):
         super().__init__()
         self.bot = bot
         self.owner = None
-        # try:
-        #     # self.bg_task = self.bot.loop.create_task(self.daily_prune())
-        # except Exception as e:
-        #     self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
+        try:
+            self.bg_task = self.bot.loop.create_task(self.daily_prune())
+        except Exception as e:
+            self.bot.logger.warning(f'Error starting task prune_clovers: {e}')
 
     def remove_clover(self, member) -> list:
         member_roles = member.roles.copy()
