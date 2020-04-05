@@ -327,6 +327,6 @@ class Channels(commands.Cog):
         removes a users perms on a channel
         """
         try:
-            await channel.set_permissions(user, read_messages=False)
+            await channel.set_permissions(user, read_messages=None)
         except Exception as e:
             self.bot.logger.warning(f'{e}')
