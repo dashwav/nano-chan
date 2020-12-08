@@ -42,7 +42,9 @@ class Nanochan(Bot):
         self.logger = logger
         self.chanreact = chanreact
         self.blglobal = blacklist
-        super().__init__('-')
+        intents = discord.Intents.default()
+        intents.members = True
+        super().__init__(command_prefix='-', intents=intents)
 
     @staticmethod
     def _record_to_dict(rec) -> dict:
