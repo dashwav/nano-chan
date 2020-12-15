@@ -296,7 +296,7 @@ class Janitor(commands.Cog):
         help? lmao bruh thats it. just run it at the end of the month and u good
         """
         roles_to_wipe = ['member', 'active', 'regular', 'contributor', 'addicted', 'insomniac', 'no-lifer']
-        color_roles = ['-2-', '-5-', '-10-', '-15-', '-20-', '-25-']
+        color_roles = ['-2-', '-3-', '-5-', '-10-', '-15-', '-20-']
         all_roles = ctx.channel.guild.roles
         local_embed = discord.Embed(
             title=f'Resetting Roles...',
